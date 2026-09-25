@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download, Play, Sparkles, Trash2 } from "lucide-react";
+import { Download, Play, Plug, Search, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -10,13 +10,18 @@ import { RunDialog, type RunTarget } from "@/components/agents/run-dialog";
 import type { CustomAgent } from "@/lib/playground-types";
 
 const KNOWLEDGE = [{ id: "policies", label: "Company policies" }, { id: "learning_refs", label: "Learning references" }];
+type Option = { id: string; name: string; hint?: string };
+const EMPTY_FORM = { name: "", description: "", instructions: "", knowledge: [] as string[], skills: [] as string[], tools: [] as string[], starters: ["", "", ""], published: true };
 
-/** The six Copilot Studio fields: name, description, instructions, knowledge, starter prompts, publish. */
-export function AgentWizard({ initial, ownerId }: { initial: CustomAgent[]; ownerId: string }) {
+/** The six Copilot Studio fields plus skills and connectors: name, description, instructions, knowledge, skills, tools, starter prompts, publish. */
+export function AgentWizard({ initial, ownerId, skills = [], connectors = [], spaces = [], presetSkill }: { initial: CustomAgent[]; ownerId: string; skills?: Option[]; connectors?: Option[]; spaces?: Option[]; presetSkill?: string }) {
   const router = useRouter();
   const [agents, setAgents] = useState(initial);
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", description: "", instructions: "", knowledge: [] as string[], starters: ["", "", ""], published: true });
+  const [open, setOpen] = useState(Boolean(presetSkill));
+  const [form, setForm] = useState({ ...EMPTY_FORM, skills: presetSkill && skills.some((s) => s.id === presetSkill) ? [presetSkill] : [] });
+  const [skillQuery, setSkillQuery] = useState("");
+  const toggle = (key: "knowledge" | "skills" | "tools", id: string, on: boolean) => setForm((f) => ({ ...f, [key]: on ? [...f[key], id] : f[key].filter((x) => x !== id) }));
+  const shownSkills = skills.filter((s) => form.skills.includes(s.id) || !skillQuery || `${s.name} ${s.hint ?? ""}`.toLowerCase().includes(skillQuery.toLowerCase())).slice(0, 14);
   const [saving, setSaving] = useState(false);
   const [runTarget, setRunTarget] = useState<RunTarget | null>(null);
 
@@ -30,7 +35,7 @@ export function AgentWizard({ initial, ownerId }: { initial: CustomAgent[]; owne
     const created = (await res.json()) as CustomAgent;
     setAgents((a) => [created, ...a]);
     setOpen(false);
-    setForm({ name: "", description: "", instructions: "", knowledge: [], starters: ["", "", ""], published: true });
+    setForm(EMPTY_FORM);
     toast.success(`${created.name} is ready to run`);
     router.refresh();
   };
@@ -55,7 +60,7 @@ export function AgentWizard({ initial, ownerId }: { initial: CustomAgent[]; owne
           <article key={a.id} className="card-hover flex flex-col rounded-2xl border bg-card p-4" aria-label={a.name}>
             <div className="flex items-center justify-between">
               <span className="rounded-md bg-brand-emerald/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-300">{a.published ? "Published" : "Private"}</span>
-              <span className="font-mono text-[10px] text-muted-foreground">{a.knowledge.length ? `knowledge: ${a.knowledge.join(", ")}` : "no knowledge"}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">{[a.knowledge.length ? `${a.knowledge.length} knowledge` : "", a.skills?.length ? `${a.skills.length} skills` : "", a.tools?.length ? `${a.tools.length} tools` : ""].filter(Boolean).join(" · ") || "instructions only"}</span>
             </div>
             <h3 className="mt-2 text-base font-semibold">{a.name}</h3>
             <p className="mt-1 flex-1 text-sm text-muted-foreground">{a.description}</p>
@@ -69,7 +74,7 @@ export function AgentWizard({ initial, ownerId }: { initial: CustomAgent[]; owne
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Create your own agent</DialogTitle>
             <DialogDescription>The same six things Copilot Studio asks for. It runs here under your model policy and budget, and exports as a declarative agent manifest.</DialogDescription>
@@ -82,7 +87,29 @@ export function AgentWizard({ initial, ownerId }: { initial: CustomAgent[]; owne
               <p>Knowledge</p>
               <div className="mt-1 flex flex-wrap gap-2">
                 {KNOWLEDGE.map((k) => (
-                  <label key={k.id} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" className="accent-[var(--brand-violet)]" checked={form.knowledge.includes(k.id)} onChange={(e) => setForm({ ...form, knowledge: e.target.checked ? [...form.knowledge, k.id] : form.knowledge.filter((x) => x !== k.id) })} aria-label={k.label} /> {k.label}</label>
+                  <label key={k.id} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" className="accent-[var(--brand-violet)]" checked={form.knowledge.includes(k.id)} onChange={(e) => toggle("knowledge", k.id, e.target.checked)} aria-label={k.label} /> {k.label}</label>
+                ))}
+                {spaces.map((s) => (
+                  <label key={s.id} className="flex items-center gap-1.5 rounded-lg border border-brand-violet/40 px-2 py-1"><input type="checkbox" className="accent-[var(--brand-violet)]" checked={form.knowledge.includes(`space:${s.id}`)} onChange={(e) => toggle("knowledge", `space:${s.id}`, e.target.checked)} aria-label={`Knowledge Space ${s.name}`} /> {s.name}</label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between"><p>Skills <span className="text-muted-foreground">({form.skills.length} attached)</span></p>
+                <label className="relative"><Search className="pointer-events-none absolute left-2 top-1.5 size-3 text-muted-foreground" /><input value={skillQuery} onChange={(e) => setSkillQuery(e.target.value)} aria-label="Search skills to attach" placeholder="Search skills" className="h-7 w-44 rounded-lg border bg-background pl-6 pr-2 text-xs" /></label>
+              </div>
+              <div className="mt-1 flex flex-wrap gap-2" data-testid="skill-picker">
+                {shownSkills.map((s) => (
+                  <label key={s.id} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" className="accent-[var(--brand-violet)]" checked={form.skills.includes(s.id)} onChange={(e) => toggle("skills", s.id, e.target.checked)} aria-label={`Skill ${s.name}`} /> {s.name}</label>
+                ))}
+                {shownSkills.length === 0 && <span className="text-muted-foreground">No skills match.</span>}
+              </div>
+            </div>
+            <div>
+              <p>Connectors <span className="text-muted-foreground">(approved MCP servers become tools)</span></p>
+              <div className="mt-1 flex flex-wrap gap-2" data-testid="connector-picker">
+                {connectors.map((c) => (
+                  <label key={c.id} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" className="accent-[var(--brand-violet)]" checked={form.tools.includes(c.id)} onChange={(e) => toggle("tools", c.id, e.target.checked)} aria-label={`Connector ${c.name}`} /> <Plug className="size-3 text-brand-violet-soft" /> {c.name}</label>
                 ))}
               </div>
             </div>

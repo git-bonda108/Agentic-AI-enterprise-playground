@@ -22,6 +22,9 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 | From playground to production | Any blueprint renders into an OpenAI Agents SDK, LangGraph, CrewAI, Microsoft Agent Framework or Google ADK project, with deploy scripts for Azure AI Foundry, Anthropic Managed Agents, AWS AgentCore and Google Agent Engine. |
 | Notebooks | Every run, conversation and blueprint opens as a Jupyter notebook in the browser, with a metered server sandbox for real packages. |
 | Low-code path | A six-field wizard that creates an agent and exports a Microsoft 365 declarative agent manifest for Copilot Studio. |
+| Connectors | A governed snapshot of the official MCP registry with admin approval, live connection tests, and the playground itself exposed as an MCP server for Claude Desktop, Cursor and VS Code. |
+| Knowledge | Knowledge Spaces over documents, pages, datasets and repositories with hybrid retrieval, cited answers, and a code map drawn as a graph. |
+| Skills | 338 SKILL.md packs, searchable and attachable to any agent, shipped with every generated project. |
 
 ## What is in the box
 
@@ -30,8 +33,8 @@ The application is organised into seven sections, laid out the way a cloud conso
 | Section | Pages | Status |
 | --- | --- | --- |
 | Home | Console with credits, spend, tokens, models used and a live ledger | Live |
-| Discover | Models, Blueprints, Frameworks, Clouds, Connectors, Skills | Models to Clouds live; Connectors and Skills in Batch 6 |
-| Build | Playground, Agent Hub, Notebooks, Knowledge, Data | Playground, Agent Hub, Notebooks and Data live; Knowledge in Batch 6 |
+| Discover | Models, Blueprints, Frameworks, Clouds, Connectors, Skills | Live |
+| Build | Playground, Agent Hub, Notebooks, Knowledge, Data | Live |
 | Evaluate | Evals, Canary | Batch 7 |
 | Operate | Runs, Traces, Cost, Adoption | Runs and Cost live; Adoption in Batch 8 |
 | Community | Showcase, Challenges, Leaderboard | Batch 8 |
@@ -116,4 +119,4 @@ The catalog includes agent definitions imported from public repositories, each s
 
 ## Roadmap
 
-Batches 6 to 9 add connectors from the official MCP registry, Knowledge Spaces with vector retrieval, a skills library, evaluation harnesses and nightly canaries, community features and adoption analytics, and the Azure deployment templates. The plan for each batch is in [docs/BATCHES.md](docs/BATCHES.md).
+Batches 7 to 9 add evaluation harnesses and nightly canaries, community features and adoption analytics, and the Azure deployment templates. The plan for each batch is in [docs/BATCHES.md](docs/BATCHES.md).

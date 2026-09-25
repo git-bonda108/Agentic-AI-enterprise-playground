@@ -86,6 +86,51 @@ All routes require the internal key and identity headers, which the web applicat
 | DELETE | `/v1/custom-agents/{id}` | Remove one of your agents |
 | GET | `/v1/custom-agents/{id}/export/declarative-agent` | Microsoft 365 declarative agent manifest |
 
+## Connectors
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/connectors` | Registry snapshot with `q`, `category`, `transport`, `approval`, `publisher` filters and paging |
+| GET | `/v1/connectors/stats` | Totals by approval, transport and category |
+| POST | `/v1/connectors/sync` | Incremental sync from the official registry (admin) |
+| GET | `/v1/connectors/{id}` | One connector with its client configuration |
+| POST | `/v1/connectors/{id}/approval` | Approve, block or reset a connector (admin) |
+| POST | `/v1/connectors/{id}/probe` | Connect to a remote server and list its tools |
+| POST | `/v1/connectors/{id}/call` | Call one tool on an approved remote server |
+
+## MCP server and tokens
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/mcp` | The playground as an MCP server (JSON-RPC over HTTP): `initialize`, `ping`, `tools/list`, `tools/call` |
+| GET, POST | `/v1/tokens` | Personal access tokens for external MCP clients; the value is returned once |
+| DELETE | `/v1/tokens/{id}` | Revoke a token |
+
+## Knowledge Spaces
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/knowledge/embedding-models` | Embedding models with price and availability |
+| GET, POST | `/v1/knowledge/spaces` | Visible spaces; create one |
+| GET, DELETE | `/v1/knowledge/spaces/{id}` | Space with documents; delete |
+| POST | `/v1/knowledge/spaces/{id}/documents/text` | Add pasted text |
+| POST | `/v1/knowledge/spaces/{id}/documents/file` | Add a file (base64) in PDF, Word, Markdown, text, CSV, JSON or HTML |
+| POST | `/v1/knowledge/spaces/{id}/documents/url` | Add a web page |
+| POST | `/v1/knowledge/spaces/{id}/documents/dataset` | Add a mock dataset, one chunk per record |
+| POST | `/v1/knowledge/spaces/{id}/documents/repo` | Map a repository into a graph and chunks |
+| DELETE | `/v1/knowledge/spaces/{id}/documents/{doc}` | Remove a document |
+| GET | `/v1/knowledge/spaces/{id}/graph` | Merged graph of mapped repositories |
+| POST | `/v1/knowledge/spaces/{id}/search` | Hybrid search |
+| POST | `/v1/knowledge/spaces/{id}/ask` | Grounded answer through the Knowledge Q&A blueprint |
+
+## Skills
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/skills` | Skills with `q`, `source`, `category` filters |
+| GET | `/v1/skills/stats` | Totals by category and source |
+| GET | `/v1/skills/{id}` | One skill with its full body |
+
 ## Error conventions
 
 | Status | Meaning |

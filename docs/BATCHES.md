@@ -10,7 +10,7 @@ The playground is built in ten batches. A batch is complete when its pages are l
 | 3 | Blueprint runtime and the first six blueprints | Done |
 | 4 | Catalog import and Discover | Done |
 | 5 | Notebooks, framework flavors, cloud deploy, no-code wizard | Done |
-| 6 | Connectors, Knowledge Spaces, skills | In progress |
+| 6 | Connectors, Knowledge Spaces, skills, the playground as an MCP server | Done |
 | 7 | Evaluate, canary, hardening levels | Planned |
 | 8 | Community, engagement, adoption analytics | Planned |
 | 9 | Azure templates, CI, demo seed, security pass | Planned |
@@ -43,7 +43,15 @@ Verification at close: 52 API tests, 26 end-to-end tests, strict types and lint 
 
 ## Batch 6: connectors, knowledge, skills
 
-Scope: connectors synchronised from the official MCP registry with admin approval and live connection tests; the playground itself exposed as an MCP server; Knowledge Spaces with chunking, embeddings, hybrid search and grounded answers; a repository mapper that turns code into a navigable graph; a skills library imported from public SKILL.md packs, attachable to any agent; wizard and framework exports updated to carry connectors, knowledge and skills.
+Connectors: a committed snapshot of the official MCP registry (7,547 servers kept out of 36,000, filtered to complete, active entries plus well-known publishers) seeded into the database, with incremental admin sync, categories, approval workflow (pending, approved, blocked), a real MCP client that tests any remote server and lists its tools, and client configuration snippets. The playground is itself an MCP server: five tools (models, usage, blueprints, run a blueprint, search knowledge) behind personal access tokens, so Claude Desktop, Cursor or VS Code can drive it as a specific person under that person's policy and budget.
+
+Knowledge Spaces: private, department or organisation-wide corpora with a chosen embedding model (local hashed vectors at no cost, or OpenAI and Gemini embeddings with their published prices), ingestion from pasted text, PDF, Word, Markdown, CSV, JSON, HTML, web pages, mock datasets and repositories, hybrid retrieval (cosine plus BM25 fused by reciprocal rank), and grounded answers through the Knowledge Q&A blueprint with every citation verified. Embeddings are metered on the ledger as their own feature.
+
+Repository mapper: Python by syntax tree, TypeScript and JavaScript by pattern, Markdown by heading, into a graph of files, classes, functions, imports and calls with communities from label propagation, drawn as a force-directed map in the browser and searchable chunk by chunk. Local paths are limited to allowed roots; GitHub URLs are cloned shallowly.
+
+Skills: 338 SKILL.md packs imported from everything-claude-code and ruflo with source and licence, categorised and searchable, attachable in the wizard. Attached skills join the system prompt at run time, ship as files in every generated framework project, and fold into the Copilot Studio manifest. Wizard agents can also call tools from approved connectors in a single tool round, and retrieve from Knowledge Spaces.
+
+Verification at close: 64 API tests, 30 end-to-end tests, strict types, lint clean.
 
 ## Batch 7: evaluate
 

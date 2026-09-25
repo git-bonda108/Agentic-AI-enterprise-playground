@@ -163,4 +163,24 @@ export type CatalogStats = { total: number; by_family: Record<string, number>; g
 
 export type FrameworkInfo = { id: string; name: string; install: string; docs: string; license: string; hosted: string; language: string };
 export type CloudInfo = { id: string; name: string; runtime: string; pricing: string; pricing_url: string; docs: string; prereq: string };
-export type CustomAgent = { id: string; name: string; description: string; instructions: string; knowledge: string[]; tools: string[]; starters: string[]; published: boolean; owner_id: string; created_at: string };
+export type CustomAgent = { id: string; name: string; description: string; instructions: string; knowledge: string[]; tools: string[]; skills: string[]; starters: string[]; published: boolean; owner_id: string; created_at: string };
+
+export type Connector = {
+  id: string; title: string; description: string; version: string; publisher: string; category: string;
+  transport: string; remote_url: string; package: { registry: string; identifier: string; version: string; transport: string } | null;
+  env_vars: string[]; repo_url: string; website: string; status: string; approval: "pending" | "approved" | "blocked";
+  approved_by: string | null; approval_note: string; signals: number; registry_updated_at: string; install: Record<string, unknown>;
+};
+export type ConnectorStats = { total: number; by_approval: Record<string, number>; by_transport: Record<string, number>; by_category: Record<string, number>; categories: string[]; registry_newest: string | null };
+export type ProbeResult = { ok: boolean; server: { name?: string; version?: string }; protocol: string; tools: { name: string; description: string; input_schema: Record<string, unknown> }[]; tool_count: number; latency_ms: number; auth_required: boolean; error: string | null };
+
+export type Skill = { id: string; name: string; description: string; source: { repo: string; path: string; license: string; url: string; title: string }; category: string; tags: string[]; words: number; preview: string; body?: string; body_truncated: boolean };
+export type SkillStats = { total: number; by_category: Record<string, number>; by_source: Record<string, number> };
+
+export type KnowledgeSpace = { id: string; name: string; description: string; visibility: "private" | "department" | "org"; department: string; embedding_model: string; embedding_name: string; doc_count: number; chunk_count: number; owner_id: string; owner_name: string | null; created_at: string; updated_at: string };
+export type KnowledgeDocument = { id: string; space_id: string; title: string; source_type: string; source_ref: string; bytes: number; chunk_count: number; tokens: number; cost_usd: number; has_graph: boolean; created_at: string };
+export type SearchHit = { chunk_id: string; doc_id: string; title: string; source_type: string; ordinal: number; text: string; meta: Record<string, unknown>; score: number; dense: number; sparse: number; cite: string };
+export type GraphNode = { id: string; label: string; kind: string; file: string; line: number; degree: number; community: number; doc_id?: string };
+export type GraphEdge = { source: string; target: string; kind: string };
+export type EmbeddingModel = { id: string; name: string; provider: string; dims: number; price_per_m: number; note: string; available: boolean };
+export type ApiTokenInfo = { id: string; name: string; prefix: string; created_at: string; last_used_at: string | null };

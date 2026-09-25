@@ -1,6 +1,8 @@
 """Streaming completions through LiteLLM, with a deterministic fake provider for tests."""
 
 import asyncio
+import json
+import re
 import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
@@ -100,6 +102,53 @@ def _fake_complete(model_id: str, messages: list[dict]) -> tuple[str, Usage]:
     tokens_in = max(8, sum(len(m["content"]) for m in messages) // 4)
     tokens_out = max(4, len(text) // 4)
     return text, Usage(tokens_in, tokens_out, 0, estimate_cost(model_id, tokens_in, tokens_out), 5)
+
+
+def _fake_tool_calls(messages: list[dict], tools: list[dict]) -> list[dict]:
+    """Pick the tool whose name shares a word with the request; fill required string arguments with the request text."""
+    last_user = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
+    words = set(re.findall(r"[a-z]+", last_user.lower()))
+    for t in tools:
+        fn = t.get("function", t)
+        name = fn.get("name", "")
+        if set(name.lower().replace("-", "_").split("_")) & words:
+            schema = fn.get("parameters") or {}
+            args = {k: (last_user[:200] if (v or {}).get("type") == "string" else 5) for k, v in (schema.get("properties") or {}).items() if k in (schema.get("required") or [])}
+            return [{"id": "call_fake_1", "name": name, "arguments": args}]
+    return []
+
+
+def complete_with_tools(model_id: str, messages: list[dict], tools: list[dict], max_tokens: int = 1500, temperature: float = 0.2) -> tuple[str, list[dict], Usage]:
+    """One model turn that may request tool calls. Returns (text, tool_calls, usage); tool_calls carry parsed JSON arguments."""
+    if settings.fake_llm:
+        calls = _fake_tool_calls(messages, tools)
+        text, usage = _fake_complete(model_id, messages)
+        return ("" if calls else text), calls, usage
+    import litellm
+
+    spec = get_model(model_id)
+    if spec is None:
+        raise ProviderError(f"Unknown model '{model_id}'")
+    if not spec.available():
+        raise ProviderError(f"{spec.provider} is not configured. Set {spec.env_key} to enable {spec.name}.")
+    litellm.drop_params = True
+    started = time.perf_counter()
+    try:
+        response = litellm.completion(model=spec.litellm_model, messages=messages, tools=tools, tool_choice="auto", max_tokens=max_tokens, temperature=temperature)
+    except Exception as exc:
+        raise ProviderError(str(exc)[:500]) from exc
+    msg = response.choices[0].message
+    calls = []
+    for tc in getattr(msg, "tool_calls", None) or []:
+        try:
+            args = json.loads(tc.function.arguments or "{}")
+        except json.JSONDecodeError:
+            args = {}
+        calls.append({"id": tc.id, "name": tc.function.name, "arguments": args})
+    usage = getattr(response, "usage", None)
+    tokens_in = int(getattr(usage, "prompt_tokens", 0) or 0)
+    tokens_out = int(getattr(usage, "completion_tokens", 0) or 0)
+    return (msg.content or ""), calls, Usage(tokens_in, tokens_out, 0, estimate_cost(model_id, tokens_in, tokens_out), int((time.perf_counter() - started) * 1000))
 
 
 def complete(model_id: str, messages: list[dict], max_tokens: int = 2048, temperature: float = 0.2) -> tuple[str, Usage]:

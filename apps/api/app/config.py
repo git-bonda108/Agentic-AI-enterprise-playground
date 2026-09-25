@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     sandbox_endpoint: str = ""
     # Where the sandbox reaches this API from (notebooks call back into the playground).
     self_url: str = "http://localhost:8000"
+    # Extra local directories the repository mapper may read, comma separated. The repo root is always allowed.
+    repo_roots: str = ""
 
 
 settings = Settings()

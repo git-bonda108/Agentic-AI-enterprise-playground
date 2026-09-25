@@ -31,6 +31,7 @@ from app.notebooks import (
 )
 from app.router import SMART, route
 from app.routers.runs import _payload as run_payload
+from app.skills import skill_prompt
 
 router = APIRouter(tags=["faces"])
 IPYNB = "application/x-ipynb+json"
@@ -175,13 +176,14 @@ class CustomAgentBody(BaseModel):
     description: str = Field(min_length=5, max_length=400)
     instructions: str = Field(min_length=20, max_length=8000)
     knowledge: list[str] = Field(default_factory=list)
-    tools: list[str] = Field(default_factory=list)
+    tools: list[str] = Field(default_factory=list)  # approved connector ids
+    skills: list[str] = Field(default_factory=list)
     starters: list[str] = Field(default_factory=list)
     published: bool = False
 
 
 def _custom_payload(a: CustomAgent) -> dict:
-    return {"id": a.id, "name": a.name, "description": a.description, "instructions": a.instructions, "knowledge": a.knowledge or [], "tools": a.tools or [], "starters": a.starters or [], "published": a.published, "owner_id": a.user_id, "created_at": a.created_at.isoformat()}
+    return {"id": a.id, "name": a.name, "description": a.description, "instructions": a.instructions, "knowledge": a.knowledge or [], "tools": a.tools or [], "skills": a.skills or [], "starters": a.starters or [], "published": a.published, "owner_id": a.user_id, "created_at": a.created_at.isoformat()}
 
 
 @router.get("/v1/custom-agents")
@@ -218,7 +220,7 @@ def export_declarative(agent_id: str, user: User = Depends(current_user), db: Se
         "version": "v1.5",
         "name": a.name[:100],
         "description": a.description[:1000],
-        "instructions": a.instructions[:8000],
+        "instructions": (a.instructions + ("\n\n" + skill_prompt(a.skills or [], max_chars=3000) if a.skills else ""))[:8000],
         "conversation_starters": [{"title": s[:50], "text": s[:200]} for s in (a.starters or [])[:6]],
         "capabilities": ([{"name": "OneDriveAndSharePoint", "items_by_url": []}] if a.knowledge else []),
     }

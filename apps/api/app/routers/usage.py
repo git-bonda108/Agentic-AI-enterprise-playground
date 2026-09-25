@@ -15,6 +15,11 @@ router = APIRouter(prefix="/v1/usage", tags=["usage"])
 @router.get("/summary")
 def usage_summary(days: int = Query(default=7, ge=1, le=90), user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     """Organization-level summary for the console. Admins and champions see everyone; others see themselves."""
+    return summary_for(db, user, days)
+
+
+def summary_for(db: Session, user: User, days: int) -> dict:
+    """The summary as a plain function so the MCP server and notebooks can reuse it."""
     now = datetime.now(UTC)
     since = now - timedelta(days=days)
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)

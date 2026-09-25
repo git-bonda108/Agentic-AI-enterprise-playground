@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Check, ExternalLink, KeyRound } from "lucide-react";
 import { apiGet } from "@/lib/api-server";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { TokensPanel } from "@/components/admin/tokens-panel";
+import type { ApiTokenInfo } from "@/lib/playground-types";
 
 export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -9,7 +11,7 @@ export const dynamic = "force-dynamic";
 type SettingsData = { environment: string; fake_llm: boolean; database: string; org_credits_usd: number; providers: { provider: string; env_key: string; configured: boolean; models: number; docs_url: string }[] };
 
 export default async function AdminSettingsPage() {
-  const data = await apiGet<SettingsData>("/v1/admin/settings");
+  const [data, tokens] = await Promise.all([apiGet<SettingsData>("/v1/admin/settings"), apiGet<{ tokens: ApiTokenInfo[]; mcp_url: string }>("/v1/tokens")]);
   return (
     <AdminShell title="Settings" blurb="Provider keys, environment and runtime. Keys are read from the API's environment, never stored in the database." active="/admin/settings">
       {!data ? <p className="text-sm text-muted-foreground">API unreachable.</p> : (
@@ -42,6 +44,7 @@ export default async function AdminSettingsPage() {
             </dl>
             <p className="mt-4 text-muted-foreground">Identity comes from Entra ID when the AUTH_MICROSOFT_ENTRA_ID variables are set; seeded users are for development only.</p>
           </section>
+          <div className="lg:col-span-2"><TokensPanel initial={tokens?.tokens ?? []} mcpUrl={tokens?.mcp_url ?? "/mcp"} /></div>
         </div>
       )}
     </AdminShell>

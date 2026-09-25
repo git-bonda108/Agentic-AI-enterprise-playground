@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.agents import registry as _registry  # noqa: F401  (registers blueprints)
 from app.config import settings
+from app.connectors import seed_connectors
 from app.curator import ensure_curated
 from app.db import SessionLocal, init_db
 from app.governance import seed_defaults
@@ -13,11 +14,15 @@ from app.routers import (
     blueprints,
     catalog,
     chat,
+    connectors,
     conversations,
     faces,
+    knowledge,
+    mcp,
     models,
     route,
     runs,
+    skills,
     usage,
 )
 
@@ -27,11 +32,12 @@ async def lifespan(_: FastAPI):
     init_db()
     with SessionLocal() as db:
         seed_defaults(db)
+        seed_connectors(db)
     ensure_curated()
     yield
 
 
-app = FastAPI(title=settings.app_name, version="0.6.0", lifespan=lifespan)
+app = FastAPI(title=settings.app_name, version="0.7.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -51,6 +57,10 @@ app.include_router(blueprints.data_router)
 app.include_router(runs.router)
 app.include_router(catalog.router)
 app.include_router(faces.router)
+app.include_router(connectors.router)
+app.include_router(knowledge.router)
+app.include_router(skills.router)
+app.include_router(mcp.router)
 
 
 @app.get("/health")
@@ -64,6 +74,6 @@ def meta() -> dict[str, object]:
     return {
         "app": settings.app_name,
         "version": app.version,
-        "batch": 5,
+        "batch": 6,
         "sections": ["home", "discover", "build", "evaluate", "operate", "community", "admin"],
     }

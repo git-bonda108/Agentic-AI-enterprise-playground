@@ -41,6 +41,8 @@ FastAPI with SQLAlchemy 2. Responsibilities, in the order a request meets them:
 6. **Ledger.** One `usage_events` row per call with feature (`chat`, `compare`, `agent`, `notebook`), model, tokens in, out and cached, cost, latency, routing decision, run and blueprint identifiers.
 7. **Agent runtime.** LangGraph graphs with a SQLite checkpointer. Runs execute on background threads, interrupt for human review, and resume after a process restart because state lives in the checkpoint store, not in memory.
 8. **Faces.** The ways a blueprint leaves the playground: notebooks, framework projects, cloud deploy scripts and the declarative agent manifest.
+9. **Connectors and the MCP server.** A snapshot of the official MCP registry with an approval workflow, a streamable-HTTP MCP client for probes and tool calls, and the playground's own MCP endpoint behind personal tokens.
+10. **Knowledge.** Chunking, embeddings (local or provider), hybrid retrieval and the repository mapper, all metered as feature `knowledge`.
 
 ### 2.3 Data model
 

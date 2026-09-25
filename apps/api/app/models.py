@@ -146,6 +146,7 @@ class CustomAgent(Base):
     instructions: Mapped[str] = mapped_column(Text)
     knowledge: Mapped[list[str]] = mapped_column(JSON, default=list)
     tools: Mapped[list[str]] = mapped_column(JSON, default=list)
+    skills: Mapped[list[str]] = mapped_column(JSON, default=list)
     starters: Mapped[list[str]] = mapped_column(JSON, default=list)
     published: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
@@ -166,3 +167,89 @@ class Alert(Base):
     cap_usd: Mapped[float] = mapped_column(Float)
     acknowledged: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+
+
+class Connector(Base):
+    """An MCP server from the official registry (or the playground itself), with the admin's approval decision."""
+
+    __tablename__ = "connectors"
+
+    id: Mapped[str] = mapped_column(String(255), primary_key=True)  # registry name, e.g. io.github.acme/server
+    title: Mapped[str] = mapped_column(String(120))
+    description: Mapped[str] = mapped_column(Text, default="")
+    version: Mapped[str] = mapped_column(String(64), default="")
+    publisher: Mapped[str] = mapped_column(String(160), index=True)
+    category: Mapped[str] = mapped_column(String(48), index=True)
+    transport: Mapped[str] = mapped_column(String(16), index=True)  # remote | npm | pypi | oci | nuget | mcpb | other
+    remote_url: Mapped[str] = mapped_column(String(512), default="")
+    package: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    env_vars: Mapped[list[str]] = mapped_column(JSON, default=list)
+    repo_url: Mapped[str] = mapped_column(String(512), default="")
+    website: Mapped[str] = mapped_column(String(512), default="")
+    status: Mapped[str] = mapped_column(String(16), default="active")
+    registry_updated_at: Mapped[str] = mapped_column(String(40), default="")
+    signals: Mapped[int] = mapped_column(Integer, default=0)
+    approval: Mapped[str] = mapped_column(String(16), default="pending", index=True)  # pending | approved | blocked
+    approved_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    approval_note: Mapped[str] = mapped_column(String(400), default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class KnowledgeSpace(Base):
+    """A retrieval corpus: documents chunked and embedded with one model, visible to its owner, a department or everyone."""
+
+    __tablename__ = "knowledge_spaces"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    owner_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    description: Mapped[str] = mapped_column(String(400), default="")
+    visibility: Mapped[str] = mapped_column(String(16), default="private")  # private | department | org
+    department: Mapped[str] = mapped_column(String(128), default="General")
+    embedding_model: Mapped[str] = mapped_column(String(64), default="local-hash")
+    doc_count: Mapped[int] = mapped_column(Integer, default=0)
+    chunk_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class KnowledgeDocument(Base):
+    __tablename__ = "knowledge_documents"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    space_id: Mapped[str] = mapped_column(String(32), ForeignKey("knowledge_spaces.id"), index=True)
+    title: Mapped[str] = mapped_column(String(255))
+    source_type: Mapped[str] = mapped_column(String(16))  # text | file | url | dataset | repo
+    source_ref: Mapped[str] = mapped_column(String(512), default="")
+    bytes: Mapped[int] = mapped_column(Integer, default=0)
+    chunk_count: Mapped[int] = mapped_column(Integer, default=0)
+    tokens: Mapped[int] = mapped_column(Integer, default=0)
+    cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+    graph: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # repository map: nodes, edges, communities
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class KnowledgeChunk(Base):
+    __tablename__ = "knowledge_chunks"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    space_id: Mapped[str] = mapped_column(String(32), ForeignKey("knowledge_spaces.id"), index=True)
+    doc_id: Mapped[str] = mapped_column(String(32), ForeignKey("knowledge_documents.id"), index=True)
+    ordinal: Mapped[int] = mapped_column(Integer, default=0)
+    text: Mapped[str] = mapped_column(Text)
+    embedding: Mapped[list[float]] = mapped_column(JSON, default=list)
+    meta: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class ApiToken(Base):
+    """Personal access token for MCP clients and scripts. Only the SHA-256 hash is stored."""
+
+    __tablename__ = "api_tokens"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
+    name: Mapped[str] = mapped_column(String(80))
+    prefix: Mapped[str] = mapped_column(String(12))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

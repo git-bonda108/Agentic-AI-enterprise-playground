@@ -187,6 +187,7 @@ def render_project(manifest: dict, framework: str) -> dict[str, str]:
     files = RENDERERS[framework](manifest)
     tool_names = [_slug(t["id"]) for t in _tools(manifest)]
     files["README.md"] = _readme(manifest, fw, framework)
+    _attach_extras(files, manifest)
     files["sample_input.json"] = json.dumps((manifest.get("samples") or [{"input": {}}])[0]["input"], indent=2)
     files["requirements.txt"] = fw["install"].replace("pip install ", "").replace(" ", "\n").replace("'", "") + "\npytest\n"
     files["test_smoke.py"] = f'''"""Offline smoke test: the module parses and every deterministic step has a stub. No network, no keys."""
@@ -208,6 +209,30 @@ def test_sample_input_is_json():
     json.loads(Path(__file__).with_name("sample_input.json").read_text())
 '''
     return files
+
+
+def _attach_extras(files: dict[str, str], manifest: dict) -> None:
+    """Skills ship as SKILL.md files; connectors ship as an mcp.json the SDKs' MCP clients can load."""
+    from app.skills import get_skill
+
+    for sid in manifest.get("skills") or []:
+        s = get_skill(sid)
+        if s:
+            files[f"skills/{sid}/SKILL.md"] = f"---\nname: {sid}\ndescription: {s['description']}\nsource: {s['source']['url']}\nlicense: {s['source']['license']}\n---\n\n{s['body']}"
+    connectors = manifest.get("connectors") or []
+    if connectors:
+        from app.db import SessionLocal
+        from app.models import Connector
+
+        servers = {}
+        with SessionLocal() as db:
+            for cid in connectors:
+                c = db.get(Connector, cid)
+                if c is not None:
+                    from app.connectors import install_snippet
+
+                    servers.update(install_snippet(c))
+        files["mcp.json"] = json.dumps({"mcpServers": servers}, indent=2)
 
 
 def zip_project(files: dict[str, str], root: str) -> bytes:

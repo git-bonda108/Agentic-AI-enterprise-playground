@@ -13,7 +13,7 @@ from typing import Any, TypedDict
 
 from app.catalog import get_model
 from app.db import SessionLocal
-from app.llm import ProviderError, complete
+from app.llm import ProviderError, complete, complete_with_tools
 from app.models import Run, UsageEvent
 from app.router import first_available
 
@@ -56,6 +56,18 @@ class RunContext:
         if json_mode:
             messages[0]["content"] += " Respond with valid JSON only, no prose."
         text, usage = complete(model_id, messages, max_tokens=max_tokens, temperature=temperature)
+        self._meter(model_id, usage)
+        return text
+
+    def llm_tools(self, tier: str, system: str, user: str, tools: list[dict], *, max_tokens: int = 1500) -> tuple[str, list[dict]]:
+        """A metered model turn that may ask for tool calls (OpenAI-style tool specs)."""
+        model_id = self.resolve_model(tier)
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        text, calls, usage = complete_with_tools(model_id, messages, tools, max_tokens=max_tokens)
+        self._meter(model_id, usage)
+        return text, calls
+
+    def _meter(self, model_id: str, usage) -> None:
         spec = get_model(model_id)
         with self.lock, SessionLocal() as db:
             db.add(UsageEvent(
@@ -69,7 +81,6 @@ class RunContext:
                 run.tokens_in += usage.tokens_in
                 run.tokens_out += usage.tokens_out
             db.commit()
-        return text
 
 
 def parse_json(text: str, fallback: Any) -> Any:
