@@ -1,0 +1,97 @@
+# API reference
+
+All routes require the internal key and identity headers, which the web application's proxy adds automatically. Direct callers must send `X-Internal-Key`, `X-User-Id` and `X-User-Email`, and may send `X-User-Name`, `X-User-Role` and `X-User-Department`. Interactive documentation is served at `/docs` while the API runs.
+
+## Health and metadata
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/health` | Liveness, environment and provider mode |
+| GET | `/v1/meta` | Application name, version, current batch, sections |
+
+## Models and routing
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/models` | Catalog with prices, tiers, capabilities, availability |
+| POST | `/v1/route/preview` | Classify a prompt and show the model Smart routing would pick, with expected savings |
+
+## Chat and conversations
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/v1/chat/stream` | Streaming completion over server-sent events: `meta`, `delta`, `usage`, `error`, `done` |
+| POST | `/v1/chat/complete` | Blocking completion for notebooks and scripts |
+| GET, POST | `/v1/conversations` | List or create |
+| GET, PATCH, DELETE | `/v1/conversations/{id}` | Read, rename, tag, pin, delete |
+
+## Usage and alerts
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/usage/summary` | Credits, spend this month, tokens, models used, recent events |
+| GET | `/v1/usage/breakdown` | Spend by `day`, `department`, `user`, `feature`, `model`, `provider` or `conversation` |
+| GET | `/v1/alerts` | Budget alerts for the caller |
+| POST | `/v1/alerts/{id}/ack` | Acknowledge an alert |
+
+## Administration
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/admin/users` | People, roles, departments |
+| PATCH | `/v1/admin/users/{id}` | Change role or department |
+| GET | `/v1/admin/policies` | Model policy per role |
+| PUT | `/v1/admin/policies/{role}` | Replace a role's policy |
+| POST | `/v1/admin/policies/reset` | Restore defaults |
+| GET, PUT | `/v1/admin/budgets` | Budgets at organisation, department, user and user-default scope |
+| GET | `/v1/admin/budgets/me` | The caller's own cap and spend |
+| GET | `/v1/admin/settings` | Providers, keys present, environment |
+
+## Blueprints, runs and data
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/blueprints` | Runnable blueprints with manifests |
+| GET | `/v1/blueprints/{id}` | One manifest |
+| GET | `/v1/data` | Mock datasets with previews |
+| POST | `/v1/runs` | Start a run; `wait=true` blocks until it completes or pauses |
+| GET | `/v1/runs` | Runs visible to the caller |
+| GET | `/v1/runs/{id}` | Run with steps, review payload and output |
+| POST | `/v1/runs/{id}/resume` | Answer a review gate |
+
+## Catalog
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/catalog` | Entries across families, with `family`, `q` and `runnable` filters |
+| GET | `/v1/catalog/stats` | Totals, per-family counts, curation grades |
+| GET | `/v1/catalog/{id}` | Entry with instructions and provenance |
+| POST | `/v1/catalog/curate` | Re-run the curator (admin) |
+
+## Faces
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/notebooks/blank.ipynb` | Empty notebook with the playground helper |
+| GET | `/v1/notebooks/blueprint/{id}.ipynb` | Notebook that runs a blueprint |
+| GET | `/v1/notebooks/run/{id}.ipynb` | Notebook reconstructed from a run |
+| GET | `/v1/notebooks/conversation/{id}.ipynb` | Notebook reconstructed from a conversation |
+| POST | `/v1/sandbox/execute` | Execute code in the server sandbox; metered as `notebook` |
+| GET | `/v1/frameworks` | Supported frameworks with install, docs, licence and hosting notes |
+| GET | `/v1/blueprints/{id}/flavor/{framework}` | Generated project files |
+| GET | `/v1/blueprints/{id}/flavor/{framework}/download` | The same project as a zip |
+| GET | `/v1/clouds` | Supported cloud runtimes with pricing and prerequisites |
+| GET | `/v1/blueprints/{id}/deploy/{cloud}` | Deploy script |
+| GET, POST | `/v1/custom-agents` | Agents built in the wizard |
+| DELETE | `/v1/custom-agents/{id}` | Remove one of your agents |
+| GET | `/v1/custom-agents/{id}/export/declarative-agent` | Microsoft 365 declarative agent manifest |
+
+## Error conventions
+
+| Status | Meaning |
+| --- | --- |
+| 401 | Missing internal key or identity |
+| 402 | Budget exhausted; the call was not sent to the provider |
+| 403 | Model not allowed by the caller's role policy |
+| 404 | Unknown model, blueprint, run or conversation |
+| 502 | Provider error, with the provider's message |

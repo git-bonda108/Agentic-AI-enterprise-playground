@@ -1,0 +1,225 @@
+"""Notebook, framework, cloud and custom-agent endpoints: the four faces of a blueprint."""
+
+from __future__ import annotations
+
+import json
+import time
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, Response
+from pydantic import BaseModel, Field
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.agents.core import REGISTRY
+from app.auth import current_user
+from app.catalog import get_model
+from app.catalog_store import get_entry, manifest_for
+from app.config import settings
+from app.db import get_db
+from app.deploy import CLOUDS, render_script
+from app.flavors import FRAMEWORKS, render_project, zip_project
+from app.governance import allowed_model_ids, check_budget, check_policy, policy_for
+from app.llm import ProviderError, complete
+from app.models import Conversation, CustomAgent, Run, UsageEvent, User
+from app.notebooks import (
+    execute,
+    notebook_blank,
+    notebook_for_blueprint,
+    notebook_for_conversation,
+    notebook_for_run,
+)
+from app.router import SMART, route
+from app.routers.runs import _payload as run_payload
+
+router = APIRouter(tags=["faces"])
+IPYNB = "application/x-ipynb+json"
+
+
+def _manifest(blueprint_id: str) -> dict:
+    bp = REGISTRY.get(blueprint_id)
+    if bp is not None and bp.family != "Runtime":
+        return bp.manifest()
+    entry = get_entry(blueprint_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Unknown blueprint")
+    return manifest_for(entry)
+
+
+# ---------- notebooks ----------
+
+@router.get("/v1/notebooks/blank.ipynb")
+def nb_blank(_: User = Depends(current_user)) -> Response:
+    return Response(json.dumps(notebook_blank()), media_type=IPYNB)
+
+
+@router.get("/v1/notebooks/blueprint/{blueprint_id}.ipynb")
+def nb_blueprint(blueprint_id: str, _: User = Depends(current_user)) -> Response:
+    return Response(json.dumps(notebook_for_blueprint(_manifest(blueprint_id))), media_type=IPYNB)
+
+
+@router.get("/v1/notebooks/run/{run_id}.ipynb")
+def nb_run(run_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    run = db.get(Run, run_id)
+    if run is None or (run.user_id != user.id and user.role not in ("admin", "champion")):
+        raise HTTPException(status_code=404, detail="Run not found")
+    return Response(json.dumps(notebook_for_run(run_payload(run), _manifest(run.blueprint_id))), media_type=IPYNB)
+
+
+@router.get("/v1/notebooks/conversation/{conversation_id}.ipynb")
+def nb_conversation(conversation_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    c = db.get(Conversation, conversation_id)
+    if c is None or c.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    conv = {"title": c.title, "model": c.model, "messages": [{"role": m.role, "content": m.content} for m in c.messages]}
+    return Response(json.dumps(notebook_for_conversation(conv)), media_type=IPYNB)
+
+
+class SandboxBody(BaseModel):
+    code: str = Field(min_length=1, max_length=20000)
+    session_id: str | None = None
+
+
+@router.post("/v1/sandbox/execute")
+def sandbox_execute(body: SandboxBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    env = {
+        "PLAYGROUND_API_URL": settings.self_url, "PLAYGROUND_INTERNAL_KEY": settings.internal_key, "PLAYGROUND_USER_ID": user.id,
+        "PLAYGROUND_USER_EMAIL": user.email, "PLAYGROUND_USER_NAME": user.name, "PLAYGROUND_USER_ROLE": user.role, "PLAYGROUND_USER_DEPARTMENT": user.department,
+    }
+    result = execute(body.code, env, body.session_id or f"{user.id}-{uuid.uuid4().hex[:8]}")
+    db.add(UsageEvent(user_id=user.id, feature="notebook", model="sandbox", provider=result["backend"], latency_ms=result["ms"], status="ok" if result["exit_code"] == 0 else "error"))
+    db.commit()
+    return result
+
+
+class CompleteBody(BaseModel):
+    model: str
+    messages: list[dict]
+    max_tokens: int = Field(default=1024, ge=1, le=16000)
+
+
+@router.post("/v1/chat/complete")
+def chat_complete(body: CompleteBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Non-streaming completion for notebooks and scripts, governed exactly like the playground."""
+    model_id = body.model
+    routed = False
+    if model_id == SMART:
+        prompt = next((m.get("content", "") for m in reversed(body.messages) if m.get("role") == "user"), "")
+        decision = route(prompt, allowed_model_ids(db, user.role))
+        if decision is None:
+            raise HTTPException(status_code=400, detail="No model available for your role")
+        model_id, routed = decision.model, True
+    spec = get_model(model_id)
+    if spec is None:
+        raise HTTPException(status_code=404, detail="Unknown model")
+    denial = check_policy(db, user, spec)
+    if denial:
+        raise HTTPException(status_code=403, detail=denial)
+    budget = check_budget(db, user)
+    if not budget.allowed:
+        raise HTTPException(status_code=402, detail=budget.reason)
+    max_tokens = min(body.max_tokens, policy_for(db, user.role).max_tokens)
+    started = time.perf_counter()
+    try:
+        text, usage = complete(model_id, body.messages, max_tokens=max_tokens)
+    except ProviderError as exc:
+        db.add(UsageEvent(user_id=user.id, feature="notebook", model=model_id, provider=spec.provider, status="error", latency_ms=int((time.perf_counter() - started) * 1000)))
+        db.commit()
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    db.add(UsageEvent(user_id=user.id, feature="notebook", model=model_id, provider=spec.provider, tokens_in=usage.tokens_in, tokens_out=usage.tokens_out, tokens_cached=usage.tokens_cached, cost_usd=usage.cost_usd, latency_ms=usage.latency_ms, status="ok", routed=routed))
+    db.commit()
+    return {"text": text, "model": model_id, "routed": routed, "tokens_in": usage.tokens_in, "tokens_out": usage.tokens_out, "cost_usd": usage.cost_usd, "latency_ms": usage.latency_ms}
+
+
+# ---------- frameworks ----------
+
+@router.get("/v1/frameworks")
+def frameworks(_: User = Depends(current_user)) -> dict:
+    return {"frameworks": [{"id": k, **v} for k, v in FRAMEWORKS.items()]}
+
+
+@router.get("/v1/blueprints/{blueprint_id}/flavor/{framework}")
+def flavor(blueprint_id: str, framework: str, _: User = Depends(current_user)) -> dict:
+    if framework not in FRAMEWORKS:
+        raise HTTPException(status_code=404, detail="Unknown framework")
+    files = render_project(_manifest(blueprint_id), framework)
+    return {"blueprint_id": blueprint_id, "framework": framework, "files": files, "download": f"/v1/blueprints/{blueprint_id}/flavor/{framework}/download"}
+
+
+@router.get("/v1/blueprints/{blueprint_id}/flavor/{framework}/download")
+def flavor_zip(blueprint_id: str, framework: str, _: User = Depends(current_user)) -> Response:
+    if framework not in FRAMEWORKS:
+        raise HTTPException(status_code=404, detail="Unknown framework")
+    data = zip_project(render_project(_manifest(blueprint_id), framework), f"{blueprint_id}-{framework}")
+    return Response(data, media_type="application/zip", headers={"content-disposition": f'attachment; filename="{blueprint_id}-{framework}.zip"'})
+
+
+# ---------- clouds ----------
+
+@router.get("/v1/clouds")
+def clouds(_: User = Depends(current_user)) -> dict:
+    return {"clouds": [{"id": k, **v} for k, v in CLOUDS.items()]}
+
+
+@router.get("/v1/blueprints/{blueprint_id}/deploy/{cloud}")
+def deploy(blueprint_id: str, cloud: str, _: User = Depends(current_user)) -> dict:
+    if cloud not in CLOUDS:
+        raise HTTPException(status_code=404, detail="Unknown cloud")
+    return render_script(_manifest(blueprint_id), cloud)
+
+
+# ---------- custom agents (no-code wizard) ----------
+
+class CustomAgentBody(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    description: str = Field(min_length=5, max_length=400)
+    instructions: str = Field(min_length=20, max_length=8000)
+    knowledge: list[str] = Field(default_factory=list)
+    tools: list[str] = Field(default_factory=list)
+    starters: list[str] = Field(default_factory=list)
+    published: bool = False
+
+
+def _custom_payload(a: CustomAgent) -> dict:
+    return {"id": a.id, "name": a.name, "description": a.description, "instructions": a.instructions, "knowledge": a.knowledge or [], "tools": a.tools or [], "starters": a.starters or [], "published": a.published, "owner_id": a.user_id, "created_at": a.created_at.isoformat()}
+
+
+@router.get("/v1/custom-agents")
+def list_custom(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    rows = db.scalars(select(CustomAgent).where((CustomAgent.user_id == user.id) | (CustomAgent.published.is_(True))).order_by(CustomAgent.created_at.desc())).all()
+    return {"agents": [_custom_payload(a) for a in rows]}
+
+
+@router.post("/v1/custom-agents", status_code=201)
+def create_custom(body: CustomAgentBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    a = CustomAgent(id=f"custom-{uuid.uuid4().hex[:12]}", user_id=user.id, **body.model_dump())
+    db.add(a)
+    db.commit()
+    return _custom_payload(a)
+
+
+@router.delete("/v1/custom-agents/{agent_id}", status_code=204)
+def delete_custom(agent_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> None:
+    a = db.get(CustomAgent, agent_id)
+    if a is None or a.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    db.delete(a)
+    db.commit()
+
+
+@router.get("/v1/custom-agents/{agent_id}/export/declarative-agent")
+def export_declarative(agent_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    """Microsoft 365 declarative agent manifest, the format Copilot Studio and the Agent Builder import."""
+    a = db.get(CustomAgent, agent_id)
+    if a is None or (a.user_id != user.id and not a.published):
+        raise HTTPException(status_code=404, detail="Agent not found")
+    manifest = {
+        "$schema": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.5/schema.json",
+        "version": "v1.5",
+        "name": a.name[:100],
+        "description": a.description[:1000],
+        "instructions": a.instructions[:8000],
+        "conversation_starters": [{"title": s[:50], "text": s[:200]} for s in (a.starters or [])[:6]],
+        "capabilities": ([{"name": "OneDriveAndSharePoint", "items_by_url": []}] if a.knowledge else []),
+    }
+    return Response(json.dumps(manifest, indent=2), media_type="application/json", headers={"content-disposition": f'attachment; filename="{a.id}-declarativeAgent.json"'})
