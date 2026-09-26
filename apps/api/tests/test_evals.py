@@ -68,12 +68,15 @@ def test_canary_detects_drift_rolls_back_and_demotes(client, headers):
         "cases": [{"id": f"c{i}", "input": {"task": q}, "expect": {"status": "completed", "contains": "POL-001"}} for i, q in enumerate(["What is the hotel limit per night?", "How much can I claim for meals?", "hotel limit", "Business class approval?", "Meal receipts?"])],
         "rubric": {"criteria": [], "pass_threshold": 3.0}, "gate": {"min_pass_rate": 100, "max_cost_per_case_usd": 1.0, "max_p95_ms": 60000},
     }).json()
-    canary = client.put(f"/v1/evals/suites/{suite['id']}/canary", headers=headers, json={"enabled": True, "hour_utc": 2, "auto_rollback": True, "max_pass_rate_drop": 10}).json()["canary"]
+    # This test exercises pass-rate drift; latency and cost thresholds are set wide because a loaded CI runner can double
+    # the latency of the fake provider between two runs, which would otherwise count as drift and reset the pass streak.
+    canary = client.put(f"/v1/evals/suites/{suite['id']}/canary", headers=headers, json={"enabled": True, "hour_utc": 2, "auto_rollback": True, "max_pass_rate_drop": 10, "max_cost_increase_pct": 10_000, "max_latency_increase_pct": 10_000}).json()["canary"]
     assert canary["enabled"] and canary["next_due_at"]
     # three good canary runs establish the baseline and level 3 evidence
     for _ in range(3):
         good = client.post(f"/v1/evals/suites/{suite['id']}/canary/run?wait=true", headers=headers).json()
         assert good["kind"] == "canary" and good["summary"]["gate_passed"], good["summary"]
+        assert (good.get("drift") or {}).get("verdict", "stable") == "stable", good.get("drift")
     ladder = client.get(f"/v1/evals/hardening?blueprint_id={agent['id']}", headers=headers).json()
     assert ladder["level"] == 3 and ladder["evidence"]["consecutive_passes"] == 3
     promoted = client.post(f"/v1/evals/hardening/{agent['id']}/promote", headers=headers, json={"level": 4, "note": "Go live"}).json()
