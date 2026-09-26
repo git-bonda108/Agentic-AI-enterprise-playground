@@ -81,12 +81,12 @@ export function Topbar({ user, onOpenSearch }: { user: ShellUser; onOpenSearch: 
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Budget alerts</DropdownMenuLabel>
+              <DropdownMenuLabel>Alerts</DropdownMenuLabel>
               {alerts.length === 0 && <DropdownMenuItem disabled>No alerts this month</DropdownMenuItem>}
               {alerts.slice(0, 6).map((a) => (
-                <DropdownMenuItem key={a.id} className={a.acknowledged ? "opacity-60" : ""}>
-                  <span className={`size-1.5 shrink-0 rounded-full ${a.threshold >= 100 ? "bg-brand-rose" : "bg-brand-amber"}`} />
-                  <span className="truncate">{a.label} at {a.threshold}%</span>
+                <DropdownMenuItem key={a.id} className={a.acknowledged ? "opacity-60" : ""} title={a.message || undefined}>
+                  <span className={`size-1.5 shrink-0 rounded-full ${a.kind === "canary" ? "bg-brand-pink" : a.threshold >= 100 ? "bg-brand-rose" : "bg-brand-amber"}`} />
+                  <span className="truncate">{a.kind === "canary" ? a.label : `${a.label} at ${a.threshold}%`}</span>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuGroup>

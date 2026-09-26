@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     self_url: str = "http://localhost:8000"
     # Extra local directories the repository mapper may read, comma separated. The repo root is always allowed.
     repo_roots: str = ""
+    # Background canary scheduler (one tick per minute). Tests drive ticks explicitly instead.
+    canary_scheduler: bool = True
 
 
 settings = Settings()

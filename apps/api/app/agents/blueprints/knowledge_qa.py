@@ -60,7 +60,7 @@ def verify(state: RunState, config) -> dict:
     if not cited & known:
         answer_text += "\n\nSources: " + ", ".join(f"[{t['id']}] {t['title']}" for t in d["retrieved"])
     citations = sorted((cited & known) or known)
-    output = {"answer_md": answer_text, "citations": citations, "invalid_citations": invalid, "retrieved": [{"id": t["id"], "title": t["title"], "score": t["score"]} for t in d["retrieved"]], "grounded": not invalid}
+    output = {"answer_md": answer_text, "citations": citations, "invalid_citations": invalid, "retrieved": [{"id": t["id"], "title": t["title"], "score": t["score"], "body": t["body"][:700]} for t in d["retrieved"]], "grounded": not invalid}
     return {"output": output, **step(state, "verify", f"Citation check: {len(citations)} valid, {len(invalid)} invalid", kind="gate")}
 
 

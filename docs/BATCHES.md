@@ -11,7 +11,7 @@ The playground is built in ten batches. A batch is complete when its pages are l
 | 4 | Catalog import and Discover | Done |
 | 5 | Notebooks, framework flavors, cloud deploy, no-code wizard | Done |
 | 6 | Connectors, Knowledge Spaces, skills, the playground as an MCP server | Done |
-| 7 | Evaluate, canary, hardening levels | Planned |
+| 7 | Evaluate, canary, hardening levels, agent versions with rollback | Done |
 | 8 | Community, engagement, adoption analytics | Planned |
 | 9 | Azure templates, CI, demo seed, security pass | Planned |
 
@@ -55,7 +55,13 @@ Verification at close: 64 API tests, 30 end-to-end tests, strict types, lint cle
 
 ## Batch 7: evaluate
 
-Guided creation of golden sets and rubrics, evaluation runs with per-case scores, nightly canary reruns with drift alerts and rollback, and hardening levels that an agent is promoted through.
+Evaluation suites: every built-in blueprint ships its ten golden cases as a system suite; a five-step guided builder creates suites for any agent from samples, real runs promoted into cases, or hand-written inputs with a phrase the answer must contain. Each step explains what it adds and why. Ten deterministic check types (status, contains, output keys and values, citations, cost, latency, review gates, anomaly codes) and a six-criterion rubric library (correctness, groundedness, completeness, format, tone, conciseness) scored one to five by an Economy-tier judge, metered as its own feature. A gate (minimum pass rate, cost per case, p95 latency) decides whether a run counts.
+
+Canary: nightly reruns per suite from an in-process scheduler, compared with the last run that cleared its gate without drift. Drift on pass rate, cost or latency (with noise floors) raises an alert in the bell, demotes the agent a level, and, for wizard agents with automatic rollback on, restores the last good version. Every wizard edit keeps a numbered snapshot; manual rollback is one call.
+
+Hardening ladder: Draft, Golden, Gated, Canaried, Production. Levels are computed from evidence (cases, evaluations, gate results, canary streaks); Production needs level 3 evidence plus an administrator's promotion, and a canary can take it away.
+
+Verification at close: 69 API tests, 32 end-to-end tests, strict types and lint clean.
 
 ## Batch 8: community and adoption
 

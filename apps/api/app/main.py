@@ -8,6 +8,7 @@ from app.config import settings
 from app.connectors import seed_connectors
 from app.curator import ensure_curated
 from app.db import SessionLocal, init_db
+from app.evals import ensure_system_suites, start_scheduler
 from app.governance import seed_defaults
 from app.routers import (
     admin,
@@ -16,6 +17,7 @@ from app.routers import (
     chat,
     connectors,
     conversations,
+    evals,
     faces,
     knowledge,
     mcp,
@@ -33,11 +35,13 @@ async def lifespan(_: FastAPI):
     with SessionLocal() as db:
         seed_defaults(db)
         seed_connectors(db)
+        ensure_system_suites(db)
     ensure_curated()
+    start_scheduler()
     yield
 
 
-app = FastAPI(title=settings.app_name, version="0.7.0", lifespan=lifespan)
+app = FastAPI(title=settings.app_name, version="0.8.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -61,6 +65,7 @@ app.include_router(connectors.router)
 app.include_router(knowledge.router)
 app.include_router(skills.router)
 app.include_router(mcp.router)
+app.include_router(evals.router)
 
 
 @app.get("/health")
@@ -74,6 +79,6 @@ def meta() -> dict[str, object]:
     return {
         "app": settings.app_name,
         "version": app.version,
-        "batch": 6,
+        "batch": 7,
         "sections": ["home", "discover", "build", "evaluate", "operate", "community", "admin"],
     }

@@ -157,7 +157,7 @@ def list_alerts(user: User = Depends(current_user), db: Session = Depends(get_db
     return {
         "alerts": [
             {"id": a.id, "scope": a.scope, "key": a.key, "label": a.label, "threshold": a.threshold, "period": a.period,
-             "spend_usd": a.spend_usd, "cap_usd": a.cap_usd, "acknowledged": a.acknowledged, "created_at": a.created_at.isoformat()}
+             "spend_usd": a.spend_usd, "cap_usd": a.cap_usd, "kind": a.kind or "budget", "message": a.message or "", "acknowledged": a.acknowledged, "created_at": a.created_at.isoformat()}
             for a in rows
         ],
         "unread": sum(1 for a in rows if not a.acknowledged),

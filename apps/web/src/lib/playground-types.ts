@@ -116,8 +116,26 @@ export type Breakdown = {
 };
 
 export type AlertItem = {
-  id: string; scope: string; key: string; label: string; threshold: number; period: string; spend_usd: number; cap_usd: number; acknowledged: boolean; created_at: string;
+  id: string; scope: string; key: string; label: string; threshold: number; period: string; spend_usd: number; cap_usd: number; kind?: "budget" | "canary"; message?: string; acknowledged: boolean; created_at: string;
 };
+
+export type EvalCase = { id: string; name?: string; input: Record<string, unknown>; resume?: unknown; expect: Record<string, unknown>; from_run_id?: string };
+export type EvalRubric = { criteria: { id: string; weight: number }[]; pass_threshold: number };
+export type EvalGate = { min_pass_rate: number; max_cost_per_case_usd: number; max_p95_ms: number };
+export type EvalSummary = { cases: number; passed: number; pass_rate: number; avg_score: number | null; cost_usd: number; cost_per_case_usd: number; p95_ms: number; gate: Record<string, boolean>; gate_passed: boolean };
+export type EvalDrift = { pass_rate_drop: number; cost_delta_pct: number; latency_delta_pct: number; verdict: "stable" | "drift"; reasons: string[]; actions?: string[] };
+export type EvalCheck = { check: string; passed: boolean; detail: string };
+export type EvalScore = { criterion: string; score: number | null; rationale: string; model: string; cost_usd?: number };
+export type EvalCaseResult = { case_id: string; name?: string; run_id: string | null; status: string; passed: boolean; checks: EvalCheck[]; scores: EvalScore[]; avg_score: number | null; cost_usd: number; ms: number; error: string | null };
+export type EvalRunRecord = { id: string; suite_id: string; blueprint_id: string; user_id: string; kind: "manual" | "canary"; status: "queued" | "running" | "completed" | "failed"; summary: Partial<EvalSummary>; baseline_run_id: string | null; drift: EvalDrift | null; agent_version: number | null; error: string | null; created_at: string; finished_at: string | null; results?: EvalCaseResult[] };
+export type CanaryInfo = { id: string; suite_id: string; enabled: boolean; hour_utc: number; auto_rollback: boolean; max_pass_rate_drop: number; max_cost_increase_pct: number; max_latency_increase_pct: number; last_run_id: string | null; next_due_at: string | null; consecutive_passes: number };
+export type EvalSuiteRecord = { id: string; owner_id: string | null; blueprint_id: string; blueprint_name: string; name: string; description: string; cases: EvalCase[]; rubric: EvalRubric; gate: EvalGate; system: boolean; case_count: number; last_run: EvalRunRecord | null; canary: CanaryInfo | null; created_at: string; updated_at: string; can_edit?: boolean; hardening?: Hardening };
+export type HardeningLevel = { level: number; name: string; requirement: string };
+export type Hardening = { blueprint_id: string; level: number; achieved: number; name: string; levels: HardeningLevel[]; evidence: { suites: number; cases: number; evaluations: number; latest_pass_rate: number | null; latest_gate_passed: boolean; canary_enabled: boolean; consecutive_passes: number; last_canaries_stable: boolean }; last_promotion: { level: number; by: string; note: string; at: string } | null };
+export type RubricCriterion = { id: string; name: string; description: string; why: string };
+export type CheckType = { id: string; label: string; example: string; explain: string };
+export type EvalLibrary = { rubric: RubricCriterion[]; checks: CheckType[]; levels: HardeningLevel[]; default_gate: EvalGate; default_rubric: EvalRubric };
+export type CanaryBoardRow = CanaryInfo & { suite: EvalSuiteRecord | null; last_run: EvalRunRecord | null; hardening: Hardening | null };
 
 export const PROVIDER_ART: Record<string, string> = {
   Anthropic: "linear-gradient(135deg,#5b8def,#7c3aed)",

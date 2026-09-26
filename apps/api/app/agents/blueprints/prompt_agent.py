@@ -162,7 +162,7 @@ def check(state: RunState, config) -> dict:
         problems.append("Answer is too short")
     if d["knowledge"] and not any(k["id"] in answer for k in d["knowledge"]):
         answer += "\n\nSources: " + ", ".join(f"[{k['id']}] {k['title']}" for k in d["knowledge"])
-    output = {"answer_md": answer, "agent": d["name"], "family": d["family"], "knowledge": [k["id"] for k in d["knowledge"]], "skills": d.get("skills", []), "tool_calls": d.get("tool_results", []), "problems": problems, "source": d["source"]}
+    output = {"answer_md": answer, "agent": d["name"], "family": d["family"], "knowledge": [k["id"] for k in d["knowledge"]], "knowledge_items": [{"id": k["id"], "title": k["title"], "body": k["body"][:700]} for k in d["knowledge"]], "skills": d.get("skills", []), "tool_calls": d.get("tool_results", []), "problems": problems, "source": d["source"]}
     return {"output": output, **step(state, "check", "Output check passed" if not problems else f"Output check: {', '.join(problems)}", kind="gate")}
 
 

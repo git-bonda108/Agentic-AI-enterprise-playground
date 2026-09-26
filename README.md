@@ -25,6 +25,7 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 | Connectors | A governed snapshot of the official MCP registry with admin approval, live connection tests, and the playground itself exposed as an MCP server for Claude Desktop, Cursor and VS Code. |
 | Knowledge | Knowledge Spaces over documents, pages, datasets and repositories with hybrid retrieval, cited answers, and a code map drawn as a graph. |
 | Skills | 338 SKILL.md packs, searchable and attachable to any agent, shipped with every generated project. |
+| Evaluate | Golden sets built in a guided wizard, deterministic checks plus a model-graded rubric, gates, nightly canaries with drift detection and automatic rollback, and a five-level hardening ladder lit only by evidence. |
 
 ## What is in the box
 
@@ -35,7 +36,7 @@ The application is organised into seven sections, laid out the way a cloud conso
 | Home | Console with credits, spend, tokens, models used and a live ledger | Live |
 | Discover | Models, Blueprints, Frameworks, Clouds, Connectors, Skills | Live |
 | Build | Playground, Agent Hub, Notebooks, Knowledge, Data | Live |
-| Evaluate | Evals, Canary | Batch 7 |
+| Evaluate | Evals, Canary | Live |
 | Operate | Runs, Traces, Cost, Adoption | Runs and Cost live; Adoption in Batch 8 |
 | Community | Showcase, Challenges, Leaderboard | Batch 8 |
 | Admin | Users, Policies, Budgets, Settings | Live |
@@ -119,4 +120,4 @@ The catalog includes agent definitions imported from public repositories, each s
 
 ## Roadmap
 
-Batches 7 to 9 add evaluation harnesses and nightly canaries, community features and adoption analytics, and the Azure deployment templates. The plan for each batch is in [docs/BATCHES.md](docs/BATCHES.md).
+Batches 8 and 9 add community features and adoption analytics, and the Azure deployment templates. The plan for each batch is in [docs/BATCHES.md](docs/BATCHES.md).

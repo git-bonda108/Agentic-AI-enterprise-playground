@@ -18,10 +18,11 @@ from app.catalog_store import get_entry, manifest_for
 from app.config import settings
 from app.db import get_db
 from app.deploy import CLOUDS, render_script
+from app.evals import current_agent_version, rollback_agent, snapshot_agent
 from app.flavors import FRAMEWORKS, render_project, zip_project
 from app.governance import allowed_model_ids, check_budget, check_policy, policy_for
 from app.llm import ProviderError, complete
-from app.models import Conversation, CustomAgent, Run, UsageEvent, User
+from app.models import AgentVersion, Conversation, CustomAgent, Run, UsageEvent, User
 from app.notebooks import (
     execute,
     notebook_blank,
@@ -198,6 +199,59 @@ def create_custom(body: CustomAgentBody, user: User = Depends(current_user), db:
     db.add(a)
     db.commit()
     return _custom_payload(a)
+
+
+class CustomAgentPatch(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=80)
+    description: str | None = Field(default=None, min_length=5, max_length=400)
+    instructions: str | None = Field(default=None, min_length=20, max_length=8000)
+    knowledge: list[str] | None = None
+    tools: list[str] | None = None
+    skills: list[str] | None = None
+    starters: list[str] | None = None
+    published: bool | None = None
+    note: str = Field(default="", max_length=400)
+
+
+class RollbackBody(BaseModel):
+    version: int = Field(ge=1)
+
+
+def _owned_agent(agent_id: str, user: User, db: Session) -> CustomAgent:
+    a = db.get(CustomAgent, agent_id)
+    if a is None or (a.user_id != user.id and user.role != "admin"):
+        raise HTTPException(status_code=404, detail="Agent not found")
+    return a
+
+
+@router.patch("/v1/custom-agents/{agent_id}")
+def patch_custom(agent_id: str, body: CustomAgentPatch, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Every edit keeps the previous state as a numbered version, so a canary can roll back to the last good one."""
+    a = _owned_agent(agent_id, user, db)
+    changes = body.model_dump(exclude_none=True)
+    note = changes.pop("note", "")
+    if not changes:
+        return _custom_payload(a)
+    db.add(AgentVersion(agent_id=a.id, version=current_agent_version(db, a.id) or 1, snapshot=snapshot_agent(a), note=note or "Edited in the wizard"))
+    for k, v in changes.items():
+        setattr(a, k, v)
+    db.commit()
+    return {**_custom_payload(a), "version": current_agent_version(db, a.id)}
+
+
+@router.get("/v1/custom-agents/{agent_id}/versions")
+def agent_versions(agent_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    a = _owned_agent(agent_id, user, db)
+    rows = db.scalars(select(AgentVersion).where(AgentVersion.agent_id == a.id).order_by(AgentVersion.version)).all()
+    return {"current": current_agent_version(db, a.id), "versions": [{"version": v.version, "note": v.note, "created_at": v.created_at.isoformat(), "snapshot": v.snapshot} for v in rows]}
+
+
+@router.post("/v1/custom-agents/{agent_id}/rollback")
+def agent_rollback(agent_id: str, body: RollbackBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    a = _owned_agent(agent_id, user, db)
+    if not rollback_agent(db, a, body.version, f"Manual rollback by {user.name}"):
+        raise HTTPException(status_code=404, detail="Version not found")
+    return {**_custom_payload(a), "version": current_agent_version(db, a.id)}
 
 
 @router.delete("/v1/custom-agents/{agent_id}", status_code=204)

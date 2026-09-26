@@ -43,6 +43,7 @@ FastAPI with SQLAlchemy 2. Responsibilities, in the order a request meets them:
 8. **Faces.** The ways a blueprint leaves the playground: notebooks, framework projects, cloud deploy scripts and the declarative agent manifest.
 9. **Connectors and the MCP server.** A snapshot of the official MCP registry with an approval workflow, a streamable-HTTP MCP client for probes and tool calls, and the playground's own MCP endpoint behind personal tokens.
 10. **Knowledge.** Chunking, embeddings (local or provider), hybrid retrieval and the repository mapper, all metered as feature `knowledge`.
+11. **Evaluate.** Suites, deterministic checks, a model-graded rubric metered as feature `eval`, gates, an in-process canary scheduler with drift detection and rollback, and hardening levels computed from evidence.
 
 ### 2.3 Data model
 

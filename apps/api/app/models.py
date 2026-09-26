@@ -165,6 +165,8 @@ class Alert(Base):
     period: Mapped[str] = mapped_column(String(7), index=True)
     spend_usd: Mapped[float] = mapped_column(Float)
     cap_usd: Mapped[float] = mapped_column(Float)
+    kind: Mapped[str] = mapped_column(String(16), default="budget")  # budget | canary
+    message: Mapped[str] = mapped_column(Text, default="")
     acknowledged: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
 
@@ -253,3 +255,85 @@ class ApiToken(Base):
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class EvalSuite(Base):
+    """A golden set: cases with inputs and expectations, a rubric for model-graded criteria, and a gate the run must clear."""
+
+    __tablename__ = "eval_suites"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    owner_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("users.id"), nullable=True, index=True)
+    blueprint_id: Mapped[str] = mapped_column(String(64), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    description: Mapped[str] = mapped_column(String(600), default="")
+    cases: Mapped[list[dict]] = mapped_column(JSON, default=list)  # [{id, name, input, resume?, expect}]
+    rubric: Mapped[dict] = mapped_column(JSON, default=dict)  # {criteria: [{id, weight}], pass_threshold}
+    gate: Mapped[dict] = mapped_column(JSON, default=dict)  # {min_pass_rate, max_cost_per_case_usd, max_p95_ms}
+    system: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class EvalRun(Base):
+    __tablename__ = "eval_runs"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    suite_id: Mapped[str] = mapped_column(String(32), ForeignKey("eval_suites.id"), index=True)
+    blueprint_id: Mapped[str] = mapped_column(String(64), index=True)
+    user_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(16), default="manual")  # manual | canary
+    status: Mapped[str] = mapped_column(String(16), default="queued")  # queued | running | completed | failed
+    results: Mapped[list[dict]] = mapped_column(JSON, default=list)
+    summary: Mapped[dict] = mapped_column(JSON, default=dict)
+    baseline_run_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    drift: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    agent_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class CanarySchedule(Base):
+    """Nightly rerun of a suite with drift detection against the last good run, and optional automatic rollback."""
+
+    __tablename__ = "canary_schedules"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    suite_id: Mapped[str] = mapped_column(String(32), ForeignKey("eval_suites.id"), unique=True, index=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    hour_utc: Mapped[int] = mapped_column(Integer, default=2)
+    auto_rollback: Mapped[bool] = mapped_column(Boolean, default=True)
+    max_pass_rate_drop: Mapped[float] = mapped_column(Float, default=10.0)  # percentage points
+    max_cost_increase_pct: Mapped[float] = mapped_column(Float, default=50.0)
+    max_latency_increase_pct: Mapped[float] = mapped_column(Float, default=100.0)
+    last_run_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    next_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    consecutive_passes: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class Promotion(Base):
+    """Hardening ladder events: promotions by an admin and demotions by a canary rollback."""
+
+    __tablename__ = "promotions"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    blueprint_id: Mapped[str] = mapped_column(String(64), index=True)
+    level: Mapped[int] = mapped_column(Integer)
+    by_user: Mapped[str] = mapped_column(String(64))
+    note: Mapped[str] = mapped_column(String(400), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+
+
+class AgentVersion(Base):
+    """Snapshot of a wizard agent before an edit, so a canary can roll it back to the last good version."""
+
+    __tablename__ = "agent_versions"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    agent_id: Mapped[str] = mapped_column(String(48), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    snapshot: Mapped[dict] = mapped_column(JSON, default=dict)
+    note: Mapped[str] = mapped_column(String(400), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)

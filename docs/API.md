@@ -131,6 +131,27 @@ All routes require the internal key and identity headers, which the web applicat
 | GET | `/v1/skills/stats` | Totals by category and source |
 | GET | `/v1/skills/{id}` | One skill with its full body |
 
+## Evaluate
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/evals/library` | Rubric criteria, deterministic check types, hardening levels, defaults |
+| GET, POST | `/v1/evals/suites` | Suites (system and yours); create one |
+| GET, PATCH, DELETE | `/v1/evals/suites/{id}` | Suite with last run, canary and hardening ladder |
+| POST | `/v1/evals/suites/{id}/cases/from-run` | Promote a real run into a golden case |
+| POST | `/v1/evals/suites/{id}/run` | Evaluate every case; `wait=true` blocks |
+| GET | `/v1/evals/runs` | Evaluation runs with `suite_id`, `blueprint_id`, `kind` filters |
+| GET | `/v1/evals/runs/{id}` | Per-case checks, scores and drift |
+| GET, PUT | `/v1/evals/suites/{id}/canary` | Nightly schedule, thresholds, automatic rollback |
+| POST | `/v1/evals/suites/{id}/canary/run` | Run the canary now |
+| GET | `/v1/evals/canary` | Canary board with last run and hardening level |
+| POST | `/v1/evals/canary/tick` | Run due canaries (admin; `force=true` runs all) |
+| GET | `/v1/evals/hardening` | Ladders for every evaluated agent, or one with `blueprint_id` |
+| POST | `/v1/evals/hardening/{id}/promote` | Promote or demote (admin) |
+| PATCH | `/v1/custom-agents/{id}` | Edit a wizard agent; the previous state becomes a numbered version |
+| GET | `/v1/custom-agents/{id}/versions` | Version history |
+| POST | `/v1/custom-agents/{id}/rollback` | Restore a version |
+
 ## Error conventions
 
 | Status | Meaning |

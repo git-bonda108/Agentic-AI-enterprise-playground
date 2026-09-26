@@ -3,6 +3,7 @@ import os
 os.environ["PLAYGROUND_FAKE_LLM"] = "true"
 os.environ["PLAYGROUND_DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["PLAYGROUND_INTERNAL_KEY"] = "test-key"
+os.environ["PLAYGROUND_CANARY_SCHEDULER"] = "false"
 import tempfile
 
 os.environ["PLAYGROUND_CHECKPOINT_PATH"] = os.path.join(tempfile.mkdtemp(), "checkpoints.db")
