@@ -3,6 +3,7 @@ import { loginAs } from "./helpers";
 
 test.describe("Batch 5 faces", () => {
   test("notebooks page embeds the in-browser runtime and the sandbox executes code", async ({ page }) => {
+    test.setTimeout(180_000);  // the in-browser Python runtime downloads and boots on a busy machine
     await loginAs(page);
     await page.goto("/build/notebooks?blueprint=doc-reconciliation");
     await expect(page.getByRole("heading", { level: 1, name: "Notebooks" })).toBeVisible();

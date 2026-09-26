@@ -1,0 +1,95 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API tests and lint
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/api } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.5.x" }
+      - run: uv python install 3.12
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run pytest -q
+        env:
+          PLAYGROUND_FAKE_LLM: "true"
+          PLAYGROUND_CANARY_SCHEDULER: "false"
+
+  web:
+    name: Web types, lint and end-to-end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.5.x" }
+      - run: uv python install 3.12
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - name: Build the in-browser notebook runtime
+        run: npm run build:jupyterlite
+      - name: Install API dependencies for the end-to-end server
+        run: cd apps/api && uv sync --frozen
+      - name: Install Playwright browsers
+        run: npx -w apps/web playwright install --with-deps chromium
+      - name: End-to-end
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-report, path: apps/web/playwright-report, retention-days: 7 }
+
+  security:
+    name: Secret and dependency scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.5.x" }
+      - run: cd apps/api && uv sync --frozen && uv run --with pip-audit pip-audit --strict --desc
+
+  bicep:
+    name: Infrastructure template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: az bicep build --file infra/bicep/main.bicep --stdout > /dev/null
+
+  images:
+    name: Container images
+    if: github.ref == 'refs/heads/main'
+    needs: [api, web, security, bicep]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.5.x" }
+      - run: npm ci && npm run build:jupyterlite
+      - uses: docker/setup-buildx-action@v3
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with: { context: apps/api, file: apps/api/Dockerfile, push: false, tags: "playground-api:${{ github.sha }}" }
+      - name: Build web image
+        uses: docker/build-push-action@v6
+        with: { context: ., file: apps/web/Dockerfile, push: false, tags: "playground-web:${{ github.sha }}" }

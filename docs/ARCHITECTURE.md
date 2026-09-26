@@ -4,6 +4,8 @@ This document describes the system as built through Batch 5, and the Azure topol
 
 ## 1. System context
 
+![Architecture](images/architecture.png)
+
 ```mermaid
 flowchart LR
   U[Employees<br/>browser] -->|HTTPS, Entra ID session| W[Web app<br/>Next.js 16]
@@ -86,6 +88,8 @@ sequenceDiagram
 
 ### 3.2 Agent run with a review gate
 
+![Run flow](images/runflow.png)
+
 ```mermaid
 sequenceDiagram
   participant B as Browser
@@ -133,6 +137,10 @@ Imported catalog entries (roles, personas, topologies, low-code templates and cl
 | Imported content | Stored with source, path and licence; instructions are shown to models, never executed as code |
 
 ## 6. Azure topology
+
+![Deployment](images/deployment.png)
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for sizing, cost and the deploy procedure.
 
 ```mermaid
 flowchart TB

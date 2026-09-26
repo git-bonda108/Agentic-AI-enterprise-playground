@@ -13,7 +13,7 @@ The playground is built in ten batches. A batch is complete when its pages are l
 | 6 | Connectors, Knowledge Spaces, skills, the playground as an MCP server | Done |
 | 7 | Evaluate, canary, hardening levels, agent versions with rollback | Done |
 | 8 | Community, engagement, adoption analytics, platform agents | Done |
-| 9 | Azure templates, CI, demo seed, security pass | Planned |
+| 9 | Azure templates, CI, demo seed, security pass, control room, one-command launch | Done |
 
 ## Batch 0: skeleton and design system
 
@@ -77,4 +77,16 @@ Verification at close: 76 API tests, 35 end-to-end tests, strict types and lint 
 
 ## Batch 9: ship
 
-Bicep templates for the Azure topology, CI pipeline, demo seed data, security review, operational runbook.
+Azure: a Bicep template for the full topology (Container Apps for web and API, PostgreSQL Flexible Server with pgvector, Redis, Key Vault, Container Registry, Log Analytics, a dynamic sessions pool, role assignments for the API's managed identity), a parameter file, and a deploy script that builds images in the cloud and runs a smoke test. Dockerfiles for both services; the web app builds as a Next.js standalone image.
+
+CI: GitHub Actions with API tests and lint, web types, lint and the Playwright suite against a production build, gitleaks, npm audit and pip-audit, Bicep compilation, and container image builds on main.
+
+Security pass: security headers on web and API, a per-caller rate limit, an internal-key check on every API route, and a start-up guard that refuses development defaults outside local environments. Documented in docs/SECURITY.md.
+
+Demo seed: one script builds a tenant of ten people across departments with a month of governed usage, twelve runs, a Knowledge Space, two wizard agents, evaluations with canaries, showcase posts and a judged challenge, all generated offline. One command, `npm run start:local`, installs, seeds, starts both services and opens the browser.
+
+Control room: a second view of any run in the playground palette, with three governed lanes (deterministic, agentic, governed), the record under review, the reasoning trace, the exception ledger and the outcome.
+
+Diagrams rendered to docs/images (architecture, workflow, deployment, run flow) and a step-by-step demo script in docs/DEMO_SCRIPT.md.
+
+Verification at close: 79 API tests, 38 end-to-end tests, strict types and lint clean, Bicep compiles.

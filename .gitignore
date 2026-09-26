@@ -27,3 +27,6 @@ apps/web/public/jupyterlite/
 apps/api/data/
 apps/api/catalog/curation.json
 .claude/
+infra/last-deployment.json
+infra/bicep/*.local.bicepparam
+.run/

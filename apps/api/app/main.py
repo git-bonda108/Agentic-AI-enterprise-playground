@@ -30,10 +30,12 @@ from app.routers import (
     skills,
     usage,
 )
+from app.security import RateLimitMiddleware, SecurityHeadersMiddleware, assert_safe_configuration
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    assert_safe_configuration()  # refuses to start with development defaults outside local environments
     init_db()
     with SessionLocal() as db:
         seed_defaults(db)
@@ -45,7 +47,9 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title=settings.app_name, version="0.9.0", lifespan=lifespan)
+app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -85,6 +89,6 @@ def meta() -> dict[str, object]:
     return {
         "app": settings.app_name,
         "version": app.version,
-        "batch": 8,
+        "batch": 9,
         "sections": ["home", "discover", "build", "evaluate", "operate", "community", "admin"],
     }

@@ -177,6 +177,10 @@ All routes require the internal key and identity headers, which the web applicat
 | GET, PUT | `/v1/adoption/assumptions` | Minutes saved per outcome and hourly value (admin edits) |
 | POST | `/v1/adoption/digest` | The adoption digest agent writes a narrative with recommendations |
 
+## Limits and headers
+
+Every response carries `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` and `Cache-Control: no-store`. Callers are limited to 240 requests a minute; a 429 carries `Retry-After`, and successful responses carry `X-RateLimit-Limit` and `X-RateLimit-Remaining`.
+
 ## Error conventions
 
 | Status | Meaning |
@@ -185,4 +189,5 @@ All routes require the internal key and identity headers, which the web applicat
 | 402 | Budget exhausted; the call was not sent to the provider |
 | 403 | Model not allowed by the caller's role policy |
 | 404 | Unknown model, blueprint, run or conversation |
+| 429 | Rate limit reached for this caller |
 | 502 | Provider error, with the provider's message |

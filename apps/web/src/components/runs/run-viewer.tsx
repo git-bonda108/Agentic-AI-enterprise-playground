@@ -6,6 +6,7 @@ import { AlertTriangle, CheckCircle2, Clock, Loader2, NotebookPen, RotateCcw, Us
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { GraphBeams } from "@/components/runs/graph-beams";
+import { ControlRoom } from "@/components/runs/control-room";
 import { Markdown } from "@/components/playground/markdown";
 import { formatTokens, formatUsd, type BlueprintManifest, type RunRecord } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,7 @@ export function RunViewer({ initial, manifest }: { initial: RunRecord; manifest:
   const [submitting, setSubmitting] = useState(false);
   const live = run.status === "queued" || run.status === "running";
   const [pendingResume, setPendingResume] = useState(false);
+  const [view, setView] = useState<"graph" | "control">("graph");
   const polling = live || pendingResume;
 
   useEffect(() => {
@@ -80,9 +82,15 @@ export function RunViewer({ initial, manifest }: { initial: RunRecord; manifest:
         </div>
       </div>
 
-      <section className="rounded-2xl border bg-card p-4" aria-label="Run graph">
-        <GraphBeams manifest={manifest} run={run} />
-      </section>
+      <div className="flex gap-1" role="tablist" aria-label="Run view">
+        {(["graph", "control"] as const).map((v) => <button key={v} type="button" role="tab" aria-selected={view === v} onClick={() => setView(v)} className={cn("h-8 rounded-lg border px-3 text-xs", view === v ? "border-brand-violet/60 bg-secondary" : "bg-card text-muted-foreground hover:text-foreground")}>{v === "graph" ? "Graph" : "Control room"}</button>)}
+      </div>
+
+      {view === "control" ? <ControlRoom run={run} manifest={manifest} /> : (
+        <section className="rounded-2xl border bg-card p-4" aria-label="Run graph">
+          <GraphBeams manifest={manifest} run={run} />
+        </section>
+      )}
 
       {run.status === "waiting_review" && run.review && (
         <section className="beam-border relative rounded-2xl border bg-card p-5" aria-label="Human review" data-testid="review-panel">

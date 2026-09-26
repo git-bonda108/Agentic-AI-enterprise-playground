@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+*.db
+*.db-*
+apps/api/.venv
+apps/api/data
+.env
+.env.*
+test-results
+playwright-report

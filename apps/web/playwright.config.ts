@@ -29,6 +29,7 @@ export default defineConfig({
         PLAYGROUND_DATABASE_URL: "sqlite:////tmp/eap-e2e.db",
         PLAYGROUND_INTERNAL_KEY: "e2e-internal-key",
         PLAYGROUND_ENVIRONMENT: "e2e",
+        PLAYGROUND_RATE_LIMIT_PER_MINUTE: "0",
       },
     },
     {

@@ -13,6 +13,11 @@
     "typecheck": "npm run typecheck -w apps/web",
     "test:e2e": "npm run test:e2e -w apps/web",
     "api": "cd apps/api && uv run uvicorn app.main:app --reload --port 8000",
-    "build:jupyterlite": "bash scripts/build-jupyterlite.sh"
+    "build:jupyterlite": "bash scripts/build-jupyterlite.sh",
+    "seed:demo": "cd apps/api && uv run python scripts/seed_demo.py",
+    "seed:reset": "cd apps/api && uv run python scripts/seed_demo.py --reset",
+    "start:local": "bash scripts/dev.sh",
+    "start:offline": "bash scripts/dev.sh --offline",
+    "diagrams": "node scripts/render-diagrams.mjs"
   }
 }

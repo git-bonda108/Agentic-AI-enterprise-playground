@@ -43,7 +43,13 @@ The application is organised into seven sections, laid out the way a cloud conso
 | Community | Showcase, Challenges, Leaderboard | Live |
 | Admin | Users, Policies, Budgets, Settings | Live |
 
-See [docs/BATCHES.md](docs/BATCHES.md) for the delivery log, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together, [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for the user journeys and the build workflow, and [docs/API.md](docs/API.md) for the API surface.
+See [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) for a step-by-step walk through every capability, [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Azure topology, costs and the one-command deploy, [docs/SECURITY.md](docs/SECURITY.md) for the security model, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together, [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for the user journeys and the build workflow, [docs/API.md](docs/API.md) for the API surface, and [docs/BATCHES.md](docs/BATCHES.md) for the delivery log.
+
+## Architecture
+
+![Architecture](docs/images/architecture.png)
+
+![Workflow](docs/images/workflow.png)
 
 ## Screens
 
@@ -58,28 +64,25 @@ See [docs/BATCHES.md](docs/BATCHES.md) for the delivery log, [docs/ARCHITECTURE.
 
 ## Quick start
 
-Prerequisites: Node 22 or later, Python 3.12, [uv](https://docs.astral.sh/uv/), and at least one model provider key. Without keys the API runs in a deterministic offline mode that is enough to explore the whole product.
+Prerequisites: Node 22 or later, Python 3.12 and [uv](https://docs.astral.sh/uv/). At least one model provider key makes the models live; without keys the offline provider answers deterministically at no cost.
 
 ```bash
 git clone https://github.com/git-bonda108/Agentic-AI-enterprise-playground.git
 cd Agentic-AI-enterprise-playground
-cp .env.example .env            # add your provider keys
-npm install                     # web workspace
-cd apps/api && uv sync && cd ../..
-npm run build:jupyterlite       # one-time: builds the in-browser notebook runtime (about 19 MB, gitignored)
+npm run start:local
 ```
 
-Run the two services in separate terminals:
+The launcher installs dependencies, builds the in-browser notebook runtime, seeds a demo tenant (ten people, a month of governed usage, runs, knowledge, evaluations, a canary, showcase posts and a judged challenge), starts the API on port 8000 and the web app on port 3000, and opens the browser. Add provider keys to `.env` for live models, or run `npm run start:offline`.
 
-```bash
-npm run api
-```
+Sign in as Satya Bonda (administrator, password `playground`), or as any of the other nine seeded people to see different roles and departments.
 
-```bash
-npm run dev
-```
-
-Open http://localhost:3000 and sign in as one of the seeded development users (password `playground`). Satya Bonda is the seeded administrator.
+| Script | Purpose |
+| --- | --- |
+| `npm run start:local` | Install, seed, start both services, open the browser |
+| `npm run start:offline` | The same with the deterministic provider |
+| `npm run seed:reset` | Rebuild the demo tenant |
+| `npm run api`, `npm run dev` | Run the API or the web app on their own |
+| `npm run diagrams` | Re-render the architecture diagrams |
 
 To run fully offline, start the API with `PLAYGROUND_FAKE_LLM=true`. Every model becomes available and returns deterministic text, while the ledger, router, budgets and agent runtime behave exactly as they do with live providers.
 

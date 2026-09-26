@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     repo_roots: str = ""
     # Background canary scheduler (one tick per minute). Tests drive ticks explicitly instead.
     canary_scheduler: bool = True
+    # Requests per minute per caller before the API answers 429. 0 disables the limit.
+    rate_limit_per_minute: int = 240
 
 
 settings = Settings()

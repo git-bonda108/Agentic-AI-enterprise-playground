@@ -2,6 +2,8 @@
 
 How people use the playground, and how the playground is built and shipped.
 
+![Workflow](images/workflow.png)
+
 ## 1. User journeys
 
 ### 1.1 Explorer: from a question to a saved comparison

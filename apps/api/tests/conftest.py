@@ -4,6 +4,7 @@ os.environ["PLAYGROUND_FAKE_LLM"] = "true"
 os.environ["PLAYGROUND_DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["PLAYGROUND_INTERNAL_KEY"] = "test-key"
 os.environ["PLAYGROUND_CANARY_SCHEDULER"] = "false"
+os.environ["PLAYGROUND_RATE_LIMIT_PER_MINUTE"] = "0"  # the suite fires hundreds of requests as one person
 import tempfile
 
 os.environ["PLAYGROUND_CHECKPOINT_PATH"] = os.path.join(tempfile.mkdtemp(), "checkpoints.db")
