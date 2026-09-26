@@ -29,7 +29,7 @@ test.describe("Batch 6 connectors, knowledge, skills", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Skills" })).toBeVisible();
     await page.getByLabel("Search skills").fill("tdd");
     const first = page.getByTestId("skill-cards").getByRole("button").first();
-    await expect(first).toBeVisible();
+    await expect(first).toHaveAttribute("aria-label", /tdd/i, { timeout: 10_000 });  // wait for the debounced search to apply
     const name = (await first.getAttribute("aria-label"))!;
     await first.click();
     await expect(page.getByTestId("skill-body")).toBeVisible();
