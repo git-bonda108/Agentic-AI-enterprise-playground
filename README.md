@@ -61,6 +61,7 @@ See [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) for a step-by-step walk through e
 | ![Agent Hub](docs/images/agents.png) Agent Hub with runnable blueprints | ![Run graph](docs/images/run-graph.png) A run in flight with its graph and step trace |
 | ![Review gate](docs/images/run-review.png) Human review gate that survives a restart | ![Catalog](docs/images/catalog.png) Blueprint catalog across six families |
 | ![Notebook](docs/images/notebook.png) A blueprint opened as a notebook in the browser | ![Frameworks](docs/images/frameworks.png) The same agent rendered as a CrewAI project |
+| ![Control room](docs/images/control-room.png) Any run as a control room: governed lanes, ledger, outcome | ![Adoption](docs/images/adoption.png) Adoption analytics with hours per feature and an ROI matrix |
 
 ## Quick start
 
