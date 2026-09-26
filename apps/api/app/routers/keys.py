@@ -17,7 +17,7 @@ from app.keys import (
     set_key_scope,
 )
 from app.llm import ProviderError, complete
-from app.models import User
+from app.models import UsageEvent, User
 from app.routers.admin import require_admin
 
 router = APIRouter(prefix="/v1/keys", tags=["keys"])
@@ -102,7 +102,34 @@ def test_key(
             api_base=extra.get("api_base"),
         )
     except ProviderError as exc:
+        db.add(
+            UsageEvent(
+                user_id=user.id,
+                feature="keytest",
+                model=spec.id,
+                provider=provider,
+                status="error",
+                key_source=source,
+            )
+        )
+        db.commit()
         return {"ok": False, "source": source, "model": spec.id, "error": str(exc)[:300]}
+    db.add(
+        UsageEvent(
+            user_id=user.id,
+            feature="keytest",
+            model=spec.id,
+            provider=provider,
+            tokens_in=usage.tokens_in,
+            tokens_out=usage.tokens_out,
+            tokens_cached=usage.tokens_cached,
+            cost_usd=usage.cost_usd,
+            latency_ms=usage.latency_ms,
+            status="ok",
+            key_source=source,
+        )
+    )
+    db.commit()
     return {
         "ok": True,
         "source": source,

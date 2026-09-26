@@ -6,7 +6,7 @@ from app import keys as keysmod
 from app.catalog import BY_ID, CATALOG
 from app.config import settings
 from app.db import SessionLocal
-from app.models import ProviderKey, User
+from app.models import ProviderKey, UsageEvent, User
 from app.router import TIER_CANDIDATES
 from app.security import assert_safe_configuration
 
@@ -121,6 +121,9 @@ def test_availability_follows_personal_keys_and_admin_scope(client, headers, mon
 def test_key_test_endpoint_uses_the_cheapest_model(client, headers):
     body = client.post("/v1/keys/Groq/test", headers=headers).json()
     assert body["ok"] is True and body["model"] == "groq-gpt-oss-20b" and body["source"] == "fake"
+    with SessionLocal() as db:
+        row = db.query(UsageEvent).filter_by(user_id="u1", feature="keytest", model="groq-gpt-oss-20b").order_by(UsageEvent.created_at.desc()).first()
+        assert row is not None and row.status == "ok" and row.key_source == "fake", "a key test is metered like any other call"
     assert client.post("/v1/keys/Nope/test", headers=headers).status_code == 404
 
 
