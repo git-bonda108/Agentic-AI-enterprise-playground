@@ -30,6 +30,7 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
   const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
+    let stale = false;  // a slower, older response must not overwrite a newer one
     const t = setTimeout(async () => {
       const params = new URLSearchParams({ limit: "60" });
       if (q) params.set("q", q);
@@ -37,9 +38,9 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
       if (transport) params.set("transport", transport);
       if (approval) params.set("approval", approval);
       const res = await fetch(`/api/pg/v1/connectors?${params}`);
-      if (res.ok) { const j = await res.json(); setRows(j.connectors); setTotal(j.total); }
+      if (res.ok) { const j = await res.json(); if (!stale) { setRows(j.connectors); setTotal(j.total); } }
     }, 200);
-    return () => clearTimeout(t);
+    return () => { stale = true; clearTimeout(t); };
   }, [q, category, transport, approval]);
 
   const refreshStats = async () => { const r = await fetch("/api/pg/v1/connectors/stats"); if (r.ok) setStats(await r.json()); };

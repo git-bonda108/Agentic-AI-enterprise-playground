@@ -27,15 +27,17 @@ export function CatalogBrowser({ initial, families, stats }: { initial: CatalogE
   const [runTarget, setRunTarget] = useState<RunTarget | null>(null);
 
   useEffect(() => {
+    let stale = false;  // a slower, older response must not overwrite a newer one
     const t = setTimeout(async () => {
       const params = new URLSearchParams();
       if (family !== "All") params.set("family", family);
       if (q) params.set("q", q);
       if (onlyRunnable) params.set("runnable", "true");
       const res = await fetch(`/api/pg/v1/catalog?${params}`);
-      if (res.ok) setEntries((await res.json()).entries);
+      const body = res.ok ? await res.json() : null;
+      if (body && !stale) setEntries(body.entries);
     }, 200);
-    return () => clearTimeout(t);
+    return () => { stale = true; clearTimeout(t); };
   }, [family, q, onlyRunnable]);
 
   const openDetail = async (e: CatalogEntry) => {

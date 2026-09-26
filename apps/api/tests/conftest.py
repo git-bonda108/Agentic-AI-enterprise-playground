@@ -11,13 +11,15 @@ os.environ["PLAYGROUND_CHECKPOINT_PATH"] = os.path.join(tempfile.mkdtemp(), "che
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.pool import StaticPool
 
 from app import db as dbmod
 from app.main import app
 
-# One shared in-memory database for the whole test session.
-dbmod.engine = dbmod.create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool, future=True)
+# One shared database file for the whole test session. A file (not :memory: with a StaticPool) gives every thread its own
+# connection: the runtime, the canary scheduler and the sandbox's HTTP server all touch the database concurrently, and a
+# single pysqlite connection shared across threads can crash the interpreter.
+_DB_FILE = os.path.join(tempfile.mkdtemp(), "test.db")
+dbmod.engine = dbmod.create_engine(f"sqlite:///{_DB_FILE}", connect_args={"check_same_thread": False, "timeout": 30}, future=True)
 dbmod.SessionLocal.configure(bind=dbmod.engine)
 
 HEADERS = {

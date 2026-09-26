@@ -16,15 +16,17 @@ export function SkillBrowser({ initial, stats }: { initial: Skill[]; stats: Skil
   const [detail, setDetail] = useState<Skill | null>(null);
 
   useEffect(() => {
+    let stale = false;  // a slower, older response must not overwrite a newer one
     const t = setTimeout(async () => {
       const params = new URLSearchParams({ limit: "300" });
       if (q) params.set("q", q);
       if (category) params.set("category", category);
       if (source) params.set("source", source);
       const res = await fetch(`/api/pg/v1/skills?${params}`);
-      if (res.ok) setRows((await res.json()).skills);
+      const body = res.ok ? await res.json() : null;
+      if (body && !stale) setRows(body.skills);
     }, 200);
-    return () => clearTimeout(t);
+    return () => { stale = true; clearTimeout(t); };
   }, [q, category, source]);
 
   const open = async (s: Skill) => {
