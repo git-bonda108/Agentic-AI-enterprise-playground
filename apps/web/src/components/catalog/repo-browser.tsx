@@ -7,7 +7,9 @@ import type { Repo, RepoCategory } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
 
 const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10_000 ? 0 : 1)}k` : String(n));
-const when = (iso: string) => (iso ? new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short" }) : "");
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// Deterministic formatting: browser locales abbreviate months differently from Node, which broke hydration.
+const when = (iso: string) => { if (!iso) return ""; const d = new Date(iso); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 
 export function RepoBrowser({ initial, categories, generatedAt, starsTotal }: { initial: Repo[]; categories: RepoCategory[]; generatedAt: string | null; starsTotal: number }) {
   const [category, setCategory] = useState("");
