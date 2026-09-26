@@ -177,6 +177,20 @@ All routes require the internal key and identity headers, which the web applicat
 | GET, PUT | `/v1/adoption/assumptions` | Minutes saved per outcome and hourly value (admin edits) |
 | POST | `/v1/adoption/digest` | The adoption digest agent writes a narrative with recommendations |
 
+## Notebooks
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/notebooks/gallery` | Getting-started notebooks and one MVP per domain blueprint, with category (Gen AI, Agentic AI), level and minutes |
+| GET | `/v1/notebooks/gallery/{slug}.ipynb`, `/v1/notebooks/blueprint/{id}.ipynb`, `/v1/notebooks/run/{id}.ipynb`, `/v1/notebooks/conversation/{id}.ipynb`, `/v1/notebooks/blank.ipynb` | Generated notebooks; every one starts with the bootstrap cell that imports the `playground` helper |
+| GET | `/v1/notebooks/playground.py` | The helper module (see docs/NOTEBOOKS.md) |
+| GET | `/v1/notebooks/compute?path=` | Where the notebook can run: browser, sandbox, NVIDIA Brev, Colab, Codespaces, with deep links when the playground has a public address |
+| POST | `/v1/notebooks/execute` | Run a whole notebook (`path`) or explicit `cells` in the sandbox; returns per-cell stdout and the first error; `%pip install` lines install into the caller's environment |
+| POST | `/v1/sandbox/pip` | Install packages into the caller's sandbox environment (validated specifiers only) |
+| POST | `/v1/sandbox/execute` | One snippet in the sandbox with the helper on the path |
+| POST | `/v1/notebooks/heartbeat` | Zero-cost editor activity for notebook hours |
+| GET | `/v1/data`, `/v1/data/{id}` | Mock datasets: catalog with previews, and all rows of one dataset |
+
 ## Provider keys
 
 People bring their own provider keys, as in the OpenAI or Claude playgrounds. A personal key is encrypted at rest (Fernet, `PLAYGROUND_KEY_ENCRYPTION_KEY`) and only its last four characters are ever returned. Resolution for a call: the caller's personal key for the provider first; otherwise the platform key from the API environment when the admin scope allows it. The judge, canaries and platform agents always use platform keys.

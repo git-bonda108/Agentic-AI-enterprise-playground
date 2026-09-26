@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -25,11 +26,17 @@ from app.keys import available_providers, resolve_key
 from app.llm import ProviderError, complete
 from app.models import AgentVersion, Conversation, CustomAgent, Run, UsageEvent, User
 from app.notebooks import (
+    HELPER,
+    compute_options,
     execute,
+    execute_notebook,
+    gallery,
     notebook_blank,
     notebook_for_blueprint,
     notebook_for_conversation,
+    notebook_for_gallery,
     notebook_for_run,
+    pip_install,
 )
 from app.router import SMART, route
 from app.routers.runs import _payload as run_payload
@@ -50,6 +57,113 @@ def _manifest(blueprint_id: str) -> dict:
 
 
 # ---------- notebooks ----------
+
+@router.get("/v1/notebooks/playground.py")
+def nb_helper(_: User = Depends(current_user)) -> Response:
+    """The helper module notebooks import; the browser runtime fetches it under the person's session."""
+    return Response(HELPER, media_type="text/x-python")
+
+
+@router.get("/v1/notebooks/gallery")
+def nb_gallery(_: User = Depends(current_user)) -> dict:
+    manifests = [bp.manifest() for bp in REGISTRY.values() if bp.family not in ("Runtime", "Platform")]
+    return {"notebooks": gallery(manifests)}
+
+
+@router.get("/v1/notebooks/gallery/{slug}.ipynb")
+def nb_gallery_item(slug: str, _: User = Depends(current_user)) -> Response:
+    nb = notebook_for_gallery(slug)
+    if nb is None:
+        raise HTTPException(status_code=404, detail="Unknown notebook")
+    return Response(json.dumps(nb), media_type=IPYNB)
+
+
+@router.get("/v1/notebooks/compute")
+def nb_compute(path: str = Query(min_length=1, max_length=300), _: User = Depends(current_user)) -> dict:
+    """Where this notebook can run, with deep links for external compute."""
+    if not path.startswith("/v1/notebooks/") or not path.endswith(".ipynb"):
+        raise HTTPException(status_code=400, detail="Not a notebook path")
+    return {"options": compute_options(path, path.rsplit("/", 1)[-1])}
+
+
+class NotebookExecuteBody(BaseModel):
+    path: str | None = Field(default=None, max_length=300)
+    cells: list[str] | None = Field(default=None, max_length=60)
+    timeout: int = Field(default=300, ge=10, le=600)
+
+
+def _sandbox_env(user: User) -> dict[str, str]:
+    return {
+        "PLAYGROUND_API_URL": settings.self_url, "PLAYGROUND_INTERNAL_KEY": settings.internal_key, "PLAYGROUND_USER_ID": user.id,
+        "PLAYGROUND_USER_EMAIL": user.email, "PLAYGROUND_USER_NAME": user.name, "PLAYGROUND_USER_ROLE": user.role, "PLAYGROUND_USER_DEPARTMENT": user.department,
+    }
+
+
+def _notebook_by_path(path: str, user: User, db: Session) -> dict:
+    """Resolve a generated notebook by its API path so the sandbox runs exactly what the browser shows."""
+    if path == "/v1/notebooks/blank.ipynb":
+        return notebook_blank()
+    m = re.match(r"^/v1/notebooks/(gallery|blueprint|run|conversation)/([A-Za-z0-9_.-]+)\.ipynb$", path)
+    if m is None:
+        raise HTTPException(status_code=400, detail="Not a notebook path")
+    kind, key = m.groups()
+    if kind == "gallery":
+        nb = notebook_for_gallery(key)
+        if nb is None:
+            raise HTTPException(status_code=404, detail="Unknown notebook")
+        return nb
+    if kind == "blueprint":
+        return notebook_for_blueprint(_manifest(key))
+    if kind == "run":
+        run = db.get(Run, key)
+        if run is None or (run.user_id != user.id and user.role not in ("admin", "champion")):
+            raise HTTPException(status_code=404, detail="Run not found")
+        return notebook_for_run(run_payload(run), _manifest(run.blueprint_id))
+    c = db.get(Conversation, key)
+    if c is None or c.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return notebook_for_conversation({"title": c.title, "model": c.model, "messages": [{"role": mm.role, "content": mm.content} for mm in c.messages]})
+
+
+@router.post("/v1/notebooks/execute")
+def nb_execute(body: NotebookExecuteBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Run a whole notebook (by path, or explicit cells) in the sandbox and return each cell's output."""
+    if body.cells is None and not body.path:
+        raise HTTPException(status_code=400, detail="Give a notebook path or cells")
+    cells = body.cells if body.cells is not None else [c["source"] if isinstance(c["source"], str) else "".join(c["source"]) for c in _notebook_by_path(body.path or "", user, db)["cells"] if c["cell_type"] == "code"]
+    result = execute_notebook(cells, _sandbox_env(user), user.id, timeout=body.timeout)
+    db.add(UsageEvent(user_id=user.id, feature="notebook", model="sandbox", provider=result["backend"], latency_ms=result["ms"], status="ok" if result["ok"] else "error"))
+    db.commit()
+    return result
+
+
+class PipBody(BaseModel):
+    packages: list[str] = Field(min_length=1, max_length=20)
+
+
+@router.post("/v1/sandbox/pip")
+def sandbox_pip(body: PipBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Install packages into the caller's sandbox environment; they stay for later runs."""
+    if settings.sandbox_endpoint:
+        return {"ok": False, "stdout": "", "stderr": "Use %pip install inside a cell: dynamic sessions install packages per session.", "ms": 0}
+    result = pip_install(user.id, [p.strip() for p in body.packages])
+    db.add(UsageEvent(user_id=user.id, feature="notebook", model="pip", provider="local", latency_ms=result["ms"], status="ok" if result["ok"] else "error"))
+    db.commit()
+    return result
+
+
+class HeartbeatBody(BaseModel):
+    path: str = Field(max_length=300)
+    mode: str = Field(default="browser", pattern="^(browser|sandbox)$")
+
+
+@router.post("/v1/notebooks/heartbeat", status_code=202)
+def nb_heartbeat(body: HeartbeatBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Editor activity for the adoption clock: one zero-cost ledger row every few minutes while a notebook is open."""
+    db.add(UsageEvent(user_id=user.id, feature="notebook", model=f"editor-{body.mode}", provider="playground", status="ok"))
+    db.commit()
+    return {"recorded": True}
+
 
 @router.get("/v1/notebooks/blank.ipynb")
 def nb_blank(_: User = Depends(current_user)) -> Response:
@@ -85,11 +199,7 @@ class SandboxBody(BaseModel):
 
 @router.post("/v1/sandbox/execute")
 def sandbox_execute(body: SandboxBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    env = {
-        "PLAYGROUND_API_URL": settings.self_url, "PLAYGROUND_INTERNAL_KEY": settings.internal_key, "PLAYGROUND_USER_ID": user.id,
-        "PLAYGROUND_USER_EMAIL": user.email, "PLAYGROUND_USER_NAME": user.name, "PLAYGROUND_USER_ROLE": user.role, "PLAYGROUND_USER_DEPARTMENT": user.department,
-    }
-    result = execute(body.code, env, body.session_id or f"{user.id}-{uuid.uuid4().hex[:8]}")
+    result = execute(body.code, _sandbox_env(user), body.session_id or f"{user.id}-{uuid.uuid4().hex[:8]}", user_id=user.id)
     db.add(UsageEvent(user_id=user.id, feature="notebook", model="sandbox", provider=result["backend"], latency_ms=result["ms"], status="ok" if result["exit_code"] == 0 else "error"))
     db.commit()
     return result

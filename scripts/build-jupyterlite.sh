@@ -11,5 +11,8 @@ JSON
 cat > "$TMP/jupyter-lite.json" <<'JSON'
 { "jupyter-config-data": { "exposeAppInBrowser": true, "appName": "Playground notebooks" } }
 JSON
-( cd "$TMP" && uvx --with jupyterlite-pyodide-kernel --from jupyterlite-core jupyter lite build --output-dir "$OLDPWD/$OUT" )
+# The playground helper ships in the runtime's file drive, so `import playground` works in the browser without a fetch.
+mkdir -p "$TMP/contents"
+cp apps/api/app/notebook_helper.py "$TMP/contents/playground.py"
+( cd "$TMP" && uvx --with jupyterlite-pyodide-kernel --with jupyter-server --from jupyterlite-core jupyter lite build --contents contents --output-dir "$OLDPWD/$OUT" )
 echo "built $OUT"

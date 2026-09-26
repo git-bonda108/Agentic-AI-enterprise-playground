@@ -16,6 +16,7 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 | --- | --- |
 | Multi-model access | A governed catalog of 30 models across eleven providers (Anthropic, OpenAI, Azure OpenAI, Google, DeepSeek, NVIDIA NIM with Nemotron and Hermes, Mistral, xAI, Groq, Cohere, Hugging Face) with live prices and lifecycle state. People bring their own keys from a Keys drawer, as in the OpenAI or Claude playgrounds; platform keys stay hidden. |
 | Security and governance | Entra ID sign-in, role-based model policies, per-user and pooled budgets with alerts and hard stops, and an internal-key boundary between web and API. |
+| Runnable notebooks | A gallery of getting-started notebooks and one MVP notebook per blueprint, each executing end to end on mock data in the browser or in a server sandbox, with package installs and links to GPU compute. See [docs/NOTEBOOKS.md](docs/NOTEBOOKS.md). |
 | Cost management | A ledger that records every call with tokens, cached tokens, latency, cost and which key paid, and a cockpit that slices it by day, department, user, feature, model, provider, key source and conversation. |
 | Smart spend | A deterministic router that classifies each prompt into Economy, Workhorse or Premium and records the savings against a premium baseline. |
 | Agent building | Six runnable domain blueprints on a LangGraph runtime with checkpoints, human review gates and resumable runs, plus a catalog of 175 imported and authored agent definitions. |

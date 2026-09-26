@@ -58,7 +58,7 @@ def test_notebooks_are_valid_ipynb(client, headers):
         r = client.get(path, headers=headers)
         assert r.status_code == 200 and "ipynb" in r.headers["content-type"]
         nb = r.json()
-        assert nb["nbformat"] == 4 and nb["cells"] and any(c["cell_type"] == "code" and "playground_post" in c["source"] for c in nb["cells"])
+        assert nb["nbformat"] == 4 and nb["cells"] and any(c["cell_type"] == "code" and "import playground as pg" in c["source"] for c in nb["cells"])
     run = client.post("/v1/runs", headers=headers, json={"blueprint_id": "knowledge-qa", "input": {"question": "hotel limit"}, "wait": True}).json()
     nb = client.get(f"/v1/notebooks/run/{run['id']}.ipynb", headers=headers).json()
     assert "hotel limit" in json.dumps(nb)

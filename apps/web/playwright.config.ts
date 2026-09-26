@@ -28,6 +28,7 @@ export default defineConfig({
         PLAYGROUND_FAKE_LLM: "true",
         PLAYGROUND_DATABASE_URL: "sqlite:////tmp/eap-e2e.db",
         PLAYGROUND_INTERNAL_KEY: "e2e-internal-key",
+        PLAYGROUND_SELF_URL: "http://127.0.0.1:8011",  // the sandbox subprocesses call the API over HTTP
         PLAYGROUND_ENVIRONMENT: "e2e",
         PLAYGROUND_RATE_LIMIT_PER_MINUTE: "0",
       },

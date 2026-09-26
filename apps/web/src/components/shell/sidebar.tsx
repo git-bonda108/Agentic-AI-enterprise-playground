@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CURRENT_BATCH, NAV, TOTAL_BATCHES } from "@/lib/nav";
+import { CURRENT_BATCH, NAV } from "@/lib/nav";
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const pathname = usePathname();
@@ -73,17 +73,6 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
       </nav>
 
       <div className={cn("border-t border-sidebar-border p-2", collapsed && "flex justify-center")}>
-        {!collapsed && (
-          <div className="mb-2 rounded-lg border bg-card/60 p-2.5">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="font-medium">Build progress</span>
-              <span className="font-mono text-muted-foreground">batch {CURRENT_BATCH} / {TOTAL_BATCHES}</span>
-            </div>
-            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full gradient-brand" style={{ width: `${(CURRENT_BATCH / TOTAL_BATCHES) * 100}%` }} />
-            </div>
-          </div>
-        )}
         <button
           type="button"
           onClick={onToggle}
