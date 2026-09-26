@@ -18,10 +18,11 @@ export function AgentWizard({ initial, ownerId, skills = [], connectors = [], sp
   const router = useRouter();
   const [agents, setAgents] = useState(initial);
   const [open, setOpen] = useState(Boolean(presetSkill));
-  const [form, setForm] = useState({ ...EMPTY_FORM, skills: presetSkill && skills.some((s) => s.id === presetSkill) ? [presetSkill] : [] });
+  const [form, setForm] = useState({ ...EMPTY_FORM, skills: presetSkill ? [presetSkill] : [] });
   const [skillQuery, setSkillQuery] = useState("");
   const toggle = (key: "knowledge" | "skills" | "tools", id: string, on: boolean) => setForm((f) => ({ ...f, [key]: on ? [...f[key], id] : f[key].filter((x) => x !== id) }));
-  const shownSkills = skills.filter((s) => form.skills.includes(s.id) || !skillQuery || `${s.name} ${s.hint ?? ""}`.toLowerCase().includes(skillQuery.toLowerCase())).slice(0, 14);
+  const knownSkills = presetSkill && !skills.some((s) => s.id === presetSkill) ? [{ id: presetSkill, name: presetSkill }, ...skills] : skills;
+  const shownSkills = knownSkills.filter((s) => form.skills.includes(s.id) || !skillQuery || `${s.name} ${s.hint ?? ""}`.toLowerCase().includes(skillQuery.toLowerCase())).slice(0, 14);
   const [saving, setSaving] = useState(false);
   const [runTarget, setRunTarget] = useState<RunTarget | null>(null);
 

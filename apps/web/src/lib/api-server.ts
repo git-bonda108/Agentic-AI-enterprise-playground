@@ -26,7 +26,7 @@ export async function apiGet<T>(path: string): Promise<T | null> {
   const headers = await identityHeaders();
   if (!headers) return null;
   try {
-    const res = await fetch(`${API_URL}${path}`, { headers, cache: "no-store", signal: AbortSignal.timeout(4000) });
+    const res = await fetch(`${API_URL}${path}`, { headers, cache: "no-store", signal: AbortSignal.timeout(12000) });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
