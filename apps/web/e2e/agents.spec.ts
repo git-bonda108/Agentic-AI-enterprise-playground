@@ -6,7 +6,7 @@ test.describe("Batch 3 agent hub and runs", () => {
     await loginAs(page);
     await page.goto("/build/agents");
     await expect(page.getByRole("heading", { level: 1, name: "Agent Hub" })).toBeVisible();
-    await expect(page.getByTestId("blueprint-grid").getByRole("article")).toHaveCount(8);  // six domain blueprints plus two platform agents
+    await expect(page.getByTestId("blueprint-grid").getByRole("article")).toHaveCount(12);  // six domain blueprints plus six platform agents
     await page.getByRole("button", { name: "Run Document reconciliation" }).click();
     await page.getByRole("radio", { name: "Three suspicious invoices" }).click();
     await page.getByRole("button", { name: "Start run" }).click();

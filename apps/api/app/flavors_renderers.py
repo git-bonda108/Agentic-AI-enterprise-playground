@@ -86,7 +86,7 @@ def {_slug(t['id'])}(payload: str) -> str:
     agent = f'''"""{m['name']} as a CrewAI crew, through the playground gateway."""
 import json
 {GATEWAY_PREAMBLE}
-from crewai import LLM, Agent, Crew, Process, Task
+from crewai import Agent, Crew, LLM, Process, Task
 from crewai.tools import tool
 
 {stubs}
