@@ -42,6 +42,7 @@ export default defineConfig({
         PLAYGROUND_API_URL: `http://localhost:${API_PORT}`,
         PLAYGROUND_INTERNAL_KEY: "e2e-internal-key",
         ALLOW_DEV_LOGIN: "true",
+        AUTH_SECRET: "e2e-only-session-secret-not-for-production",
       },
     },
   ],
