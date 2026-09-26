@@ -121,7 +121,7 @@ def seed_usage(db, users: dict[str, User], days: int = 30) -> int:
 
 def run_blueprint(blueprint_id: str, payload: dict, uid: str, resume=None, backdate_days: float = 0.0) -> Run:
     with SessionLocal() as db:
-        run = Run(blueprint_id=blueprint_id, user_id=uid, input=payload, status="queued")
+        run = Run(blueprint_id=blueprint_id, user_id=uid, input=payload, status="queued", source="demo")
         db.add(run)
         db.commit()
         start_run(run, background=False)

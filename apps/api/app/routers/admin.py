@@ -133,18 +133,22 @@ def put_budgets(body: BudgetsBody, _: User = Depends(require_admin), db: Session
 
 @router.get("/settings")
 def get_settings(_: User = Depends(require_admin), db: Session = Depends(get_db)) -> dict:
+    from app.keys import PROVIDERS, key_scope, platform_key
+
     models = catalog_payload()
     providers: dict[str, dict] = {}
     for m in models:
-        p = providers.setdefault(m["provider"], {"provider": m["provider"], "env_key": m["env_key"], "configured": False, "models": 0, "docs_url": m["docs_url"]})
+        meta = PROVIDERS.get(m["provider"], {})
+        p = providers.setdefault(m["provider"], {"provider": m["provider"], "env_key": m["env_key"], "configured": bool(platform_key(m["provider"])), "models": 0, "docs_url": meta.get("docs") or m["docs_url"], "key_page": meta.get("key_page", ""), "pricing": meta.get("pricing", "")})
         p["models"] += 1
-        p["configured"] = p["configured"] or m["available"]
     return {
         "environment": settings.environment,
         "fake_llm": settings.fake_llm,
         "database": settings.database_url.split("://")[0],
         "providers": sorted(providers.values(), key=lambda p: p["provider"]),
         "org_credits_usd": settings.org_credits_usd,
+        "key_scope": key_scope(db),
+        "key_encryption": "configured" if settings.key_encryption_key else "derived-from-internal-key",
     }
 
 

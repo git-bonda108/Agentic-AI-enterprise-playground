@@ -1,5 +1,7 @@
 "use client";
 
+import { openKeysDrawer } from "@/components/shell/keys-drawer";
+
 import { formatTokens, type CatalogModel, type ChatParams } from "@/lib/playground-types";
 
 export function ParamsPanel({ params, onChange, model }: { params: ChatParams; onChange: (p: ChatParams) => void; model?: CatalogModel }) {
@@ -47,7 +49,13 @@ export function ParamsPanel({ params, onChange, model }: { params: ChatParams; o
           <div className="mt-2 flex flex-wrap gap-1">
             {model.tags.map((t) => <span key={t} className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{t}</span>)}
           </div>
-          {!model.available && <p className="mt-2 text-[11px] text-brand-amber">Set {model.env_key} to enable this model.</p>}
+          {!model.available && (
+            <p className="mt-2 text-[11px] text-brand-amber">
+              No {model.provider} key is available.{" "}
+              <button type="button" onClick={() => openKeysDrawer(model.provider)} className="underline">Add your {model.provider} key</button> to use this model.
+            </p>
+          )}
+          {model.available && model.key_source === "personal" && <p className="mt-2 text-[11px] text-brand-violet-soft">Runs on your own {model.provider} key.</p>}
           {model.notes && <p className="mt-2 text-[11px] text-muted-foreground">{model.notes}</p>}
         </div>
       )}

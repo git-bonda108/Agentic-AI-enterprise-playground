@@ -43,16 +43,29 @@ async def _fake_stream(model_id: str, messages: list[dict], params: dict) -> Asy
     }
 
 
-async def _litellm_stream(model_id: str, messages: list[dict], params: dict) -> AsyncIterator[dict]:
+def _no_key_message(spec) -> str:
+    return f"No {spec.provider} key is available for {spec.name}. Add your own {spec.provider} key from the Keys drawer, or ask an admin to enable the platform key ({spec.env_key})."
+
+
+def _credentials(spec, api_key: str | None, api_base: str | None) -> dict:
+    """LiteLLM credentials for one call: an explicit key wins; otherwise the platform key must be present in the environment."""
+    if api_key:
+        creds: dict = {"api_key": api_key}
+        if api_base:
+            creds["api_base"] = api_base
+        return creds
+    if not spec.available():
+        raise ProviderError(_no_key_message(spec))
+    return {}
+
+
+async def _litellm_stream(model_id: str, messages: list[dict], params: dict, api_key: str | None = None, api_base: str | None = None) -> AsyncIterator[dict]:
     import litellm
 
     spec = get_model(model_id)
     if spec is None:
         raise ProviderError(f"Unknown model '{model_id}'")
-    if not spec.available():
-        raise ProviderError(f"{spec.provider} is not configured. Set {spec.env_key} to enable {spec.name}.")
-
-    kwargs: dict = {"model": spec.litellm_model, "messages": messages, "stream": True, "stream_options": {"include_usage": True}}
+    kwargs: dict = {"model": spec.litellm_model, "messages": messages, "stream": True, "stream_options": {"include_usage": True}, **_credentials(spec, api_key, api_base)}
     for key in ("temperature", "max_tokens"):
         if params.get(key) is not None:
             kwargs[key] = params[key]
@@ -87,10 +100,10 @@ async def _litellm_stream(model_id: str, messages: list[dict], params: dict) -> 
     yield {"type": "usage", "usage": Usage(tokens_in, tokens_out, tokens_cached, cost, int((time.perf_counter() - started) * 1000))}
 
 
-def stream_completion(model_id: str, messages: list[dict], params: dict) -> AsyncIterator[dict]:
+def stream_completion(model_id: str, messages: list[dict], params: dict, api_key: str | None = None, api_base: str | None = None) -> AsyncIterator[dict]:
     if settings.fake_llm:
         return _fake_stream(model_id, messages, params)
-    return _litellm_stream(model_id, messages, params)
+    return _litellm_stream(model_id, messages, params, api_key=api_key, api_base=api_base)
 
 
 def _fake_complete(model_id: str, messages: list[dict]) -> tuple[str, Usage]:
@@ -118,7 +131,7 @@ def _fake_tool_calls(messages: list[dict], tools: list[dict]) -> list[dict]:
     return []
 
 
-def complete_with_tools(model_id: str, messages: list[dict], tools: list[dict], max_tokens: int = 1500, temperature: float = 0.2) -> tuple[str, list[dict], Usage]:
+def complete_with_tools(model_id: str, messages: list[dict], tools: list[dict], max_tokens: int = 1500, temperature: float = 0.2, api_key: str | None = None, api_base: str | None = None) -> tuple[str, list[dict], Usage]:
     """One model turn that may request tool calls. Returns (text, tool_calls, usage); tool_calls carry parsed JSON arguments."""
     if settings.fake_llm:
         calls = _fake_tool_calls(messages, tools)
@@ -129,12 +142,11 @@ def complete_with_tools(model_id: str, messages: list[dict], tools: list[dict], 
     spec = get_model(model_id)
     if spec is None:
         raise ProviderError(f"Unknown model '{model_id}'")
-    if not spec.available():
-        raise ProviderError(f"{spec.provider} is not configured. Set {spec.env_key} to enable {spec.name}.")
+    creds = _credentials(spec, api_key, api_base)
     litellm.drop_params = True
     started = time.perf_counter()
     try:
-        response = litellm.completion(model=spec.litellm_model, messages=messages, tools=tools, tool_choice="auto", max_tokens=max_tokens, temperature=temperature)
+        response = litellm.completion(model=spec.litellm_model, messages=messages, tools=tools, tool_choice="auto", max_tokens=max_tokens, temperature=temperature, **creds)
     except Exception as exc:
         raise ProviderError(str(exc)[:500]) from exc
     msg = response.choices[0].message
@@ -151,7 +163,7 @@ def complete_with_tools(model_id: str, messages: list[dict], tools: list[dict], 
     return (msg.content or ""), calls, Usage(tokens_in, tokens_out, 0, estimate_cost(model_id, tokens_in, tokens_out), int((time.perf_counter() - started) * 1000))
 
 
-def complete(model_id: str, messages: list[dict], max_tokens: int = 2048, temperature: float = 0.2) -> tuple[str, Usage]:
+def complete(model_id: str, messages: list[dict], max_tokens: int = 2048, temperature: float = 0.2, api_key: str | None = None, api_base: str | None = None) -> tuple[str, Usage]:
     """Blocking completion used inside blueprint nodes. Raises ProviderError on provider failure."""
     if settings.fake_llm:
         return _fake_complete(model_id, messages)
@@ -160,12 +172,11 @@ def complete(model_id: str, messages: list[dict], max_tokens: int = 2048, temper
     spec = get_model(model_id)
     if spec is None:
         raise ProviderError(f"Unknown model '{model_id}'")
-    if not spec.available():
-        raise ProviderError(f"{spec.provider} is not configured. Set {spec.env_key} to enable {spec.name}.")
+    creds = _credentials(spec, api_key, api_base)
     litellm.drop_params = True
     started = time.perf_counter()
     try:
-        response = litellm.completion(model=spec.litellm_model, messages=messages, max_tokens=max_tokens, temperature=temperature)
+        response = litellm.completion(model=spec.litellm_model, messages=messages, max_tokens=max_tokens, temperature=temperature, **creds)
     except Exception as exc:
         raise ProviderError(str(exc)[:500]) from exc
     text = response.choices[0].message.content or ""

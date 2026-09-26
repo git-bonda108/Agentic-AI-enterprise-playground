@@ -210,16 +210,18 @@ def check_case(run: dict, expect: dict) -> list[dict]:
 
 def _judge_model(user: User | None) -> str:
     from app.governance import allowed_model_ids
+    from app.keys import available_providers
 
     allowed = None
-    if user is not None:
-        with SessionLocal() as db:
+    with SessionLocal() as db:
+        if user is not None:
             allowed = allowed_model_ids(db, user.role)
+        providers = set(available_providers(db, None, "eval"))
     for tier in ("Economy", "Workhorse", "Premium"):
-        spec = first_available(tier, allowed)
+        spec = first_available(tier, allowed, providers)
         if spec:
             return spec.id
-    raise ProviderError("No model available to judge")
+    raise ProviderError("No model available to judge: the platform has no provider key configured")
 
 
 def judge(criterion: dict, case: dict, run: dict, user: User | None, eval_run_id: str, blueprint_id: str) -> dict:
@@ -234,7 +236,7 @@ def judge(criterion: dict, case: dict, run: dict, user: User | None, eval_run_id
     user_msg = f"Criterion: {criterion['name']}. {criterion['description']}\n\nInput:\n{json.dumps(case.get('input'))[:1500]}\n\nKnowledge available to the agent:\n{knowledge or '(none)'}\n\nResponse:\n{answer}"
     model_id = _judge_model(user)
     try:
-        text, usage = complete(model_id, [{"role": "system", "content": system}, {"role": "user", "content": user_msg}], max_tokens=200, temperature=0.0)
+        text, usage = complete(model_id, [{"role": "system", "content": system}, {"role": "user", "content": user_msg}], max_tokens=200, temperature=0.0)  # platform key from the environment
     except ProviderError as exc:
         return {"criterion": criterion["id"], "score": None, "rationale": f"Judge unavailable: {exc}"[:200], "model": model_id}
     spec = get_model(model_id)
@@ -258,11 +260,11 @@ def _resume_answer(case: dict, review: dict | None) -> Any:
     return options[0] if options else "approve"
 
 
-def _run_case(db: Session, suite: EvalSuite, case: dict, user_id: str) -> tuple[dict, int]:
+def _run_case(db: Session, suite: EvalSuite, case: dict, user_id: str, source: str = "eval") -> tuple[dict, int]:
     from app.routers.runs import _payload
 
     started = time.perf_counter()
-    run = Run(blueprint_id=suite.blueprint_id, user_id=user_id, input=case.get("input") or {}, status="queued")
+    run = Run(blueprint_id=suite.blueprint_id, user_id=user_id, input=case.get("input") or {}, status="queued", source=source)
     db.add(run)
     db.commit()
     start_run(run, background=False)
@@ -300,7 +302,7 @@ def execute_eval(eval_run_id: str) -> None:
             results = []
             for case in suite.cases or []:
                 try:
-                    run, ms = _run_case(db, suite, case, er.user_id)
+                    run, ms = _run_case(db, suite, case, er.user_id, source=er.kind if er.kind == "canary" else "eval")
                     checks = check_case(run, case.get("expect") or {})
                     scores = [judge(c, case, run, user, er.id, suite.blueprint_id) for c in criteria] if run.get("status") == "completed" else []
                     scored = [s for s in scores if s.get("score") is not None]

@@ -6,7 +6,7 @@ test.describe("Batch 2 catalog, routing, cost, admin", () => {
     await loginAs(page);
     await page.goto("/discover/models");
     await expect(page.getByRole("heading", { level: 1, name: "Models" })).toBeVisible();
-    await expect(page.getByTestId("model-grid").getByRole("article")).toHaveCount(15);
+    await expect(page.getByTestId("model-grid").getByRole("article")).toHaveCount(30);
     await page.getByRole("button", { name: "DeepSeek", exact: true }).click();
     await expect(page.getByTestId("model-grid").getByRole("article")).toHaveCount(2);
     await page.getByRole("button", { name: "Table view" }).click();

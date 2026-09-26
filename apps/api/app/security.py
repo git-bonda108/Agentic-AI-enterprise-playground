@@ -76,6 +76,8 @@ def assert_safe_configuration() -> list[str]:
         problems.append("PLAYGROUND_DATABASE_URL points at SQLite")
     if any(o.startswith("http://") for o in settings.cors_origins):
         problems.append("PLAYGROUND_CORS_ORIGINS allows a plain-http origin")
+    if not settings.key_encryption_key:
+        problems.append("PLAYGROUND_KEY_ENCRYPTION_KEY is not set (personal provider keys would be encrypted with a key derived from the internal key)")
     if settings.environment in LOCAL_ENVIRONMENTS:
         return problems
     if problems:

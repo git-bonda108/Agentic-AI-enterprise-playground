@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpDown, BookOpen, Check, ExternalLink, LayoutGrid, Lock, Rows3, Search, Sparkles } from "lucide-react";
+import { ArrowUpDown, BookOpen, Check, ExternalLink, LayoutGrid, Lock, Rows3, Search, Sparkles, KeyRound } from "lucide-react";
 import { formatTokens, PROVIDER_ART, type CatalogModel } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { openKeysDrawer } from "@/components/shell/keys-drawer";
 
 const TIERS = ["Frontier", "Premium", "Workhorse", "Economy"] as const;
 const TIER_STYLE: Record<string, string> = {
@@ -111,9 +112,15 @@ export function ModelCatalog({ models, smartEnabled }: { models: (CatalogModel &
                   {m.available && m.allowed ? (
                     <Link href={`/build/playground?model=${m.id}`} className="inline-flex h-8 items-center gap-1 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground">Try in playground</Link>
                   ) : (
-                    <span className="inline-flex h-8 items-center gap-1 rounded-lg border px-3 text-xs text-muted-foreground" title={!m.available ? `Set ${m.env_key}` : "Not allowed for your role"}>
-                      <Lock className="size-3" /> {!m.available ? "Needs key" : "Policy"}
-                    </span>
+                    !m.available ? (
+                      <button type="button" onClick={() => openKeysDrawer(m.provider)} className="inline-flex h-8 items-center gap-1 rounded-lg border border-brand-amber/50 px-3 text-xs text-brand-amber hover:bg-brand-amber/10" title={`Add your own ${m.provider} key to use ${m.name}`}>
+                        <KeyRound className="size-3" /> Add your {m.provider} key
+                      </button>
+                    ) : (
+                      <span className="inline-flex h-8 items-center gap-1 rounded-lg border px-3 text-xs text-muted-foreground" title="Not allowed for your role">
+                        <Lock className="size-3" /> Policy
+                      </span>
+                    )
                   )}
                   <a href={m.docs_url} target="_blank" rel="noreferrer" className="ml-auto inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs text-muted-foreground hover:text-foreground" aria-label={`${m.provider} documentation`}>
                     <BookOpen className="size-3.5" /> Docs <ExternalLink className="size-3" />
@@ -139,7 +146,7 @@ export function ModelCatalog({ models, smartEnabled }: { models: (CatalogModel &
                   <td className="px-3 py-2 text-right font-mono">${m.output_per_m}</td>
                   <td className="px-3 py-2 text-right font-mono">{m.cached_input_per_m !== null ? `$${m.cached_input_per_m}` : "—"}</td>
                   <td className="px-3 py-2 text-right font-mono">{formatTokens(m.context)}</td>
-                  <td className="px-3 py-2">{m.available ? (m.allowed ? <span className="inline-flex items-center gap-1 text-brand-emerald"><Check className="size-3" /> Ready</span> : <span className="text-brand-amber">Policy</span>) : <span className="text-muted-foreground">Needs key</span>}</td>
+                  <td className="px-3 py-2">{m.available ? (m.allowed ? <span className="inline-flex items-center gap-1 text-brand-emerald"><Check className="size-3" /> {m.key_source === "personal" ? "Your key" : "Ready"}</span> : <span className="text-brand-amber">Policy</span>) : <button type="button" onClick={() => openKeysDrawer(m.provider)} className="text-brand-amber hover:underline">Add key</button>}</td>
                   <td className="px-3 py-2 text-right">{m.available && m.allowed && <Link href={`/build/playground?model=${m.id}`} className="text-brand-violet-soft hover:underline">Try</Link>}</td>
                 </tr>
               ))}

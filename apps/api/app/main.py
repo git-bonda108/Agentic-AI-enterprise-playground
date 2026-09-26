@@ -22,6 +22,7 @@ from app.routers import (
     conversations,
     evals,
     faces,
+    keys,
     knowledge,
     mcp,
     models,
@@ -47,7 +48,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
+app = FastAPI(title=settings.app_name, version="1.1.0", lifespan=lifespan)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
@@ -76,6 +77,7 @@ app.include_router(mcp.router)
 app.include_router(evals.router)
 app.include_router(community.router)
 app.include_router(adoption.router)
+app.include_router(keys.router)
 
 
 @app.get("/health")
@@ -89,6 +91,6 @@ def meta() -> dict[str, object]:
     return {
         "app": settings.app_name,
         "version": app.version,
-        "batch": 9,
+        "batch": 10,
         "sections": ["home", "discover", "build", "evaluate", "operate", "community", "admin"],
     }

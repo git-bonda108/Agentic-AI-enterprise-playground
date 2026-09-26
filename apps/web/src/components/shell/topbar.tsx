@@ -9,6 +9,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/shell/theme-toggle";
+import { KeysDrawer } from "@/components/shell/keys-drawer";
 import { signOutAction } from "@/app/login/actions";
 import { findNavItem } from "@/lib/nav";
 import { ROLE_LABEL, type Role } from "@/lib/users";
@@ -73,6 +74,7 @@ export function Topbar({ user, onOpenSearch }: { user: ShellUser; onOpenSearch: 
           <span className={cn("size-1.5 rounded-full", api === "online" ? "bg-brand-emerald animate-pulse-glow" : api === "offline" ? "bg-brand-rose" : "bg-muted-foreground")} />
           API {api}
         </span>
+        <KeysDrawer />
 
         <DropdownMenu>
           <DropdownMenuTrigger aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"} className="relative grid size-8 place-items-center rounded-lg hover:bg-muted">

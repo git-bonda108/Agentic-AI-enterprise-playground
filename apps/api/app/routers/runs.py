@@ -33,7 +33,7 @@ def _payload(run: Run, users: dict[str, User] | None = None) -> dict:
     return {
         "id": run.id, "blueprint_id": run.blueprint_id, "blueprint_name": bp.name if bp else entry["name"] if entry else run.blueprint_id, "user_id": run.user_id,
         "user_name": user.name if user else None, "status": run.status, "input": run.input, "output": run.output, "steps": run.steps or [],
-        "review": run.review, "error": run.error, "cost_usd": run.cost_usd, "tokens_in": run.tokens_in, "tokens_out": run.tokens_out,
+        "source": run.source or "manual", "review": run.review, "error": run.error, "cost_usd": run.cost_usd, "tokens_in": run.tokens_in, "tokens_out": run.tokens_out,
         "created_at": run.created_at.isoformat(), "updated_at": run.updated_at.isoformat(), "finished_at": run.finished_at.isoformat() if run.finished_at else None,
     }
 

@@ -21,6 +21,7 @@ from app.deploy import CLOUDS, render_script
 from app.evals import current_agent_version, rollback_agent, snapshot_agent
 from app.flavors import FRAMEWORKS, render_project, zip_project
 from app.governance import allowed_model_ids, check_budget, check_policy, policy_for
+from app.keys import available_providers, resolve_key
 from app.llm import ProviderError, complete
 from app.models import AgentVersion, Conversation, CustomAgent, Run, UsageEvent, User
 from app.notebooks import (
@@ -107,9 +108,9 @@ def chat_complete(body: CompleteBody, user: User = Depends(current_user), db: Se
     routed = False
     if model_id == SMART:
         prompt = next((m.get("content", "") for m in reversed(body.messages) if m.get("role") == "user"), "")
-        decision = route(prompt, allowed_model_ids(db, user.role))
+        decision = route(prompt, allowed_model_ids(db, user.role), providers=set(available_providers(db, user, "notebook")))
         if decision is None:
-            raise HTTPException(status_code=400, detail="No model available for your role")
+            raise HTTPException(status_code=400, detail="No model with a usable key is available for your role. Add a provider key from the Keys drawer.")
         model_id, routed = decision.model, True
     spec = get_model(model_id)
     if spec is None:
@@ -120,17 +121,20 @@ def chat_complete(body: CompleteBody, user: User = Depends(current_user), db: Se
     budget = check_budget(db, user)
     if not budget.allowed:
         raise HTTPException(status_code=402, detail=budget.reason)
+    api_key, key_source, key_extra = resolve_key(db, user.id, spec.provider, "notebook")
+    if key_source == "none":
+        raise HTTPException(status_code=402, detail=f"No {spec.provider} key is available. Add your own {spec.provider} key from the Keys drawer, or ask an admin to enable the platform key.")
     max_tokens = min(body.max_tokens, policy_for(db, user.role).max_tokens)
     started = time.perf_counter()
     try:
-        text, usage = complete(model_id, body.messages, max_tokens=max_tokens)
+        text, usage = complete(model_id, body.messages, max_tokens=max_tokens, api_key=api_key, api_base=key_extra.get("api_base"))
     except ProviderError as exc:
         db.add(UsageEvent(user_id=user.id, feature="notebook", model=model_id, provider=spec.provider, status="error", latency_ms=int((time.perf_counter() - started) * 1000)))
         db.commit()
         raise HTTPException(status_code=502, detail=str(exc)) from exc
-    db.add(UsageEvent(user_id=user.id, feature="notebook", model=model_id, provider=spec.provider, tokens_in=usage.tokens_in, tokens_out=usage.tokens_out, tokens_cached=usage.tokens_cached, cost_usd=usage.cost_usd, latency_ms=usage.latency_ms, status="ok", routed=routed))
+    db.add(UsageEvent(user_id=user.id, feature="notebook", model=model_id, provider=spec.provider, tokens_in=usage.tokens_in, tokens_out=usage.tokens_out, tokens_cached=usage.tokens_cached, cost_usd=usage.cost_usd, latency_ms=usage.latency_ms, status="ok", routed=routed, key_source=key_source))
     db.commit()
-    return {"text": text, "model": model_id, "routed": routed, "tokens_in": usage.tokens_in, "tokens_out": usage.tokens_out, "cost_usd": usage.cost_usd, "latency_ms": usage.latency_ms}
+    return {"text": text, "model": model_id, "routed": routed, "key_source": key_source, "tokens_in": usage.tokens_in, "tokens_out": usage.tokens_out, "cost_usd": usage.cost_usd, "latency_ms": usage.latency_ms}
 
 
 # ---------- frameworks ----------

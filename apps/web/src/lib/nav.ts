@@ -78,7 +78,7 @@ export const NAV: NavSection[] = [
       { title: "Users", href: "/admin/users", icon: UserCog, batch: 2, blurb: "People, roles and groups from your identity provider." },
       { title: "Policies", href: "/admin/policies", icon: ScrollText, batch: 2, blurb: "Who may use which model, tool and data class." },
       { title: "Budgets", href: "/admin/budgets", icon: Wallet, batch: 2, blurb: "Caps per user and pooled limits with alerts." },
-      { title: "Settings", href: "/admin/settings", icon: Settings, batch: 2, blurb: "Providers, keys, theme and integrations." },
+      { title: "Settings", href: "/admin/settings", icon: Settings, batch: 2, blurb: "Platform keys, who they serve, tokens and runtime." },
     ],
   },
 ];
@@ -94,4 +94,6 @@ export function findNavItem(pathname: string): { section: NavSection; item: NavI
   return null;
 }
 
-export const CURRENT_BATCH = 9;
+export const CURRENT_BATCH = 10;
+/** Batches planned in docs/BATCHES.md; drives the build-progress widget. */
+export const TOTAL_BATCHES = 15;

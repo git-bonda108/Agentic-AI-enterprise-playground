@@ -15,6 +15,23 @@ export type CatalogModel = {
   docs_url: string;
   capabilities: string[];
   available: boolean;
+  /** Which key would serve this model for the caller: personal | platform | fake | none. */
+  key_source?: "personal" | "platform" | "fake" | "none";
+};
+
+export type ProviderKeyStatus = {
+  provider: string;
+  env_key: string;
+  key_page: string;
+  docs: string;
+  pricing: string;
+  prefix: string;
+  needs_base: boolean;
+  models: number;
+  platform_configured: boolean;
+  personal: { last4: string; extra: Record<string, string>; created_at: string; last_used_at: string | null } | null;
+  source: "personal" | "platform" | "fake" | "none";
+  usable: boolean;
 };
 
 export type ChatParams = { temperature: number; max_tokens: number; top_p: number; system: string };

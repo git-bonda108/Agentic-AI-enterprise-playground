@@ -14,9 +14,9 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 
 | Need | What the playground provides |
 | --- | --- |
-| Multi-model access | A governed catalog of 15 models across Anthropic, OpenAI, Azure OpenAI, Google, DeepSeek and Hugging Face, with live prices and lifecycle state. |
+| Multi-model access | A governed catalog of 30 models across eleven providers (Anthropic, OpenAI, Azure OpenAI, Google, DeepSeek, NVIDIA NIM with Nemotron and Hermes, Mistral, xAI, Groq, Cohere, Hugging Face) with live prices and lifecycle state. People bring their own keys from a Keys drawer, as in the OpenAI or Claude playgrounds; platform keys stay hidden. |
 | Security and governance | Entra ID sign-in, role-based model policies, per-user and pooled budgets with alerts and hard stops, and an internal-key boundary between web and API. |
-| Cost management | A ledger that records every call with tokens, cached tokens, latency and cost, and a cockpit that slices it by day, department, user, feature, model, provider and conversation. |
+| Cost management | A ledger that records every call with tokens, cached tokens, latency, cost and which key paid, and a cockpit that slices it by day, department, user, feature, model, provider, key source and conversation. |
 | Smart spend | A deterministic router that classifies each prompt into Economy, Workhorse or Premium and records the savings against a premium baseline. |
 | Agent building | Six runnable domain blueprints on a LangGraph runtime with checkpoints, human review gates and resumable runs, plus a catalog of 175 imported and authored agent definitions. |
 | From playground to production | Any blueprint renders into an OpenAI Agents SDK, LangGraph, CrewAI, Microsoft Agent Framework or Google ADK project, with deploy scripts for Azure AI Foundry, Anthropic Managed Agents, AWS AgentCore and Google Agent Engine. |
@@ -65,7 +65,7 @@ See [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) for a step-by-step walk through e
 
 ## Quick start
 
-Prerequisites: Node 22 or later, Python 3.12 and [uv](https://docs.astral.sh/uv/). At least one model provider key makes the models live; without keys the offline provider answers deterministically at no cost.
+Prerequisites: Node 22 or later, Python 3.12 and [uv](https://docs.astral.sh/uv/). Add provider keys to `.env` as platform keys, or add your own from the Keys drawer once signed in; without any key the offline provider answers deterministically at no cost.
 
 ```bash
 git clone https://github.com/git-bonda108/Agentic-AI-enterprise-playground.git
@@ -126,4 +126,4 @@ The catalog includes agent definitions imported from public repositories, each s
 
 ## Roadmap
 
-Batch 9 adds the Azure deployment templates, CI, demo seed data and the security pass. The plan for each batch is in [docs/BATCHES.md](docs/BATCHES.md).
+Batches 0 to 9 built the product; Batch 10 added bring-your-own keys and thirteen more models. Batches 11 to 15 (executable notebooks with compute choice, agents on every framework, cloud platform guides, datasets and deeper cost analytics, a documentation hub) are planned in [docs/BATCHES.md](docs/BATCHES.md).

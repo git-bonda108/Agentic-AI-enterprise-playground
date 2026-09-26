@@ -16,6 +16,7 @@ dependencies = [
   "langgraph>=0.4",
   "langgraph-checkpoint-sqlite>=2.0",
   "pandas>=2.2",
+  "cryptography>=50.0.1",
 ]
 
 [dependency-groups]

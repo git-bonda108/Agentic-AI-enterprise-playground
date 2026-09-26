@@ -20,7 +20,9 @@ def preview(body: RoutePreviewRequest, user: User = Depends(current_user), db: S
     policy = policy_for(db, user.role)
     if not policy.smart_enabled:
         return {"enabled": False, "reason": "Smart routing is disabled for your role."}
-    decision = route(body.prompt, allowed_model_ids(db, user.role))
+    from app.keys import available_providers
+
+    decision = route(body.prompt, allowed_model_ids(db, user.role), providers=set(available_providers(db, user, "chat")))
     if decision is None:
         return {"enabled": True, "decision": None, "reason": "No model is available for your role."}
     return {

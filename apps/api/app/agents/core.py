@@ -40,14 +40,30 @@ class RunContext:
     blueprint_id: str
     user_id: str
     allowed_models: set[str] | None = None
+    providers: dict[str, str] | None = None  # provider -> key source usable by this run; None means platform keys only
+    feature: str = "agent"  # "agent" for people's runs; "canary" / "platform" always resolve to platform keys
     lock: threading.Lock = field(default_factory=threading.Lock)
 
     def resolve_model(self, tier: str) -> str:
+        usable = set(self.providers) if self.providers is not None else None
         for t in TIER_FALLBACK.get(tier, ["Workhorse", "Economy", "Premium"]):
-            spec = first_available(t, self.allowed_models)
+            spec = first_available(t, self.allowed_models, usable)
             if spec:
                 return spec.id
-        raise ProviderError("No model is available for this run. Configure a provider key.")
+        raise ProviderError("No model with a usable key is available for this run. Add a provider key from the Keys drawer, or ask an admin to enable platform keys.")
+
+    def _credentials(self, model_id: str) -> tuple[dict, str]:
+        """(kwargs for the LLM call, key source) for the resolved model."""
+        from app.keys import resolve_key
+
+        spec = get_model(model_id)
+        if spec is None:
+            return {}, "none"
+        with SessionLocal() as db:
+            secret, source, extra = resolve_key(db, self.user_id, spec.provider, self.feature)
+        if source == "none":
+            raise ProviderError(f"No {spec.provider} key is available for {spec.name}. Add your own key from the Keys drawer.")
+        return ({"api_key": secret, "api_base": extra.get("api_base")} if secret else {}), source
 
     def llm(self, tier: str, system: str, user: str, *, max_tokens: int = 1500, temperature: float = 0.2, json_mode: bool = False) -> str:
         """One metered model call. Cost lands on the ledger and on the run."""
@@ -55,25 +71,27 @@ class RunContext:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         if json_mode:
             messages[0]["content"] += " Respond with valid JSON only, no prose."
-        text, usage = complete(model_id, messages, max_tokens=max_tokens, temperature=temperature)
-        self._meter(model_id, usage)
+        creds, source = self._credentials(model_id)
+        text, usage = complete(model_id, messages, max_tokens=max_tokens, temperature=temperature, **creds)
+        self._meter(model_id, usage, source)
         return text
 
     def llm_tools(self, tier: str, system: str, user: str, tools: list[dict], *, max_tokens: int = 1500) -> tuple[str, list[dict]]:
         """A metered model turn that may ask for tool calls (OpenAI-style tool specs)."""
         model_id = self.resolve_model(tier)
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
-        text, calls, usage = complete_with_tools(model_id, messages, tools, max_tokens=max_tokens)
-        self._meter(model_id, usage)
+        creds, source = self._credentials(model_id)
+        text, calls, usage = complete_with_tools(model_id, messages, tools, max_tokens=max_tokens, **creds)
+        self._meter(model_id, usage, source)
         return text, calls
 
-    def _meter(self, model_id: str, usage) -> None:
+    def _meter(self, model_id: str, usage, key_source: str = "platform") -> None:
         spec = get_model(model_id)
         with self.lock, SessionLocal() as db:
             db.add(UsageEvent(
                 user_id=self.user_id, feature="agent", model=model_id, provider=spec.provider if spec else "unknown",
                 tokens_in=usage.tokens_in, tokens_out=usage.tokens_out, tokens_cached=usage.tokens_cached, cost_usd=usage.cost_usd,
-                latency_ms=usage.latency_ms, status="ok", run_id=self.run_id, blueprint_id=self.blueprint_id,
+                latency_ms=usage.latency_ms, status="ok", run_id=self.run_id, blueprint_id=self.blueprint_id, key_source=key_source,
             ))
             run = db.get(Run, self.run_id)
             if run is not None:

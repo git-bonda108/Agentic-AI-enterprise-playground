@@ -13,7 +13,7 @@ All routes require the internal key and identity headers, which the web applicat
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| GET | `/v1/models` | Catalog with prices, tiers, capabilities, availability |
+| GET | `/v1/models` | Catalog with prices, tiers, capabilities and availability for the caller; each model carries `key_source` (`personal`, `platform`, `fake` or `none`) |
 | POST | `/v1/route/preview` | Classify a prompt and show the model Smart routing would pick, with expected savings |
 
 ## Chat and conversations
@@ -176,6 +176,20 @@ All routes require the internal key and identity headers, which the web applicat
 | GET | `/v1/adoption/summary` | Hours per feature, outcomes, cost per outcome, ROI matrix, weekly series, assumptions |
 | GET, PUT | `/v1/adoption/assumptions` | Minutes saved per outcome and hourly value (admin edits) |
 | POST | `/v1/adoption/digest` | The adoption digest agent writes a narrative with recommendations |
+
+## Provider keys
+
+People bring their own provider keys, as in the OpenAI or Claude playgrounds. A personal key is encrypted at rest (Fernet, `PLAYGROUND_KEY_ENCRYPTION_KEY`) and only its last four characters are ever returned. Resolution for a call: the caller's personal key for the provider first; otherwise the platform key from the API environment when the admin scope allows it. The judge, canaries and platform agents always use platform keys.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/keys` | One row per provider: source (`personal`, `platform`, `fake`, `none`), last four characters of a personal key, the key page, docs and pricing links, model count; plus the admin scope |
+| PUT | `/v1/keys/{provider}` | Save or replace a personal key (`key`, optional `api_base` for Azure OpenAI). Prefix is validated per provider |
+| DELETE | `/v1/keys/{provider}` | Remove the personal key |
+| POST | `/v1/keys/{provider}/test` | One tiny completion on the provider's cheapest model with the key that would serve the caller |
+| PUT | `/v1/keys/admin/scope` | Admin: `all` (platform keys serve everyone; pilot default) or `platform-only` (people bring their own) |
+
+Every ledger row records `key_source`, and `/v1/usage/breakdown?by=key_source` splits spend between personal and platform keys.
 
 ## Limits and headers
 

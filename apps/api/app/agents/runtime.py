@@ -63,10 +63,14 @@ def graph_for(blueprint_id: str):
 def context_for(run: Run) -> RunContext:
     ctx = CONTEXTS.get(run.id)
     if ctx is None:
+        from app.keys import available_providers
+
+        feature = "canary" if run.source == "canary" else "agent"
         with SessionLocal() as db:
             user = db.get(User, run.user_id)
             allowed = allowed_model_ids(db, user.role) if user else None
-        ctx = RunContext(run_id=run.id, blueprint_id=run.blueprint_id, user_id=run.user_id, allowed_models=allowed)
+            providers = available_providers(db, user, feature)
+        ctx = RunContext(run_id=run.id, blueprint_id=run.blueprint_id, user_id=run.user_id, allowed_models=allowed, providers=providers, feature=feature)
         CONTEXTS[run.id] = ctx
     return ctx
 

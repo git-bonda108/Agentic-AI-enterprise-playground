@@ -52,7 +52,12 @@ def summary_for(db: Session, user: User, days: int) -> dict:
     by_model: dict[str, dict] = {}
     by_feature: dict[str, dict] = {}
     by_user: dict[str, dict] = {}
+    by_key_source: dict[str, dict] = {}
     for e in events:
+        ks = by_key_source.setdefault(e.key_source or "platform", {"key_source": e.key_source or "platform", "tokens": 0, "cost_usd": 0.0, "requests": 0})
+        ks["tokens"] += e.tokens_in + e.tokens_out
+        ks["cost_usd"] += e.cost_usd
+        ks["requests"] += 1
         d = e.created_at.date().isoformat() if e.created_at.tzinfo else e.created_at.replace(tzinfo=UTC).date().isoformat()
         row = by_day.setdefault(d, {"day": d, "tokens": 0, "cost_usd": 0.0, "requests": 0})
         row["tokens"] += e.tokens_in + e.tokens_out
@@ -93,10 +98,11 @@ def summary_for(db: Session, user: User, days: int) -> dict:
         "by_model": sorted(by_model.values(), key=lambda r: -r["cost_usd"]),
         "by_feature": sorted(by_feature.values(), key=lambda r: -r["cost_usd"]),
         "by_user": sorted(by_user.values(), key=lambda r: -r["cost_usd"])[:20],
+        "by_key_source": sorted(by_key_source.values(), key=lambda r: -r["cost_usd"]),
     }
 
 
-LAYERS = ("day", "department", "user", "feature", "model", "provider", "conversation")
+LAYERS = ("day", "department", "user", "feature", "model", "provider", "key_source", "conversation")
 
 
 @router.get("/breakdown")
@@ -136,6 +142,8 @@ def usage_breakdown(
             return e.feature, e.feature
         if by == "provider":
             return e.provider, e.provider
+        if by == "key_source":
+            return (e.key_source or "platform"), ("Your key" if e.key_source == "personal" else "Platform key")
         if by == "conversation":
             cid = e.conversation_id or "-"
             return cid, conv_titles.get(cid, "Unsaved (compare or agent)")

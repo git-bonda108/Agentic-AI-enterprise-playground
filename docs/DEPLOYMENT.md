@@ -45,7 +45,9 @@ Prerequisites: Azure CLI signed in with rights to create resources in a subscrip
 export PG_PASSWORD='a-long-random-password'
 export PLAYGROUND_INTERNAL_KEY="$(openssl rand -hex 32)"
 export AUTH_SECRET="$(openssl rand -hex 32)"
-export ANTHROPIC_API_KEY='sk-ant-...'
+export PLAYGROUND_KEY_ENCRYPTION_KEY="$(python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
+export ANTHROPIC_API_KEY='sk-ant-...'          # platform keys are optional: people can bring their own from the Keys drawer
+export NVIDIA_NIM_API_KEY='nvapi-...'
 infra/deploy.sh rg-ai-playground westeurope aiplay
 ```
 
@@ -65,7 +67,7 @@ The GitHub Actions workflow runs on every push and pull request:
 
 ## 5. Configuration the API refuses to run with
 
-Outside a local environment the API exits at start-up if any of these hold: the internal key is the development default or shorter than 24 characters, the fake provider is on, the database is SQLite, or a plain-http origin is allowed for CORS. The Bicep template satisfies all of them; the guard exists so a hand-edited configuration cannot.
+Outside a local environment the API exits at start-up if any of these hold: the internal key is the development default or shorter than 24 characters, the fake provider is on, the database is SQLite, a plain-http origin is allowed for CORS, or the key encryption key is missing. The Bicep template satisfies all of them; the guard exists so a hand-edited configuration cannot.
 
 ## 6. Operations
 

@@ -81,6 +81,7 @@ class UsageEvent(Base):
     status: Mapped[str] = mapped_column(String(16), default="ok")  # ok | error | blocked
     routed: Mapped[bool] = mapped_column(Boolean, default=False)
     routed_tier: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    key_source: Mapped[str] = mapped_column(String(16), default="platform")  # platform | personal | none
     savings_usd: Mapped[float] = mapped_column(Float, default=0.0)
     run_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
     blueprint_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
@@ -96,6 +97,7 @@ class Run(Base):
     blueprint_id: Mapped[str] = mapped_column(String(64), index=True)
     user_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
     status: Mapped[str] = mapped_column(String(24), default="queued", index=True)  # queued | running | waiting_review | completed | failed
+    source: Mapped[str] = mapped_column(String(16), default="manual")  # manual | eval | canary | demo | platform
     input: Mapped[dict] = mapped_column(JSON, default=dict)
     output: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     steps: Mapped[list[dict]] = mapped_column(JSON, default=list)
@@ -424,4 +426,29 @@ class Assumption(Base):
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     value: Mapped[float] = mapped_column(Float)
     label: Mapped[str] = mapped_column(String(160), default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class ProviderKey(Base):
+    """A person's own provider key, encrypted at rest. Only the last four characters are ever returned."""
+
+    __tablename__ = "provider_keys"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
+    provider: Mapped[str] = mapped_column(String(48), index=True)
+    ciphertext: Mapped[str] = mapped_column(Text)
+    last4: Mapped[str] = mapped_column(String(8), default="")
+    extra: Mapped[dict] = mapped_column(JSON, default=dict)  # e.g. api_base for Azure OpenAI
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class AppSetting(Base):
+    """Admin-editable product settings, such as what the platform's own keys may be used for."""
+
+    __tablename__ = "app_settings"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[dict] = mapped_column(JSON, default=dict)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)

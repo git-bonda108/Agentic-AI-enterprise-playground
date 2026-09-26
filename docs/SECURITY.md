@@ -9,7 +9,7 @@ What protects the playground, layer by layer, and what a reviewer should verify.
 | Browser to web | Entra ID OpenID Connect, HTTP-only session cookie, CSRF handled by Auth.js | `apps/web/src/auth.ts` |
 | Web to API | Shared internal key in a header, at least 24 characters in production; identity asserted only by the web tier; the API has internal ingress only | `apps/api/app/auth.py`, `infra/bicep/main.bicep` |
 | External MCP clients to API | Personal access tokens, shown once, stored as SHA-256, revocable; every call metered to the owner | `apps/api/app/routers/mcp.py` |
-| API to providers | Keys in environment variables sourced from Key Vault; never persisted or returned | `apps/api/app/llm.py` |
+| API to providers | Platform keys in environment variables sourced from Key Vault, never returned. Personal keys encrypted at rest with Fernet (`PLAYGROUND_KEY_ENCRYPTION_KEY`), only the last four characters returned, resolved per call and never logged | `apps/api/app/keys.py`, `apps/api/app/llm.py` |
 | Model access | Role policies checked before every call | `apps/api/app/governance.py` |
 | Spend | Budgets with alerts at 50, 80 and 100 percent and a hard stop | `apps/api/app/governance.py` |
 | Code execution | Browser (Pyodide) or Container Apps dynamic sessions with egress disabled; locally an isolated subprocess | `apps/api/app/notebooks.py` |
@@ -32,6 +32,7 @@ Outside `local`, `e2e`, `test` and `development` environments the API refuses to
 - `.env` is ignored by git; `.env.example` contains placeholders only.
 - CI runs gitleaks over the full history on every push, plus `npm audit` and `pip-audit`.
 - Personal tokens and the internal key never appear in logs or responses after creation.
+- Personal provider keys are stored as Fernet ciphertext; the encryption key is required outside local environments and rotating it invalidates stored keys (people re-enter them). The judge, canaries and platform agents never use personal keys.
 
 ## What is out of scope for the pilot
 

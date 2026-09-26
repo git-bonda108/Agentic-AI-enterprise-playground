@@ -66,6 +66,26 @@ param geminiApiKey string = ''
 @description('DeepSeek API key.')
 param deepseekApiKey string = ''
 
+@secure()
+@description('NVIDIA NIM API key (build.nvidia.com): Nemotron, Hermes and the NIM shelf.')
+param nvidiaNimApiKey string = ''
+
+@secure()
+@description('Mistral API key.')
+param mistralApiKey string = ''
+
+@secure()
+@description('xAI API key.')
+param xaiApiKey string = ''
+
+@secure()
+@description('Groq API key.')
+param groqApiKey string = ''
+
+@secure()
+@description('Fernet key that encrypts personal provider keys at rest (python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"). Required.')
+param keyEncryptionKey string
+
 @description('Minimum replicas for the API. 1 keeps the canary scheduler and checkpoints warm.')
 param apiMinReplicas int = 1
 
@@ -114,6 +134,11 @@ var secretDefinitions = [
   { name: 'openai-api-key', value: openaiApiKey }
   { name: 'gemini-api-key', value: geminiApiKey }
   { name: 'deepseek-api-key', value: deepseekApiKey }
+  { name: 'nvidia-nim-api-key', value: nvidiaNimApiKey }
+  { name: 'mistral-api-key', value: mistralApiKey }
+  { name: 'xai-api-key', value: xaiApiKey }
+  { name: 'groq-api-key', value: groqApiKey }
+  { name: 'key-encryption-key', value: keyEncryptionKey }
   { name: 'entra-client-secret', value: entraClientSecret }
 ]
 
@@ -221,6 +246,11 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
         { name: 'openai-api-key', value: openaiApiKey }
         { name: 'gemini-api-key', value: geminiApiKey }
         { name: 'deepseek-api-key', value: deepseekApiKey }
+        { name: 'nvidia-nim-api-key', value: nvidiaNimApiKey }
+        { name: 'mistral-api-key', value: mistralApiKey }
+        { name: 'xai-api-key', value: xaiApiKey }
+        { name: 'groq-api-key', value: groqApiKey }
+        { name: 'key-encryption-key', value: keyEncryptionKey }
       ]
     }
     template: {
@@ -241,6 +271,11 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
           { name: 'OPENAI_API_KEY', secretRef: 'openai-api-key' }
           { name: 'GEMINI_API_KEY', secretRef: 'gemini-api-key' }
           { name: 'DEEPSEEK_API_KEY', secretRef: 'deepseek-api-key' }
+          { name: 'NVIDIA_NIM_API_KEY', secretRef: 'nvidia-nim-api-key' }
+          { name: 'MISTRAL_API_KEY', secretRef: 'mistral-api-key' }
+          { name: 'XAI_API_KEY', secretRef: 'xai-api-key' }
+          { name: 'GROQ_API_KEY', secretRef: 'groq-api-key' }
+          { name: 'PLAYGROUND_KEY_ENCRYPTION_KEY', secretRef: 'key-encryption-key' }
         ]
         probes: [
           { type: 'Liveness', httpGet: { path: '/health', port: 8000 }, periodSeconds: 30 }

@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     canary_scheduler: bool = True
     # Requests per minute per caller before the API answers 429. 0 disables the limit.
     rate_limit_per_minute: int = 240
+    # Fernet key (urlsafe base64, 32 bytes) for personal provider keys at rest. Empty derives one from the internal key locally only.
+    key_encryption_key: str = ""
 
 
 settings = Settings()

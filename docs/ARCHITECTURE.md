@@ -130,7 +130,7 @@ Imported catalog entries (roles, personas, topologies, low-code templates and cl
 | --- | --- |
 | Browser to web | Entra ID OIDC, HTTP-only session cookie, CSRF handled by Auth.js |
 | Web to API | Shared internal key in a header; identity asserted by the web tier only. The API is not exposed to browsers. |
-| API to providers | Keys in the environment (Key Vault in Azure), never in the database or in responses |
+| API to providers | Platform keys in the environment (Key Vault in Azure), never in responses; personal keys encrypted at rest and resolved per call |
 | Model access | Role policies, evaluated before every call |
 | Spend | Budgets with a hard stop at 100 percent |
 | Code execution | Notebook code runs in the browser (Pyodide) or in an isolated subprocess locally; Azure Container Apps dynamic sessions in production |

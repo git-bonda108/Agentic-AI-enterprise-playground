@@ -47,7 +47,8 @@ export function ModelPicker({ models, value, onChange, compact = false, smartEna
                 <span className={cn("size-1.5 rounded-full", TIER_DOT[m.tier])} />
                 <span className="flex-1 truncate">{m.name}</span>
                 <span className="font-mono text-[10px] text-muted-foreground">${m.input_per_m}/${m.output_per_m}</span>
-                {!m.available && <span className="rounded bg-muted px-1 text-[9px] text-muted-foreground">no key</span>}
+                {!m.available && <span className="rounded bg-muted px-1 text-[9px] text-muted-foreground">add key</span>}
+                {m.available && m.key_source === "personal" && <span className="rounded bg-brand-violet/15 px-1 text-[9px] text-brand-violet-soft">your key</span>}
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>

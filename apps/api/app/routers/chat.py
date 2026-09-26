@@ -10,6 +10,7 @@ from app.auth import current_user
 from app.catalog import estimate_cost, get_model
 from app.db import get_db
 from app.governance import allowed_model_ids, check_budget, check_policy, policy_for
+from app.keys import available_providers, resolve_key
 from app.llm import ProviderError, stream_completion
 from app.models import Conversation, Message, UsageEvent, User
 from app.router import SMART, route
@@ -45,9 +46,9 @@ async def chat_stream(req: ChatStreamRequest, user: User = Depends(current_user)
         if not policy_for(db, user.role).smart_enabled:
             return EventSourceResponse(_blocked(db, user, req, "smart", "Smart routing is disabled for your role."))
         prompt = next((m.content for m in reversed(req.messages) if m.role == "user"), "")
-        decision = route(prompt, allowed_model_ids(db, user.role))
+        decision = route(prompt, allowed_model_ids(db, user.role), providers=set(available_providers(db, user, req.feature)))
         if decision is None:
-            return EventSourceResponse(_blocked(db, user, req, "smart", "No model is available for your role."))
+            return EventSourceResponse(_blocked(db, user, req, "smart", "No model with a usable key is available for your role. Add a provider key from the Keys drawer."))
         req.model = decision.model
         routed, routed_tier, baseline_model, route_reason = True, decision.tier, decision.baseline_model, decision.reason
     spec = get_model(req.model)
@@ -62,6 +63,9 @@ async def chat_stream(req: ChatStreamRequest, user: User = Depends(current_user)
     budget = check_budget(db, user)
     if not budget.allowed:
         return EventSourceResponse(_blocked(db, user, req, req.model, budget.reason or "Budget exceeded", provider))
+    api_key, key_source, key_extra = resolve_key(db, user.id, provider, req.feature)
+    if key_source == "none":
+        return EventSourceResponse(_blocked(db, user, req, req.model, f"No {provider} key is available. Add your own {provider} key from the Keys drawer, or ask an admin to enable the platform key.", provider))
     policy = policy_for(db, user.role)
     if req.params.max_tokens is None or req.params.max_tokens > policy.max_tokens:
         req.params.max_tokens = policy.max_tokens
@@ -91,11 +95,11 @@ async def chat_stream(req: ChatStreamRequest, user: User = Depends(current_user)
         meta = {
             "conversation_id": conversation.id if conversation else None, "title": conversation.title if conversation else None,
             "model": req.model, "routed": routed, "routed_tier": routed_tier, "route_reason": route_reason,
-            "budget_warnings": budget.warnings, "user_spend_usd": round(budget.user_spend, 6), "user_cap_usd": budget.user_cap,
+            "budget_warnings": budget.warnings, "user_spend_usd": round(budget.user_spend, 6), "user_cap_usd": budget.user_cap, "key_source": key_source,
         }
         yield {"event": "meta", "data": json.dumps(meta)}
         try:
-            async for item in stream_completion(req.model, wire_messages, req.params.model_dump()):
+            async for item in stream_completion(req.model, wire_messages, req.params.model_dump(), api_key=api_key, api_base=key_extra.get("api_base")):
                 if item["type"] == "delta":
                     text_parts.append(item["text"])
                     yield {"event": "delta", "data": json.dumps({"text": item["text"]})}
@@ -117,14 +121,14 @@ async def chat_stream(req: ChatStreamRequest, user: User = Depends(current_user)
                         user_id=user.id, conversation_id=conversation.id if conversation else None, message_id=message_id,
                         feature=req.feature, model=req.model, provider=provider, tokens_in=u.tokens_in, tokens_out=u.tokens_out,
                         tokens_cached=u.tokens_cached, cost_usd=u.cost_usd, latency_ms=u.latency_ms, status="ok",
-                        routed=routed, routed_tier=routed_tier, savings_usd=round(savings, 8),
+                        routed=routed, routed_tier=routed_tier, savings_usd=round(savings, 8), key_source=key_source,
                     ))
                     db.commit()
                     yield {"event": "usage", "data": json.dumps({
                         "tokens_in": u.tokens_in, "tokens_out": u.tokens_out, "tokens_cached": u.tokens_cached,
                         "cost_usd": u.cost_usd, "latency_ms": u.latency_ms, "model": req.model, "provider": provider,
                         "message_id": message_id, "conversation_id": conversation.id if conversation else None,
-                        "routed": routed, "routed_tier": routed_tier, "savings_usd": round(savings, 8),
+                        "routed": routed, "routed_tier": routed_tier, "savings_usd": round(savings, 8), "key_source": key_source,
                     })}
         except ProviderError as exc:
             logger.warning("provider error user=%s model=%s: %s", user.id, req.model, exc)

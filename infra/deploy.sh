@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploys the Enterprise AI Playground to Azure in four steps: resource group, registry and images, infrastructure, smoke test.
-# Usage:  PG_PASSWORD=... PLAYGROUND_INTERNAL_KEY=... AUTH_SECRET=... ANTHROPIC_API_KEY=... infra/deploy.sh <resource-group> <location> [prefix] [tag]
+# Usage:  PG_PASSWORD=... PLAYGROUND_INTERNAL_KEY=... AUTH_SECRET=... PLAYGROUND_KEY_ENCRYPTION_KEY=... ANTHROPIC_API_KEY=... infra/deploy.sh <resource-group> <location> [prefix] [tag]
 # Requires: az CLI signed in (az login). Images are built by `az acr build` in the cloud, so no local Docker is needed.
 set -euo pipefail
 
@@ -13,6 +13,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 : "${PG_PASSWORD:?set PG_PASSWORD}"
 : "${PLAYGROUND_INTERNAL_KEY:?set PLAYGROUND_INTERNAL_KEY}"
 : "${AUTH_SECRET:?set AUTH_SECRET}"
+: "${PLAYGROUND_KEY_ENCRYPTION_KEY:?set PLAYGROUND_KEY_ENCRYPTION_KEY (python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')}"
 
 echo "1/4 resource group $RG in $LOCATION"
 az group create --name "$RG" --location "$LOCATION" --output none
@@ -43,6 +44,11 @@ az deployment group create \
                openaiApiKey="${OPENAI_API_KEY:-}" \
                geminiApiKey="${GEMINI_API_KEY:-}" \
                deepseekApiKey="${DEEPSEEK_API_KEY:-}" \
+               nvidiaNimApiKey="${NVIDIA_NIM_API_KEY:-}" \
+               mistralApiKey="${MISTRAL_API_KEY:-}" \
+               xaiApiKey="${XAI_API_KEY:-}" \
+               groqApiKey="${GROQ_API_KEY:-}" \
+               keyEncryptionKey="$PLAYGROUND_KEY_ENCRYPTION_KEY" \
                entraClientId="${AUTH_MICROSOFT_ENTRA_ID_ID:-}" \
                entraClientSecret="${AUTH_MICROSOFT_ENTRA_ID_SECRET:-}" \
                entraIssuer="${AUTH_MICROSOFT_ENTRA_ID_ISSUER:-}" \

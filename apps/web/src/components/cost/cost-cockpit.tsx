@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const LAYERS: { id: string; label: string }[] = [
   { id: "department", label: "Department" }, { id: "user", label: "User" }, { id: "feature", label: "Feature" },
-  { id: "model", label: "Model" }, { id: "provider", label: "Provider" }, { id: "conversation", label: "Conversation" },
+  { id: "model", label: "Model" }, { id: "provider", label: "Provider" }, { id: "key_source", label: "Key source" }, { id: "conversation", label: "Conversation" },
 ];
 
 export function CostCockpit({ initial, initialDays }: { initial: Breakdown; initialDays: Breakdown }) {

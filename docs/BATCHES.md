@@ -1,6 +1,6 @@
 # Delivery log
 
-The playground is built in ten batches. A batch is complete when its pages are live, its tests pass and it has been exercised with real providers.
+The playground was built in ten batches, then extended in a second series that turns it from a demonstration into a daily tool. A batch is complete when its pages are live, its tests pass and it has been exercised with real providers.
 
 | Batch | Theme | Status |
 | --- | --- | --- |
@@ -14,6 +14,12 @@ The playground is built in ten batches. A batch is complete when its pages are l
 | 7 | Evaluate, canary, hardening levels, agent versions with rollback | Done |
 | 8 | Community, engagement, adoption analytics, platform agents | Done |
 | 9 | Azure templates, CI, demo seed, security pass, control room, one-command launch | Done |
+| 10 | Bring-your-own keys, platform key scope, thirteen more models across NVIDIA NIM, Mistral, xAI, Groq and Cohere | Done |
+| 11 | Notebooks that execute like Colab: helper module, run on open, compute picker, package installs, examples gallery | Planned |
+| 12 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Planned |
+| 13 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Planned |
+| 14 | Datasets section with mock data and trusted sources; cost and token drill-down; hours tiles on the console | Planned |
+| 15 | Documentation hub and a full retest of every left-pane item | Planned |
 
 ## Batch 0: skeleton and design system
 
@@ -90,3 +96,13 @@ Control room: a second view of any run in the playground palette, with three gov
 Diagrams rendered to docs/images (architecture, workflow, deployment, run flow) and a step-by-step demo script in docs/DEMO_SCRIPT.md.
 
 Verification at close: 79 API tests, 38 end-to-end tests, strict types and lint clean, Bicep compiles.
+
+## Batch 10: keys and models
+
+Keys: a Keys drawer in the top bar, opened from anywhere a model needs a key. Each provider shows its status (your key with the last four characters, platform key, offline provider, not set), a link to the provider's key page, documentation and pricing, and add, test and remove actions. Personal keys are encrypted at rest with Fernet and never returned. Resolution order is personal key first, then the platform key; an admin switch in Settings decides whether platform keys serve everyone (pilot default) or only the product's own judge, canaries and platform agents. Availability, Smart routing, notebooks, agents and embeddings all resolve keys per caller, and every ledger row records which key paid, which the cost cockpit slices as a new layer.
+
+Models: thirteen additions with prices from the providers' September 2026 sheets. NVIDIA NIM brings Nemotron 3 Nano, Super and Ultra, Hermes 4 405B, Llama 3.3 70B and Qwen3 235B on the free developer endpoint (rate limited); Mistral Medium 3.5, Large 3, Small 4 and Codestral; xAI Grok 4.7 and 4.3; Groq GPT-OSS 120B and 20B; Cohere Command A. The catalog now spans eleven providers and thirty models, and the Smart router's tier candidates include the new economy and workhorse options.
+
+Deployment: the encryption key and the new provider keys are Key Vault secrets in the Bicep template, and the start-up guard requires the encryption key outside local environments.
+
+Verification at close: 87 API tests, 43 end-to-end tests, strict types and lint clean, Bicep compiles.

@@ -113,11 +113,25 @@ def embedding_available(model_id: str) -> bool:
     return bool(os.environ.get(spec["env"])) or settings.fake_llm
 
 
-def embed(model_id: str, texts: list[str]) -> tuple[np.ndarray, int, float, int]:
+def embedding_credentials(db: Session, user: User | None, model_id: str) -> dict:
+    """The caller's own key for the embedding provider when they have one; empty means the platform key (environment)."""
+    from app.keys import resolve_key
+
+    spec = EMBEDDING_MODELS.get(model_id)
+    if spec is None or spec["litellm"] is None or user is None:
+        return {}
+    secret, source, extra = resolve_key(db, user.id, spec["provider"], "knowledge")
+    if source == "personal" and secret:
+        return {"api_key": secret, **({"api_base": extra["api_base"]} if extra.get("api_base") else {})}
+    return {}
+
+
+def embed(model_id: str, texts: list[str], creds: dict | None = None) -> tuple[np.ndarray, int, float, int]:
     """Returns (vectors, tokens, cost_usd, latency_ms). Falls back to local vectors when a provider is unavailable or faked."""
     spec = EMBEDDING_MODELS.get(model_id) or EMBEDDING_MODELS["local-hash"]
     started = time.perf_counter()
-    if spec["litellm"] is None or settings.fake_llm or not embedding_available(model_id):
+    creds = creds or {}
+    if spec["litellm"] is None or settings.fake_llm or (not creds and not embedding_available(model_id)):
         vecs = _hash_embed(texts, EMBEDDING_MODELS["local-hash"]["dims"])
         return vecs, sum(estimate_tokens(t) for t in texts), 0.0, int((time.perf_counter() - started) * 1000)
     import litellm
@@ -126,7 +140,7 @@ def embed(model_id: str, texts: list[str]) -> tuple[np.ndarray, int, float, int]
     total_tokens = 0
     for start in range(0, len(texts), 64):
         batch = texts[start : start + 64]
-        resp = litellm.embedding(model=spec["litellm"], input=batch)
+        resp = litellm.embedding(model=spec["litellm"], input=batch, **creds)
         vectors.extend(item["embedding"] for item in resp.data)
         usage = getattr(resp, "usage", None)
         total_tokens += int(getattr(usage, "prompt_tokens", 0) or 0) or sum(estimate_tokens(t) for t in batch)
@@ -182,7 +196,7 @@ def ingest_text(db: Session, space: KnowledgeSpace, user: User, title: str, text
     db.add(doc)
     db.flush()
     if pieces:
-        vecs, used, cost, latency = embed(space.embedding_model, pieces)
+        vecs, used, cost, latency = embed(space.embedding_model, pieces, embedding_credentials(db, user, space.embedding_model))
         db.bulk_save_objects([
             KnowledgeChunk(space_id=space.id, doc_id=doc.id, ordinal=i, text=piece, embedding=[round(float(x), 6) for x in vecs[i]], meta=(metas[i] if metas and i < len(metas) else {}))
             for i, piece in enumerate(pieces)
