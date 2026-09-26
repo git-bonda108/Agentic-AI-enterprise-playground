@@ -24,6 +24,8 @@ async function proxy(req: Request, ctx: { params: Promise<{ path: string[] }> })
   const out = new Headers();
   const ct = upstream.headers.get("content-type");
   if (ct) out.set("content-type", ct);
+  const cd = upstream.headers.get("content-disposition");
+  if (cd) out.set("content-disposition", cd);  // downloads (notebooks, flows, recipes) keep their file names
   out.set("cache-control", "no-store");
   if (ct?.includes("text/event-stream")) out.set("x-accel-buffering", "no");
   return new Response(upstream.body, { status: upstream.status, headers: out });

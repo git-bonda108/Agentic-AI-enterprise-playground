@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Compass, Hammer, FlaskConical, Activity, Users, ShieldCheck,
   Boxes, Blocks, Layers, Cloud, Plug, Sparkles, MessagesSquare, Bot, NotebookPen,
   BookOpen, Database, ClipboardCheck, Radar, Play, Waypoints, Coins, TrendingUp,
-  Trophy, Medal, Star, UserCog, ScrollText, Wallet, Settings,
+  Trophy, Medal, Star, UserCog, ScrollText, Wallet, Settings, Workflow,
 } from "lucide-react";
 
 export type NavItem = {
@@ -33,6 +33,7 @@ export const NAV: NavSection[] = [
       { title: "Models", href: "/discover/models", icon: Boxes, batch: 2, blurb: "Every model, every provider, one price sheet." },
       { title: "Blueprints", href: "/discover/blueprints", icon: Blocks, batch: 4, blurb: "Runnable agent packages across six families." },
       { title: "Frameworks", href: "/discover/frameworks", icon: Layers, batch: 5, blurb: "The same agent as OpenAI Agents SDK, LangGraph, CrewAI, Agent Framework, ADK." },
+      { title: "Low-code studios", href: "/discover/low-code", icon: Workflow, batch: 12, blurb: "Any blueprint as a Langflow flow, an n8n workflow or a Copilot Studio recipe." },
       { title: "Clouds", href: "/discover/clouds", icon: Cloud, batch: 5, blurb: "Deploy to Foundry, AgentCore or Google Agent Runtime with real commands." },
       { title: "Connectors", href: "/discover/connectors", icon: Plug, batch: 6, blurb: "MCP servers from the official registry, approved by your admins." },
       { title: "Skills", href: "/discover/skills", icon: Sparkles, batch: 6, blurb: "SKILL.md packs you can attach to any agent." },
@@ -94,4 +95,4 @@ export function findNavItem(pathname: string): { section: NavSection; item: NavI
   return null;
 }
 
-export const CURRENT_BATCH = 10;  // items with a higher batch number stay hidden until they ship; never shown to people
+export const CURRENT_BATCH = 12;  // items with a higher batch number stay hidden until they ship; never shown to people

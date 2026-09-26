@@ -24,6 +24,7 @@ from app.routers import (
     faces,
     keys,
     knowledge,
+    lowcode,
     mcp,
     models,
     route,
@@ -78,6 +79,7 @@ app.include_router(evals.router)
 app.include_router(community.router)
 app.include_router(adoption.router)
 app.include_router(keys.router)
+app.include_router(lowcode.router)
 
 
 @app.get("/health")

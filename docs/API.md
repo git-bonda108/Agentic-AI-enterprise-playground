@@ -191,6 +191,18 @@ All routes require the internal key and identity headers, which the web applicat
 | POST | `/v1/notebooks/heartbeat` | Zero-cost editor activity for notebook hours |
 | GET | `/v1/data`, `/v1/data/{id}` | Mock datasets: catalog with previews, and all rows of one dataset |
 
+## Two ways to build (low-code studios)
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/lowcode/landscape` | Nine low-code and agent platforms with licence, hosting, MCP support and official links; the three studios with their steps; the playground's MCP URL |
+| GET | `/v1/lowcode/{blueprint_id}` | Both tracks for a blueprint: category (Gen AI or Agentic AI), studio artefact URLs, code track links, recommended MCP servers |
+| GET | `/v1/lowcode/{blueprint_id}/langflow` | Importable Langflow flow JSON (`?download=1` for an attachment) |
+| GET | `/v1/lowcode/{blueprint_id}/n8n` | Importable n8n workflow JSON |
+| GET | `/v1/lowcode/{blueprint_id}/copilot` | Copilot Studio recipe as JSON with a `markdown` field; `?download=1` returns the Markdown |
+
+`/v1/catalog` entries carry `category`, stats carry `by_category`, and `?category=` filters.
+
 ## Provider keys
 
 People bring their own provider keys, as in the OpenAI or Claude playgrounds. A personal key is encrypted at rest (Fernet, `PLAYGROUND_KEY_ENCRYPTION_KEY`) and only its last four characters are ever returned. Resolution for a call: the caller's personal key for the provider first; otherwise the platform key from the API environment when the admin scope allows it. The judge, canaries and platform agents always use platform keys.

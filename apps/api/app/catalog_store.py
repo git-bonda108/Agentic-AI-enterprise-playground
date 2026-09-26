@@ -31,6 +31,7 @@ def _domain_entries() -> list[dict]:
             "summary": bp.summary, "instructions": bp.description, "instructions_truncated": False, "tools": list(bp.datasets), "model_hint": "",
             "tags": ["domain", *bp.flavors], "runnable": True, "tier": next((t for t in bp.tiers.values() if t in ("Economy", "Workhorse", "Premium")), "Workhorse"),
             "samples": bp.samples, "input_schema": bp.input_schema, "flavors": bp.flavors, "links": bp.links, "knowledge": bp.datasets,
+            "graph": bp.graph, "review_gates": bp.review_gates,  # the Gen AI / Agentic AI rule reads these
         })
     return out
 
@@ -83,8 +84,11 @@ def get_entry(entry_id: str) -> dict | None:
 
 
 def public_view(entry: dict, include_instructions: bool = False) -> dict:
+    from app.lowcode import category_for
+
     cur = load_curation().get(entry["id"]) or ({"status": "green", "reasons": ["Built in the wizard"]} if entry["id"].startswith("custom-") else {"status": "unreviewed", "reasons": []})
     view = {k: v for k, v in entry.items() if k != "instructions"}
+    view["category"] = category_for(entry)
     view["instructions_preview"] = entry.get("instructions", "")[:600]
     view["curation"] = cur
     if include_instructions:
@@ -112,8 +116,13 @@ def stats() -> dict:
     fam = {f: 0 for f in FAMILIES}
     for e in entries:
         fam[e["family"]] = fam.get(e["family"], 0) + 1
+    from app.lowcode import CATEGORIES, category_for
+
+    by_category = {c: 0 for c in CATEGORIES}
+    for e in entries:
+        by_category[category_for(e)] += 1
     return {
-        "total": len(entries), "by_family": fam,
+        "total": len(entries), "by_family": fam, "by_category": by_category,
         "green": sum(1 for e in entries if cur.get(e["id"], {}).get("status") == "green"),
         "red": sum(1 for e in entries if cur.get(e["id"], {}).get("status") == "red"),
         "runnable": sum(1 for e in entries if e.get("runnable")),

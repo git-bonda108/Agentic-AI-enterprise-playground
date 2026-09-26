@@ -192,9 +192,22 @@ export type CatalogEntry = {
   tools: string[]; model_hint: string; tags: string[]; runnable: boolean; tier: string;
   knowledge?: string[]; starter_prompts?: string[]; flavors?: string[]; samples?: { name: string; input: Record<string, unknown> }[]; links?: Record<string, string>; input_schema?: Record<string, string>;
   curation: { status: "green" | "red" | "unreviewed"; reasons: string[]; reviewed_at?: string };
+  /** Gen AI: one model call with instructions and knowledge. Agentic AI: several steps, tools, review or coordination. */
+  category: "Gen AI" | "Agentic AI";
 };
 
-export type CatalogStats = { total: number; by_family: Record<string, number>; green: number; red: number; runnable: number; sources: string[] };
+export type CatalogStats = { total: number; by_family: Record<string, number>; by_category: Record<string, number>; green: number; red: number; runnable: number; sources: string[] };
+
+export type LowcodeStudio = { id: "langflow" | "n8n" | "copilot"; name: string; artefact: string; install: string; steps: string[]; docs: string; mcp_docs: string; install_docs: string; artefact_url?: string; download_url?: string };
+export type LowcodePlatform = { id: string; name: string; vendor: string; kind: string; licence: string; hosting: string; mcp: string; best_for: string; playground: string; url: string; docs: string; pricing: string };
+export type LowcodeTracks = { blueprint_id: string; name: string; category: "Gen AI" | "Agentic AI"; category_blurb: string; lowcode: LowcodeStudio[]; code: { id: string; name: string; blurb: string; href: string }[]; recommended_connectors: Connector[] };
+export type CopilotRecipe = {
+  blueprint_id: string; name: string; category: string; overview: string; description: string; instructions: string;
+  knowledge: { dataset: string; guidance: string }[]; tools: { kind: string; name: string; why: string; how: string; url: string; docs: string }[];
+  orchestration: string; triggers: { name: string; when: string }[]; topics: { name: string; purpose: string }[];
+  workflow: { step: string; kind: string; node: string; how: string; docs: string }[]; review: string[]; evaluation: string;
+  samples: { name: string; input: Record<string, unknown> }[]; links: Record<string, string>; markdown: string;
+};
 
 export type FrameworkInfo = { id: string; name: string; install: string; docs: string; license: string; hosted: string; language: string };
 export type CloudInfo = { id: string; name: string; runtime: string; pricing: string; pricing_url: string; docs: string; prereq: string };

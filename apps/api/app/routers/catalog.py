@@ -14,13 +14,15 @@ router = APIRouter(prefix="/v1/catalog", tags=["catalog"])
 
 @router.get("")
 def list_catalog(
-    family: str = Query(default=""), q: str = Query(default=""), source: str = Query(default=""), runnable: bool | None = Query(default=None),
+    family: str = Query(default=""), q: str = Query(default=""), source: str = Query(default=""), runnable: bool | None = Query(default=None), category: str = Query(default=""),
     status: str = Query(default=""), limit: int = Query(default=300, le=500), user: User = Depends(current_user), db: Session = Depends(get_db),
 ) -> dict:
     mine = db.scalars(select(CustomAgent).where((CustomAgent.user_id == user.id) | (CustomAgent.published.is_(True)))).all()
     rows = [public_view(custom_entry(a)) for a in mine] + [public_view(e) for e in load_entries()]
     if family:
         rows = [r for r in rows if r["family"] == family]
+    if category:
+        rows = [r for r in rows if r["category"] == category]
     if source:
         rows = [r for r in rows if r["source"]["title"] == source]
     if runnable is not None:

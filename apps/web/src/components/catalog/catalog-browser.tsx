@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import { BookOpen, CheckCircle2, Cloud, Code2, ExternalLink, NotebookPen, Play, Search, XCircle } from "lucide-react";
 import { RunDialog, type RunTarget } from "@/components/agents/run-dialog";
@@ -20,6 +22,7 @@ const FAMILY_BLURB: Record<string, string> = {
 
 export function CatalogBrowser({ initial, families, stats }: { initial: CatalogEntry[]; families: string[]; stats: CatalogStats }) {
   const [family, setFamily] = useState("All");
+  const [category, setCategory] = useState<"All" | "Gen AI" | "Agentic AI">("All");
   const [q, setQ] = useState("");
   const [onlyRunnable, setOnlyRunnable] = useState(false);
   const [entries, setEntries] = useState(initial);
@@ -31,6 +34,7 @@ export function CatalogBrowser({ initial, families, stats }: { initial: CatalogE
     const t = setTimeout(async () => {
       const params = new URLSearchParams();
       if (family !== "All") params.set("family", family);
+      if (category !== "All") params.set("category", category);
       if (q) params.set("q", q);
       if (onlyRunnable) params.set("runnable", "true");
       const res = await fetch(`/api/pg/v1/catalog?${params}`);
@@ -38,7 +42,7 @@ export function CatalogBrowser({ initial, families, stats }: { initial: CatalogE
       if (body && !stale) setEntries(body.entries);
     }, 200);
     return () => { stale = true; clearTimeout(t); };
-  }, [family, q, onlyRunnable]);
+  }, [family, category, q, onlyRunnable]);
 
   const openDetail = async (e: CatalogEntry) => {
     const res = await fetch(`/api/pg/v1/catalog/${e.id}`);
@@ -70,6 +74,13 @@ export function CatalogBrowser({ initial, families, stats }: { initial: CatalogE
           <Search className="pointer-events-none absolute left-2 top-2 size-3.5 text-muted-foreground" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search blueprints" aria-label="Search blueprints" className="h-8 w-60 rounded-lg border bg-card pl-7 pr-2 text-xs outline-none focus-visible:border-brand-violet/60" />
         </label>
+        <div className="flex gap-1" role="tablist" aria-label="Category" data-testid="category-tabs">
+          {(["All", "Gen AI", "Agentic AI"] as const).map((c) => (
+            <button key={c} type="button" role="tab" aria-selected={category === c} onClick={() => setCategory(c)} className={cn("h-8 rounded-lg border px-2.5 text-xs font-medium", category === c ? "border-brand-pink/60 bg-brand-pink/10" : "bg-card text-muted-foreground hover:text-foreground")} title={c === "Gen AI" ? "One model call with instructions and knowledge" : c === "Agentic AI" ? "Several steps, tools, review or coordination" : "Every blueprint"}>
+              {c}{c !== "All" && <span className="ml-1 font-mono text-[10px] opacity-70">{stats.by_category?.[c] ?? 0}</span>}
+            </button>
+          ))}
+        </div>
         <div className="flex flex-wrap gap-1" role="tablist" aria-label="Family">
           {["All", ...families].map((f) => (
             <button key={f} type="button" role="tab" aria-selected={family === f} onClick={() => setFamily(f)} className={cn("h-8 rounded-lg border px-2.5 text-xs", family === f ? "border-brand-violet/60 bg-secondary text-secondary-foreground" : "bg-card text-muted-foreground hover:text-foreground")}>
@@ -88,7 +99,10 @@ export function CatalogBrowser({ initial, families, stats }: { initial: CatalogE
         {entries.map((e) => (
           <article key={e.id} className="card-hover flex flex-col rounded-2xl border bg-card p-3.5" aria-label={e.name}>
             <div className="flex items-center justify-between gap-2">
-              <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", FAMILY_STYLE[e.family])}>{e.family}</span>
+              <span className="flex items-center gap-1">
+                <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", FAMILY_STYLE[e.family])}>{e.family}</span>
+                <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", e.category === "Agentic AI" ? "bg-brand-pink/15 text-brand-pink" : "bg-brand-cyan/15 text-brand-cyan")} data-testid="category-badge">{e.category}</span>
+              </span>
               <span className={cn("inline-flex items-center gap-1 text-[10px]", e.curation.status === "green" ? "text-brand-emerald" : e.curation.status === "red" ? "text-brand-rose" : "text-muted-foreground")} title={e.curation.reasons.join("; ") || "Curated"}>
                 {e.curation.status === "green" ? <CheckCircle2 className="size-3" /> : <XCircle className="size-3" />} {e.curation.status}
               </span>
@@ -121,6 +135,29 @@ export function CatalogBrowser({ initial, families, stats }: { initial: CatalogE
                 {detail.tools.slice(0, 8).map((t) => <span key={t} className="rounded-md border px-1.5 py-0.5 font-mono text-muted-foreground">{t}</span>)}
               </div>
               <pre className="max-h-80 overflow-auto rounded-xl border bg-[#0d0d18] p-3 font-mono text-[11.5px] leading-5 text-slate-100 whitespace-pre-wrap" data-testid="entry-instructions">{detail.instructions ?? detail.instructions_preview}</pre>
+              {detail.runnable && (
+                <div className="rounded-xl border p-3" data-testid="build-tracks">
+                  <p className="text-xs font-semibold">Build it your way <span className="ml-1 font-normal text-muted-foreground">{detail.category} blueprint</span></p>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2 text-xs">
+                    <div>
+                      <p className="text-[10.5px] font-medium uppercase tracking-wider text-muted-foreground">Low-code track</p>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        {[["langflow", "Langflow flow"], ["n8n", "n8n workflow"], ["copilot", "Copilot Studio recipe"]].map(([id, label]) => (
+                          <Link key={id} href={`/discover/low-code?blueprint=${detail.id}&studio=${id}`} className="rounded-md border px-2 py-1 hover:border-brand-violet/40">{label}</Link>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10.5px] font-medium uppercase tracking-wider text-muted-foreground">Code track</p>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        <Link href={`/build/notebooks?blueprint=${detail.id}`} className="rounded-md border px-2 py-1 hover:border-brand-violet/40">Notebook</Link>
+                        <Link href={`/discover/frameworks?blueprint=${detail.id}`} className="rounded-md border px-2 py-1 hover:border-brand-violet/40">Frameworks</Link>
+                        <Link href={`/discover/clouds?blueprint=${detail.id}`} className="rounded-md border px-2 py-1 hover:border-brand-violet/40">Deploy</Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <a href={detail.source.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-violet-soft hover:underline"><BookOpen className="size-3.5" /> {detail.source.repo} · {detail.source.license} <ExternalLink className="size-3" /></a>
                 {detail.curation.reasons.length > 0 && <span className="text-muted-foreground">Curator: {detail.curation.reasons.join("; ")}</span>}

@@ -16,7 +16,7 @@ The playground was built in ten batches, then extended in a second series that t
 | 9 | Azure templates, CI, demo seed, security pass, control room, one-command launch | Done |
 | 10 | Bring-your-own keys, platform key scope, thirteen more models across NVIDIA NIM, Mistral, xAI, Groq and Cohere | Done |
 | 11 | Runnable notebooks: every blueprint ships an MVP notebook that executes end to end on mock data with minimal setup; compute picker, package installs, examples gallery | Done |
-| 12 | Two ways to build: blueprints split into Gen AI and Agentic AI, each with a low-code track (Langflow flow, n8n workflow, Copilot Studio recipe) and a code track (notebook, framework flavor); low-code landscape page | Planned |
+| 12 | Two ways to build: blueprints split into Gen AI and Agentic AI, each with a low-code track (Langflow flow, n8n workflow, Copilot Studio recipe) and a code track (notebook, framework flavor); low-code landscape page | Done |
 | 13 | MCP Marketplace (Connectors reborn): client configuration generator, featured shelf, per-blueprint recommendations, the playground as a server for Langflow, n8n, Copilot Studio and Claude; Popular Git repos | Planned |
 | 14 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Planned |
 | 15 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Planned |
@@ -126,6 +126,16 @@ The **low-code track** generates real artefacts: a Langflow flow (importable JSO
 The **code track** is the notebook from Batch 11 plus the five framework flavors and the deploy scripts.
 
 A **low-code landscape** page compares Copilot Studio, Langflow, n8n, Dify, Flowise, Power Automate, Azure AI Foundry, Vertex AI Agent Builder and Bedrock Flows on licence, hosting, MCP support and best fit, each with its official link. Licensing matters for the subscription: Langflow is MIT and can be bundled; n8n's Sustainable Use Licence allows internal self-hosting but not hosting it for customers, so the playground generates n8n workflows and links out rather than embedding n8n; Dify's Apache 2.0 licence carries a multi-tenant restriction.
+
+### Batch 12 as shipped
+
+Delivered 2026-09-27. Every catalog entry carries a category. The rule: Role and Persona entries are Gen AI; Topology and Cloud entries are Agentic AI; Domain blueprints are Agentic AI when they have a human gate, two or more tool steps or two or more model steps (Knowledge Q&A is the one Gen AI domain blueprint); wizard agents are Agentic AI once they have connectors. The Blueprints page filters by category, every card shows its badge, and the detail dialog offers **Build it your way** with both tracks.
+
+Discover → Low-code studios generates, for any runnable domain blueprint or low-code template, an importable Langflow flow, an importable n8n workflow and a Copilot Studio recipe, with the five steps to run each, the playground's MCP URL, the code track and the most suitable MCP servers (admin-approved and vendor-published servers ranked first; marketplaces that republish paid listings excluded). The page ends with the landscape of nine platforms.
+
+Accuracy was verified against the real tools, not assumed. Langflow: flows are assembled from Langflow's own starter projects and from the MCP Tools component captured from a running Langflow 1.12.3, so every node carries the real component template; all six domain flows were uploaded through Langflow's `/api/v1/flows/upload/` endpoint and Langflow's build engine sorted and started executing the graph. n8n: node types, versions and parameter names (including the MCP Client Tool's `endpointUrl`, `serverTransport` and `authentication`, and the Wait node's form fields) were read from the installed n8n 2.40.7 node definitions, and all six workflows were imported with `n8n import:workflow`. Copilot Studio: every Microsoft Learn link the recipe cites returned 200 on 2026-09-27, including the Classify, Extract and Agent node pages and the Request for information (human review) page.
+
+Verification at close: 120 API tests (15 new), 48 end-to-end tests, strict types and lint clean.
 
 ### Batch 13: MCP Marketplace and Popular Git repos
 
