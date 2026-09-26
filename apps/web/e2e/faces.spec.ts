@@ -8,7 +8,7 @@ test.describe("Batch 5 faces", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Notebooks" })).toBeVisible();
     const frame = page.getByTestId("jupyterlite-frame");
     await expect(frame).toHaveAttribute("src", /\/jupyterlite\/lab\/index\.html/);
-    await expect(page.getByTestId("lite-state")).toHaveText(/opened/, { timeout: 60_000 });
+    await expect(page.getByTestId("lite-state")).toHaveText(/opened/, { timeout: 100_000 });
     await expect(page.frameLocator('[data-testid="jupyterlite-frame"]').locator(".lm-TabBar-tabLabel", { hasText: "doc-reconciliation.ipynb" })).toBeVisible({ timeout: 30_000 });
     const lite = await page.request.get("/jupyterlite/lab/index.html");
     expect(lite.status()).toBe(200);

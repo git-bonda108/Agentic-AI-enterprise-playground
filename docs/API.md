@@ -152,6 +152,31 @@ All routes require the internal key and identity headers, which the web applicat
 | GET | `/v1/custom-agents/{id}/versions` | Version history |
 | POST | `/v1/custom-agents/{id}/rollback` | Restore a version |
 
+## Community
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET, POST | `/v1/community/showcase` | Published items with `q`, `tag`, `sort`; publish one |
+| POST | `/v1/community/showcase/draft` | The showcase writer agent drafts a post from a run or a sentence |
+| GET, DELETE | `/v1/community/showcase/{id}` | Item with comments; unpublish |
+| POST | `/v1/community/showcase/{id}/like` | Toggle a like |
+| POST | `/v1/community/showcase/{id}/comments` | Comment |
+| GET, POST | `/v1/community/challenges` | Challenges; open one (admin or champion) |
+| GET | `/v1/community/challenges/{id}` | Brief, cases, rubric, submissions and standings |
+| POST | `/v1/community/challenges/{id}/submit` | Enter an agent |
+| POST | `/v1/community/challenges/{id}/judge` | Judge pending entries with the evaluation engine |
+| POST | `/v1/community/challenges/{id}/close` | Close and award the badge |
+| GET | `/v1/community/me` | Achievements with progress, rank and points |
+| GET | `/v1/community/leaderboard` | Rows by `user` or `department` over `days` |
+
+## Adoption
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/adoption/summary` | Hours per feature, outcomes, cost per outcome, ROI matrix, weekly series, assumptions |
+| GET, PUT | `/v1/adoption/assumptions` | Minutes saved per outcome and hourly value (admin edits) |
+| POST | `/v1/adoption/digest` | The adoption digest agent writes a narrative with recommendations |
+
 ## Error conventions
 
 | Status | Meaning |

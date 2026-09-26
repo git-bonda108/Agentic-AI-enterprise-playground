@@ -23,7 +23,7 @@ def _domain_entries() -> list[dict]:
 
     out = []
     for bp in REGISTRY.values():
-        if bp.family == "Runtime":
+        if bp.family != "Domain":  # platform agents run the playground itself and live in the Agent Hub, not the catalog
             continue
         out.append({
             "id": bp.id, "name": bp.name, "family": "Domain", "group": bp.pattern,

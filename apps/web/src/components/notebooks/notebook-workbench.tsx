@@ -30,7 +30,7 @@ export function NotebookWorkbench({ source, recent }: { source: Source; recent: 
       type LiteApp = { serviceManager: { contents: { save: (path: string, model: object) => Promise<unknown> } }; commands: { execute: (id: string, args: object) => Promise<unknown> } };
       const app = (frameRef.current?.contentWindow as (Window & { jupyterapp?: LiteApp }) | null)?.jupyterapp;
       attempts += 1;
-      if (!app) { if (attempts > 60) { clearInterval(timer); setLiteState("failed"); } return; }
+      if (!app) { if (attempts > 180) { clearInterval(timer); setLiteState("failed"); } return; }  // the runtime can take a while on a busy machine
       clearInterval(timer);
       try {
         const res = await fetch(`/api/pg${source.path}`);

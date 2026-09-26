@@ -26,6 +26,8 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 | Knowledge | Knowledge Spaces over documents, pages, datasets and repositories with hybrid retrieval, cited answers, and a code map drawn as a graph. |
 | Skills | 338 SKILL.md packs, searchable and attachable to any agent, shipped with every generated project. |
 | Evaluate | Golden sets built in a guided wizard, deterministic checks plus a model-graded rubric, gates, nightly canaries with drift detection and automatic rollback, and a five-level hardening ladder lit only by evidence. |
+| Community | A showcase with outcomes, likes and comments, challenges judged by the evaluation engine, twelve evidence-based achievements, and leaderboards by person and department. |
+| Adoption | Hours per feature from ledger sessions, cost per outcome, estimated hours saved with visible assumptions, an ROI matrix by department, and a digest written by a platform agent. |
 
 ## What is in the box
 
@@ -37,8 +39,8 @@ The application is organised into seven sections, laid out the way a cloud conso
 | Discover | Models, Blueprints, Frameworks, Clouds, Connectors, Skills | Live |
 | Build | Playground, Agent Hub, Notebooks, Knowledge, Data | Live |
 | Evaluate | Evals, Canary | Live |
-| Operate | Runs, Traces, Cost, Adoption | Runs and Cost live; Adoption in Batch 8 |
-| Community | Showcase, Challenges, Leaderboard | Batch 8 |
+| Operate | Runs, Traces, Cost, Adoption | Live |
+| Community | Showcase, Challenges, Leaderboard | Live |
 | Admin | Users, Policies, Budgets, Settings | Live |
 
 See [docs/BATCHES.md](docs/BATCHES.md) for the delivery log, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together, [docs/WORKFLOWS.md](docs/WORKFLOWS.md) for the user journeys and the build workflow, and [docs/API.md](docs/API.md) for the API surface.
@@ -120,4 +122,4 @@ The catalog includes agent definitions imported from public repositories, each s
 
 ## Roadmap
 
-Batches 8 and 9 add community features and adoption analytics, and the Azure deployment templates. The plan for each batch is in [docs/BATCHES.md](docs/BATCHES.md).
+Batch 9 adds the Azure deployment templates, CI, demo seed data and the security pass. The plan for each batch is in [docs/BATCHES.md](docs/BATCHES.md).

@@ -337,3 +337,91 @@ class AgentVersion(Base):
     snapshot: Mapped[dict] = mapped_column(JSON, default=dict)
     note: Mapped[str] = mapped_column(String(400), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class ShowcaseItem(Base):
+    """Something a colleague published: an agent, a run, a conversation or an evaluation suite, with a story around it."""
+
+    __tablename__ = "showcase_items"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    owner_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(16), index=True)  # agent | run | conversation | suite
+    ref_id: Mapped[str] = mapped_column(String(64), index=True)
+    title: Mapped[str] = mapped_column(String(140))
+    summary: Mapped[str] = mapped_column(Text, default="")
+    tags: Mapped[list[str]] = mapped_column(JSON, default=list)
+    outcome: Mapped[str] = mapped_column(String(300), default="")  # the business result in one line
+    likes: Mapped[int] = mapped_column(Integer, default=0)
+    views: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+
+
+class ShowcaseLike(Base):
+    __tablename__ = "showcase_likes"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    item_id: Mapped[str] = mapped_column(String(32), ForeignKey("showcase_items.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String(64), index=True)
+
+
+class ShowcaseComment(Base):
+    __tablename__ = "showcase_comments"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    item_id: Mapped[str] = mapped_column(String(32), ForeignKey("showcase_items.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String(64))
+    body: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class Challenge(Base):
+    """A time-boxed build: a brief, shared cases and a rubric; submissions are judged by the evaluation engine."""
+
+    __tablename__ = "challenges"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    owner_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"))
+    title: Mapped[str] = mapped_column(String(140))
+    brief: Mapped[str] = mapped_column(Text)
+    cases: Mapped[list[dict]] = mapped_column(JSON, default=list)
+    rubric: Mapped[dict] = mapped_column(JSON, default=dict)
+    badge: Mapped[str] = mapped_column(String(80), default="Challenge winner")
+    status: Mapped[str] = mapped_column(String(16), default="open", index=True)  # open | closed
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    winner_submission_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, index=True)
+
+
+class ChallengeSubmission(Base):
+    __tablename__ = "challenge_submissions"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    challenge_id: Mapped[str] = mapped_column(String(32), ForeignKey("challenges.id"), index=True)
+    user_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
+    agent_id: Mapped[str] = mapped_column(String(64))
+    note: Mapped[str] = mapped_column(String(400), default="")
+    eval_run_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    judged: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class Achievement(Base):
+    __tablename__ = "achievements"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(String(64), ForeignKey("users.id"), index=True)
+    key: Mapped[str] = mapped_column(String(40), index=True)
+    unlocked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+
+
+class Assumption(Base):
+    """Admin-editable numbers behind the adoption analytics, such as minutes saved per outcome."""
+
+    __tablename__ = "assumptions"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[float] = mapped_column(Float)
+    label: Mapped[str] = mapped_column(String(160), default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)

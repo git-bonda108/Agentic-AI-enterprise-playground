@@ -9,6 +9,8 @@ from app.agents.blueprints import (  # noqa: F401
     review_panel,
     data_analyst,
     knowledge_qa,
+    adoption_digest,
+    showcase_writer,
     prompt_agent,
 )
 

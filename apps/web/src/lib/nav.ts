@@ -94,4 +94,4 @@ export function findNavItem(pathname: string): { section: NavSection; item: NavI
   return null;
 }
 
-export const CURRENT_BATCH = 7;
+export const CURRENT_BATCH = 8;

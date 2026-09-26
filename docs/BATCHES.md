@@ -12,7 +12,7 @@ The playground is built in ten batches. A batch is complete when its pages are l
 | 5 | Notebooks, framework flavors, cloud deploy, no-code wizard | Done |
 | 6 | Connectors, Knowledge Spaces, skills, the playground as an MCP server | Done |
 | 7 | Evaluate, canary, hardening levels, agent versions with rollback | Done |
-| 8 | Community, engagement, adoption analytics | Planned |
+| 8 | Community, engagement, adoption analytics, platform agents | Done |
 | 9 | Azure templates, CI, demo seed, security pass | Planned |
 
 ## Batch 0: skeleton and design system
@@ -65,7 +65,15 @@ Verification at close: 69 API tests, 32 end-to-end tests, strict types and lint 
 
 ## Batch 8: community and adoption
 
-Showcase of published agents, challenges with rubric judging, leaderboards, achievements, and adoption analytics: hours per feature, cost per outcome, ROI by team.
+Showcase: colleagues publish an agent, a run, a conversation or a suite with a title, a two-sentence summary, a one-line business outcome and tags; likes, comments, views, tag filters and a "most liked" sort. A platform agent, the showcase writer, drafts the post from the run so sharing a win takes one click; the author keeps the pen.
+
+Challenges: an admin or champion opens a time-boxed build with a brief, shared cases and a rubric. Anyone submits an agent. Judging runs every entry through the evaluation engine on the same cases and rubric; the score is 60 percent rubric quality and 40 percent pass rate, so a fast wrong answer cannot win. Closing names the winner and awards the Champion badge.
+
+Achievements and leaderboard: twelve badges unlocked only by evidence in the ledger and the evaluation engine (first prompt, comparer, smart saver, agent runner, reviewer, builder, librarian, evaluator, canary keeper, notebook hand, publisher, champion), each with progress. Leaderboards by person and by department over a window, with points from requests, outcomes, Smart routing savings, agents built, suites, likes received, badges and challenge wins.
+
+Adoption analytics: hours per feature derived from ledger sessions, outcomes per feature, cost per outcome, estimated hours saved and value with admin-editable assumptions shown next to every number, an ROI matrix by department, weekly activity, and a second platform agent, the adoption digest, that writes a short narrative and three recommendations for a chosen audience.
+
+Verification at close: 76 API tests, 35 end-to-end tests, strict types and lint clean.
 
 ## Batch 9: ship
 

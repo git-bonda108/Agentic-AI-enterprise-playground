@@ -66,6 +66,6 @@ def test_cloud_mirror_is_not_runnable_and_hub_hides_runner(client, headers):
     assert client.post("/v1/runs", headers=headers, json={"blueprint_id": "cloud-adk-deep-search", "input": {}}).status_code == 404
     assert client.post("/v1/runs", headers=headers, json={"blueprint_id": "prompt-agent", "input": {}}).status_code == 404
     hub = client.get("/v1/blueprints", headers=headers).json()["blueprints"]
-    assert all(b["id"] != "prompt-agent" for b in hub) and len(hub) == 6
+    assert all(b["id"] != "prompt-agent" for b in hub) and len(hub) == 8  # six domain blueprints plus two platform agents
     admin = client.post("/v1/catalog/curate", headers=headers).json()
     assert admin["reviewed"] >= 150 and admin["green"] >= 60

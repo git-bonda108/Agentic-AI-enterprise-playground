@@ -44,6 +44,7 @@ FastAPI with SQLAlchemy 2. Responsibilities, in the order a request meets them:
 9. **Connectors and the MCP server.** A snapshot of the official MCP registry with an approval workflow, a streamable-HTTP MCP client for probes and tool calls, and the playground's own MCP endpoint behind personal tokens.
 10. **Knowledge.** Chunking, embeddings (local or provider), hybrid retrieval and the repository mapper, all metered as feature `knowledge`.
 11. **Evaluate.** Suites, deterministic checks, a model-graded rubric metered as feature `eval`, gates, an in-process canary scheduler with drift detection and rollback, and hardening levels computed from evidence.
+12. **Community and adoption.** Showcase, challenges judged by the evaluation engine, achievements and leaderboards derived from the ledger, and adoption analytics with session-based hours per feature. Two platform agents (showcase writer, adoption digest) run on the same runtime as business blueprints.
 
 ### 2.3 Data model
 
