@@ -126,4 +126,4 @@ The catalog includes agent definitions imported from public repositories, each s
 
 ## Roadmap
 
-Batches 0 to 9 built the product; Batch 10 added bring-your-own keys and thirteen more models. Batches 11 to 15 (executable notebooks with compute choice, agents on every framework, cloud platform guides, datasets and deeper cost analytics, a documentation hub) are planned in [docs/BATCHES.md](docs/BATCHES.md).
+Batches 0 to 9 built the product; Batch 10 added bring-your-own keys and thirteen more models. Batches 11 to 17 (runnable notebook MVPs, Gen AI and Agentic AI blueprints with low-code and code tracks, an MCP Marketplace and Popular Git repos, agents on every framework, cloud platform guides, datasets and deeper cost analytics, a documentation hub) are planned in [docs/BATCHES.md](docs/BATCHES.md).

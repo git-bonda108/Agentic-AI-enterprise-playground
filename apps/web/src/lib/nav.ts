@@ -96,4 +96,4 @@ export function findNavItem(pathname: string): { section: NavSection; item: NavI
 
 export const CURRENT_BATCH = 10;
 /** Batches planned in docs/BATCHES.md; drives the build-progress widget. */
-export const TOTAL_BATCHES = 15;
+export const TOTAL_BATCHES = 17;

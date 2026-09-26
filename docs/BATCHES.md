@@ -15,11 +15,13 @@ The playground was built in ten batches, then extended in a second series that t
 | 8 | Community, engagement, adoption analytics, platform agents | Done |
 | 9 | Azure templates, CI, demo seed, security pass, control room, one-command launch | Done |
 | 10 | Bring-your-own keys, platform key scope, thirteen more models across NVIDIA NIM, Mistral, xAI, Groq and Cohere | Done |
-| 11 | Notebooks that execute like Colab: helper module, run on open, compute picker, package installs, examples gallery | Planned |
-| 12 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Planned |
-| 13 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Planned |
-| 14 | Datasets section with mock data and trusted sources; cost and token drill-down; hours tiles on the console | Planned |
-| 15 | Documentation hub and a full retest of every left-pane item | Planned |
+| 11 | Runnable notebooks: every blueprint ships an MVP notebook that executes end to end on mock data with minimal setup; compute picker, package installs, examples gallery | Planned |
+| 12 | Two ways to build: blueprints split into Gen AI and Agentic AI, each with a low-code track (Langflow flow, n8n workflow, Copilot Studio recipe) and a code track (notebook, framework flavor); low-code landscape page | Planned |
+| 13 | MCP Marketplace (Connectors reborn): client configuration generator, featured shelf, per-blueprint recommendations, the playground as a server for Langflow, n8n, Copilot Studio and Claude; Popular Git repos | Planned |
+| 14 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Planned |
+| 15 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Planned |
+| 16 | Datasets section with mock data and trusted sources; cost and token drill-down; hours tiles on the console | Planned |
+| 17 | Documentation hub and a full retest of every left-pane item | Planned |
 
 ## Batch 0: skeleton and design system
 
@@ -106,3 +108,32 @@ Models: thirteen additions with prices from the providers' September 2026 sheets
 Deployment: the encryption key and the new provider keys are Key Vault secrets in the Bicep template, and the start-up guard requires the encryption key outside local environments.
 
 Verification at close: 87 API tests, 43 end-to-end tests, strict types and lint clean, Bicep compiles.
+
+## The second series in detail
+
+The first ten batches proved the product. The second series turns it into a daily tool: everything runs, every path has a low-code and a code version, and every step ends with the official next link from the provider.
+
+### Batch 11: runnable notebooks and blueprint MVPs
+
+Every blueprint (six domain blueprints, the sixteen low-code templates, the wizard agents) ships a minimal viable notebook that runs end to end on the mock datasets with no configuration beyond a key from the Keys drawer. Notebooks open with a `playground` helper module already imported (chat, run blueprint, search knowledge, datasets) so the first cell works, and a run-on-open option executes the notebook as soon as it loads. A compute picker offers the browser runtime (free, no install), the playground sandbox (packages installable with `pip` from a cell, like an IDE), and external compute deep links: NVIDIA Brev launchables, Google Colab and GitHub Codespaces, each carrying the notebook. An examples gallery groups notebooks by blueprint and skill level. Activity metering records notebook time for the console.
+
+### Batch 12: two ways to build
+
+Blueprints are recategorised. **Gen AI blueprints** are single-model patterns: chat assistant, retrieval Q&A, extraction, classification, summarisation, content generation. **Agentic AI blueprints** are multi-step patterns with tools, memory, human review, loops and hand-offs: reconciliation, research, review panel, data analyst, learning path, plus the platform's own agents. Every blueprint carries two tracks.
+
+The **low-code track** generates real artefacts: a Langflow flow (importable JSON with the same nodes, plus a "Run in Langflow" card with the install command, the import step and the MCP link back to the playground), an n8n workflow (importable JSON with an AI Agent node, the playground as an MCP Client Tool, and the equivalent connectors), and a Copilot Studio recipe (overview, instructions, what knowledge to add and from where, which tools to add and whether to use a Power Platform connector or an MCP server, the most suitable MCP servers, triggers and topics, and how the blueprint maps to workflow nodes: Classify, Extract, Agent, Human review, Connector, If/Else, Loop). Each recipe links to the exact Microsoft Learn page for the next step. The existing declarative agent manifest export stays.
+
+The **code track** is the notebook from Batch 11 plus the five framework flavors and the deploy scripts.
+
+A **low-code landscape** page compares Copilot Studio, Langflow, n8n, Dify, Flowise, Power Automate, Azure AI Foundry, Vertex AI Agent Builder and Bedrock Flows on licence, hosting, MCP support and best fit, each with its official link. Licensing matters for the subscription: Langflow is MIT and can be bundled; n8n's Sustainable Use Licence allows internal self-hosting but not hosting it for customers, so the playground generates n8n workflows and links out rather than embedding n8n; Dify's Apache 2.0 licence carries a multi-tenant restriction.
+
+### Batch 13: MCP Marketplace and Popular Git repos
+
+Connectors becomes **MCP Marketplace**: the same 7,547 registry entries with tiles, categories, a featured shelf, quality signals and admin approval, plus a configuration generator that produces the exact snippet for the client the person is using: Claude Desktop and Claude Code (`claude mcp add`), Cursor, VS Code, Copilot Studio (custom connector steps), Langflow (MCP client component) and n8n (MCP Client Tool node). Each blueprint recommends its most suitable servers. The playground's own MCP server appears as a tile with one-click configuration for each client, so a Langflow flow, an n8n workflow or a Copilot Studio agent can call the playground's models, blueprints and Knowledge Spaces. External directories (the official registry, mcpmarket.com, the awesome-mcp lists) are linked as sources.
+
+**Popular Git repos** is a curated, categorised catalogue: agent frameworks and harnesses (superpowers, hermes-agent, OpenClaw, AutoGPT, ECC, claude-swarm, gstack, ruflo), visual builders (Langflow, n8n, Dify, Flowise), MCP (official servers, awesome-mcp lists, agentshield), knowledge tooling (graphify), evaluation and observability. Each tile shows stars and licence from a committed snapshot refreshed by a script, what it is for, how it relates to the playground (already used as a tile source, runnable as a flavor, installable as a skill) and the official link.
+
+### Batches 14 to 17
+
+Unchanged from the earlier plan: agents on every framework in the sandbox with built-in tools and how-to panels (14); Cloud platforms with portal links, CLI sign-in and step-by-step deploy guides (15); Datasets, cost and token drill-down, console hours tiles (16); documentation hub and full retest (17).
+
