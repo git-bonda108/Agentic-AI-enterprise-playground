@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download, Play, Plug, Search, Sparkles, Trash2 } from "lucide-react";
+import { Download, Play, Plug, Search, Sparkles, Trash2, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -11,16 +11,16 @@ import type { CustomAgent } from "@/lib/playground-types";
 
 const KNOWLEDGE = [{ id: "policies", label: "Company policies" }, { id: "learning_refs", label: "Learning references" }];
 type Option = { id: string; name: string; hint?: string };
-const EMPTY_FORM = { name: "", description: "", instructions: "", knowledge: [] as string[], skills: [] as string[], tools: [] as string[], starters: ["", "", ""], published: true };
+const EMPTY_FORM = { name: "", description: "", instructions: "", knowledge: [] as string[], skills: [] as string[], tools: [] as string[], builtin_tools: [] as string[], starters: ["", "", ""], published: true };
 
 /** The six Copilot Studio fields plus skills and connectors: name, description, instructions, knowledge, skills, tools, starter prompts, publish. */
-export function AgentWizard({ initial, ownerId, skills = [], connectors = [], spaces = [], presetSkill }: { initial: CustomAgent[]; ownerId: string; skills?: Option[]; connectors?: Option[]; spaces?: Option[]; presetSkill?: string }) {
+export function AgentWizard({ initial, ownerId, skills = [], connectors = [], spaces = [], builtins = [], presetSkill }: { initial: CustomAgent[]; ownerId: string; skills?: Option[]; connectors?: Option[]; spaces?: Option[]; builtins?: { id: string; blurb: string }[]; presetSkill?: string }) {
   const router = useRouter();
   const [agents, setAgents] = useState(initial);
   const [open, setOpen] = useState(Boolean(presetSkill));
   const [form, setForm] = useState({ ...EMPTY_FORM, skills: presetSkill ? [presetSkill] : [] });
   const [skillQuery, setSkillQuery] = useState("");
-  const toggle = (key: "knowledge" | "skills" | "tools", id: string, on: boolean) => setForm((f) => ({ ...f, [key]: on ? [...f[key], id] : f[key].filter((x) => x !== id) }));
+  const toggle = (key: "knowledge" | "skills" | "tools" | "builtin_tools", id: string, on: boolean) => setForm((f) => ({ ...f, [key]: on ? [...f[key], id] : f[key].filter((x) => x !== id) }));
   const knownSkills = presetSkill && !skills.some((s) => s.id === presetSkill) ? [{ id: presetSkill, name: presetSkill }, ...skills] : skills;
   // selected skills always show first, then the best matches for the search box
   const selectedSkills = knownSkills.filter((s) => form.skills.includes(s.id));
@@ -64,7 +64,7 @@ export function AgentWizard({ initial, ownerId, skills = [], connectors = [], sp
           <article key={a.id} className="card-hover flex flex-col rounded-2xl border bg-card p-4" aria-label={a.name}>
             <div className="flex items-center justify-between">
               <span className="rounded-md bg-brand-emerald/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-300">{a.published ? "Published" : "Private"}</span>
-              <span className="font-mono text-[10px] text-muted-foreground">{[a.knowledge.length ? `${a.knowledge.length} knowledge` : "", a.skills?.length ? `${a.skills.length} skills` : "", a.tools?.length ? `${a.tools.length} tools` : ""].filter(Boolean).join(" · ") || "instructions only"}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">{[a.knowledge.length ? `${a.knowledge.length} knowledge` : "", a.skills?.length ? `${a.skills.length} skills` : "", a.builtin_tools?.length ? `${a.builtin_tools.length} built-in` : "", a.tools?.length ? `${a.tools.length} connectors` : ""].filter(Boolean).join(" · ") || "instructions only"}</span>
             </div>
             <h3 className="mt-2 text-base font-semibold">{a.name}</h3>
             <p className="mt-1 flex-1 text-sm text-muted-foreground">{a.description}</p>
@@ -107,6 +107,14 @@ export function AgentWizard({ initial, ownerId, skills = [], connectors = [], sp
                   <label key={s.id} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" value={s.id} className="accent-[var(--brand-violet)]" checked={form.skills.includes(s.id)} onChange={(e) => toggle("skills", s.id, e.target.checked)} aria-label={`Skill ${s.name}`} /> {s.name}</label>
                 ))}
                 {shownSkills.length === 0 && <span className="text-muted-foreground">No skills match.</span>}
+              </div>
+            </div>
+            <div>
+              <p>Built-in tools <span className="text-muted-foreground">(run inside the playground, no server needed)</span></p>
+              <div className="mt-1 flex flex-wrap gap-2" data-testid="builtin-picker">
+                {builtins.map((t) => (
+                  <label key={t.id} title={t.blurb} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" className="accent-[var(--brand-violet)]" checked={form.builtin_tools.includes(t.id)} onChange={(e) => toggle("builtin_tools", t.id, e.target.checked)} aria-label={`Built-in tool ${t.id}`} /> <Wrench className="size-3 text-brand-violet-soft" /> {t.id}</label>
+                ))}
               </div>
             </div>
             <div>

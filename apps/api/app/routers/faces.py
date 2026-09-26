@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 import uuid
@@ -24,7 +25,7 @@ from app.flavors import FRAMEWORKS, render_project, zip_project
 from app.governance import allowed_model_ids, check_budget, check_policy, policy_for
 from app.keys import available_providers, resolve_key
 from app.llm import ProviderError, complete
-from app.models import AgentVersion, Conversation, CustomAgent, Run, UsageEvent, User
+from app.models import AgentVersion, ApiToken, Conversation, CustomAgent, Run, UsageEvent, User
 from app.notebooks import (
     HELPER,
     compute_options,
@@ -262,6 +263,69 @@ def flavor(blueprint_id: str, framework: str, _: User = Depends(current_user)) -
     return {"blueprint_id": blueprint_id, "framework": framework, "files": files, "download": f"/v1/blueprints/{blueprint_id}/flavor/{framework}/download"}
 
 
+class FlavorRunBody(BaseModel):
+    mode: str = Field(default="smoke", pattern="^(smoke|live)$")
+    model: str = Field(default="smart", max_length=64)
+
+
+@router.post("/v1/blueprints/{blueprint_id}/flavor/{framework}/run")
+def flavor_run(blueprint_id: str, framework: str, body: FlavorRunBody, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Run the rendered project in the caller's sandbox.
+
+    `smoke` runs the project's offline test. `live` installs the framework into the caller's sandbox environment, mints a
+    short-lived personal token, and runs `agent.py` against the playground gateway, so the framework really executes and
+    every model call is governed and metered.
+    """
+    import secrets
+    import subprocess
+    import tempfile
+    from pathlib import Path
+
+    from app.notebooks import ensure_sandbox_env, sandbox_python
+    from app.routers.mcp import _hash
+
+    if framework not in FRAMEWORKS:
+        raise HTTPException(status_code=404, detail="Unknown framework")
+    files = render_project(_manifest(blueprint_id), framework)
+    started = time.perf_counter()
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, content in files.items():
+            path = Path(tmp, name)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content)
+        env = {"PATH": os.environ.get("PATH", ""), "HOME": tmp, "PYTHONIOENCODING": "utf-8"}
+        if body.mode == "smoke":
+            proc = subprocess.run([sandbox_python(user.id), "-m", "pytest", "-q", "test_smoke.py"], cwd=tmp, env=env, capture_output=True, text=True, timeout=120, check=False)
+            result = {"mode": "smoke", "ok": proc.returncode == 0, "stdout": proc.stdout[-6000:], "stderr": proc.stderr[-3000:], "exit_code": proc.returncode, "installed": False}
+        else:
+            if framework == "adk":
+                return {"mode": "live", "ok": False, "stdout": "", "stderr": "Google ADK agents run with `adk run .` or `adk web`, which are interactive; download the project and run it locally, or use the smoke test here.", "exit_code": 1, "installed": False, "ms": 0}
+            python = ensure_sandbox_env(user.id)
+            pip = subprocess.run([python, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "-r", "requirements.txt"], cwd=tmp, env=env, capture_output=True, text=True, timeout=600, check=False)
+            if pip.returncode != 0:
+                return {"mode": "live", "ok": False, "stdout": pip.stdout[-3000:], "stderr": "pip install failed: " + pip.stderr[-3000:], "exit_code": pip.returncode, "installed": False, "ms": int((time.perf_counter() - started) * 1000)}
+            raw = "pgk_" + secrets.token_urlsafe(32)
+            token = ApiToken(user_id=user.id, name=f"sandbox run {framework}", prefix=raw[:10], token_hash=_hash(raw))
+            db.add(token)
+            db.commit()
+            try:
+                run_env = {**env, "PLAYGROUND_BASE_URL": f"{settings.self_url.rstrip('/')}/openai/v1", "PLAYGROUND_TOKEN": raw, "PLAYGROUND_MODEL": body.model, "X_TRACE": f"sandbox-{framework}"}
+                proc = subprocess.run([python, "agent.py"], cwd=tmp, env=run_env, capture_output=True, text=True, timeout=240, check=False)
+            except subprocess.TimeoutExpired:
+                proc = None
+            finally:
+                db.delete(token)
+                db.commit()
+            if proc is None:
+                result = {"mode": "live", "ok": False, "stdout": "", "stderr": "Timed out after 240 s", "exit_code": 124, "installed": True}
+            else:
+                result = {"mode": "live", "ok": proc.returncode == 0, "stdout": proc.stdout[-8000:], "stderr": proc.stderr[-4000:], "exit_code": proc.returncode, "installed": True}
+    result["ms"] = int((time.perf_counter() - started) * 1000)
+    db.add(UsageEvent(user_id=user.id, feature="sdk", model=f"sandbox-{framework}", provider="playground", latency_ms=result["ms"], status="ok" if result["ok"] else "error", trace_id=f"sandbox-{framework}"))
+    db.commit()
+    return result
+
+
 @router.get("/v1/blueprints/{blueprint_id}/flavor/{framework}/download")
 def flavor_zip(blueprint_id: str, framework: str, _: User = Depends(current_user)) -> Response:
     if framework not in FRAMEWORKS:
@@ -284,6 +348,14 @@ def deploy(blueprint_id: str, cloud: str, _: User = Depends(current_user)) -> di
     return render_script(_manifest(blueprint_id), cloud)
 
 
+@router.get("/v1/tools/builtin")
+def builtin_tools(_: User = Depends(current_user)) -> dict:
+    """The built-in tools any wizard agent may use, with their schemas."""
+    from app.agents.tools import catalog
+
+    return {"tools": catalog()}
+
+
 # ---------- custom agents (no-code wizard) ----------
 
 class CustomAgentBody(BaseModel):
@@ -293,12 +365,13 @@ class CustomAgentBody(BaseModel):
     knowledge: list[str] = Field(default_factory=list)
     tools: list[str] = Field(default_factory=list)  # approved connector ids
     skills: list[str] = Field(default_factory=list)
+    builtin_tools: list[str] = Field(default_factory=list)  # names from app.agents.tools
     starters: list[str] = Field(default_factory=list)
     published: bool = False
 
 
 def _custom_payload(a: CustomAgent) -> dict:
-    return {"id": a.id, "name": a.name, "description": a.description, "instructions": a.instructions, "knowledge": a.knowledge or [], "tools": a.tools or [], "skills": a.skills or [], "starters": a.starters or [], "published": a.published, "owner_id": a.user_id, "created_at": a.created_at.isoformat()}
+    return {"id": a.id, "name": a.name, "description": a.description, "instructions": a.instructions, "knowledge": a.knowledge or [], "tools": a.tools or [], "skills": a.skills or [], "builtin_tools": a.builtin_tools or [], "starters": a.starters or [], "published": a.published, "owner_id": a.user_id, "created_at": a.created_at.isoformat()}
 
 
 @router.get("/v1/custom-agents")
@@ -322,6 +395,7 @@ class CustomAgentPatch(BaseModel):
     knowledge: list[str] | None = None
     tools: list[str] | None = None
     skills: list[str] | None = None
+    builtin_tools: list[str] | None = None
     starters: list[str] | None = None
     published: bool | None = None
     note: str = Field(default="", max_length=400)

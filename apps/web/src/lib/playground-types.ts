@@ -211,7 +211,9 @@ export type CopilotRecipe = {
 
 export type FrameworkInfo = { id: string; name: string; install: string; docs: string; license: string; hosted: string; language: string };
 export type CloudInfo = { id: string; name: string; runtime: string; pricing: string; pricing_url: string; docs: string; prereq: string };
-export type CustomAgent = { id: string; name: string; description: string; instructions: string; knowledge: string[]; tools: string[]; skills: string[]; starters: string[]; published: boolean; owner_id: string; created_at: string };
+export type CustomAgent = { id: string; name: string; description: string; instructions: string; knowledge: string[]; tools: string[]; skills: string[]; builtin_tools?: string[]; starters: string[]; published: boolean; owner_id: string; created_at: string };
+export type BuiltinTool = { id: string; description: string; blurb: string; parameters: Record<string, unknown> };
+export type FlavorRun = { mode: "smoke" | "live"; ok: boolean; stdout: string; stderr: string; exit_code: number; installed: boolean; ms: number };
 
 export type Connector = {
   id: string; title: string; description: string; version: string; publisher: string; category: string;

@@ -82,6 +82,9 @@ def prepare(state: RunState, config) -> dict:
     with SessionLocal() as db:
         user = db.get(User, ctx.user_id)
     tools, connectors = _tools_for(entry.get("connectors", []), user)
+    from app.agents.tools import tool_specs
+
+    tools = tool_specs(entry.get("builtin_tools") or []) + tools
     data = {
         "entry_id": entry["id"], "name": entry["name"], "family": entry["family"], "tier": entry.get("tier", "Workhorse"), "task": task, "context": str(state["input"].get("context", "")),
         "knowledge": knowledge, "source": entry["source"]["url"], "skills": entry.get("skills", []), "tools": tools, "connectors": connectors,
@@ -92,7 +95,8 @@ def prepare(state: RunState, config) -> dict:
     if data["skills"]:
         parts.append(f"{len(data['skills'])} skills attached")
     if tools:
-        parts.append(f"{len(tools)} tools from {len(connectors)} connectors")
+        builtin_n = sum(1 for t in tools if t.get("builtin"))
+        parts.append(f"{len(tools)} tools ({builtin_n} built-in, {len(tools) - builtin_n} from {len(connectors)} connectors)")
     return {"data": data, **step(state, "prepare", "; ".join(parts), {"knowledge": [k["id"] for k in knowledge], "skills": data["skills"], "tools": [t["function"]["name"] for t in tools]})}
 
 
@@ -134,13 +138,21 @@ def tools_node(state: RunState, config) -> dict:
     """Execute the requested MCP tool calls, then let the model finish with the results in hand."""
     ctx = ctx_from_config(config)
     d = state["data"]
-    by_name = {t["function"]["name"]: t["connector"] for t in d["tools"]}
+    by_name = {t["function"]["name"]: t.get("connector", "builtin") for t in d["tools"]}
+    builtin_names = {t["function"]["name"] for t in d["tools"] if t.get("builtin")}
     with SessionLocal() as db:
         user = db.get(User, ctx.user_id)
         urls = {c["id"]: c["url"] for c in d["connectors"]}
     results = []
     for call in d.get("pending_calls", []):
         cid = by_name.get(call["name"])
+        if call["name"] in builtin_names:
+            from app.agents.tools import call_builtin
+
+            with SessionLocal() as db:
+                text = call_builtin(call["name"], call.get("arguments") or {}, db.get(User, ctx.user_id), db)
+            results.append({"tool": call["name"], "connector": "built-in", "arguments": call.get("arguments") or {}, "result": text[:3000], "is_error": text.startswith("Tool ") and "failed" in text[:40]})
+            continue
         try:
             client = McpClient(urls[cid], loopback_user=user)
             client.initialize()

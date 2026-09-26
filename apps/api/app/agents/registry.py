@@ -11,6 +11,10 @@ from app.agents.blueprints import (  # noqa: F401
     knowledge_qa,
     adoption_digest,
     showcase_writer,
+    key_health,
+    cost_sentinel,
+    connector_reviewer,
+    onboarding_coach,
     prompt_agent,
 )
 

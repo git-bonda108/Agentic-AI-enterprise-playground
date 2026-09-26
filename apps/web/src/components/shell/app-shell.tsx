@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sidebar } from "@/components/shell/sidebar";
 import { Topbar, type ShellUser } from "@/components/shell/topbar";
 import { CommandPalette } from "@/components/shell/command-palette";
+import { HowToPanel } from "@/components/shell/howto";
 import { useStoredBoolean } from "@/lib/use-client-store";
 
 export function AppShell({ user, children }: { user: ShellUser; children: React.ReactNode }) {
@@ -18,6 +19,7 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
         <main id="main" className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+      <HowToPanel />
     </div>
   );
 }

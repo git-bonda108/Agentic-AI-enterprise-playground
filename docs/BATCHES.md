@@ -18,7 +18,7 @@ The playground was built in ten batches, then extended in a second series that t
 | 11 | Runnable notebooks: every blueprint ships an MVP notebook that executes end to end on mock data with minimal setup; compute picker, package installs, examples gallery | Done |
 | 12 | Two ways to build: blueprints split into Gen AI and Agentic AI, each with a low-code track (Langflow flow, n8n workflow, Copilot Studio recipe) and a code track (notebook, framework flavor); low-code landscape page | Done |
 | 13 | MCP Marketplace (Connectors reborn): client configuration generator, featured shelf, per-blueprint recommendations, the playground as a server for Langflow, n8n, Copilot Studio and Claude; Popular Git repos | Done |
-| 14 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Planned |
+| 14 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Done |
 | 15 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Planned |
 | 16 | Datasets section with mock data and trusted sources; cost and token drill-down; hours tiles on the console | Planned |
 | 17 | Documentation hub and a full retest of every left-pane item | Planned |
@@ -159,7 +159,17 @@ Delivered 2026-09-27. Connectors became the **MCP Marketplace**: the same 7,547 
 
 Verification at close: 124 API tests (4 new), 50 end-to-end tests (2 new), strict types and lint clean.
 
-### Batches 14 to 17
+### Batch 14 as shipped
 
-Unchanged from the earlier plan: agents on every framework in the sandbox with built-in tools and how-to panels (14); Cloud platforms with portal links, CLI sign-in and step-by-step deploy guides (15); Datasets, cost and token drill-down, console hours tiles (16); documentation hub and full retest (17).
+Delivered 2026-09-27. The playground now exposes an **OpenAI-compatible gateway** at `/openai/v1`: any SDK that speaks the Chat Completions API (OpenAI, OpenAI Agents SDK, LangChain and LangGraph, CrewAI, Microsoft Agent Framework, Google ADK through LiteLLM) uses the playground as its provider with a personal token, and every call gets Smart routing, the role policy, the budget, personal or platform keys, metering as feature `sdk`, and a trace grouped by `X-Trace-Id`. Streaming, tool calls and content parts are supported; errors use the OpenAI error shape. Every framework project on the Frameworks page now points at the gateway and needs no provider key; two buttons run it in the sandbox (the offline smoke test, or a live run that installs the SDK, mints a short-lived token, executes `agent.py` through the gateway and removes the token).
+
+**Built-in tools** for wizard agents: current date, exact arithmetic, dataset queries, knowledge search, public web fetch (private and local addresses blocked) and sandboxed Python, executed inside the API with the caller's identity alongside MCP connectors. Four more **platform agents**: Key health check (probes every platform key, alerts on rejection), Cost sentinel (last day against the trailing week per department and feature, alerts on jumps), Connector reviewer (approve, hold or block recommendations for the marketplace queue) and Onboarding coach (next three steps from a person's own ledger), each with ten golden cases. A **Traces** page lists runs, SDK sessions and chats with timelines of steps beside metered calls. **How-to** panels on nine pages give the steps for that page and the vendor documentation.
+
+Found live and fixed before shipping: an SDK that omits `max_tokens` used to receive the policy ceiling, which Anthropic rejects above a model's maximum; the gateway now defaults to 4,096 within the policy cap. Live check with real keys: the OpenAI Python SDK listed models, completed through Smart routing on Claude Haiku, streamed, and returned a real tool call from Claude Sonnet, all visible in Traces.
+
+Verification at close: 143 API tests (19 new, one skipped where the LangGraph SDK is not installed), 53 end-to-end tests, strict types and lint clean.
+
+### Batches 15 to 17
+
+Unchanged from the earlier plan: Cloud platforms with portal links, CLI sign-in and step-by-step deploy guides (15); Datasets, cost and token drill-down, console hours tiles (16); documentation hub and full retest (17).
 

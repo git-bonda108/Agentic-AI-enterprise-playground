@@ -66,7 +66,7 @@ def custom_entry(agent) -> dict:
         "source": {"repo": "playground", "path": f"custom/{agent.id}", "license": "Yours", "url": "/build/agents", "title": "Yours"},
         "summary": agent.description, "instructions": agent.instructions, "instructions_truncated": False, "tools": agent.tools or [], "model_hint": "",
         "tags": ["custom", "no-code"], "runnable": True, "tier": "Workhorse", "knowledge": agent.knowledge or [], "starter_prompts": agent.starters or [],
-        "skills": agent.skills or [], "connectors": agent.tools or [],
+        "skills": agent.skills or [], "connectors": agent.tools or [], "builtin_tools": agent.builtin_tools or [],
         "flavors": ["No-code", "Copilot Studio export"], "samples": [{"name": s[:48], "input": {"task": s}} for s in (agent.starters or [])[:3]] or [{"name": "Ask", "input": {"task": "Describe what you do."}}],
         "links": {"export": f"/v1/custom-agents/{agent.id}/export/declarative-agent"}, "owner_id": agent.user_id, "published": agent.published,
     }
@@ -106,7 +106,7 @@ def manifest_for(entry: dict) -> dict:
         "datasets": entry.get("knowledge", []), "flavors": entry.get("flavors", ["LangGraph", "OpenAI Agents SDK", "Claude"]),
         "review_gates": [], "dashboard": ["Runs", "Cost per run"], "links": {"source": entry["source"]["url"], **entry.get("links", {})},
         "input_schema": {"task": "text", "context": "optional text"}, "batch": 4,
-        "skills": entry.get("skills", []), "connectors": entry.get("connectors", []),
+        "skills": entry.get("skills", []), "connectors": entry.get("connectors", []), "builtin_tools": entry.get("builtin_tools", []),
     }
 
 

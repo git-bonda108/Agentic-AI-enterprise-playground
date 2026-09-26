@@ -13,7 +13,7 @@ def test_system_suites_and_library(client, headers):
     assert {c["id"] for c in lib["rubric"]} >= {"correctness", "groundedness", "format"} and len(lib["levels"]) == 5 and len(lib["checks"]) >= 8
     suites = client.get("/v1/evals/suites", headers=headers).json()["suites"]
     system = [s for s in suites if s["system"]]
-    assert len(system) == 8 and all(s["case_count"] == 10 for s in system)  # six domain blueprints plus two platform agents
+    assert len(system) == 12 and all(s["case_count"] == 10 for s in system)  # six domain blueprints plus six platform agents
     assert any(s["blueprint_id"] == "knowledge-qa" for s in system)
 
 

@@ -191,6 +191,24 @@ All routes require the internal key and identity headers, which the web applicat
 | POST | `/v1/notebooks/heartbeat` | Zero-cost editor activity for notebook hours |
 | GET | `/v1/data`, `/v1/data/{id}` | Mock datasets: catalog with previews, and all rows of one dataset |
 
+## OpenAI-compatible gateway
+
+Any SDK that speaks the Chat Completions API can use the playground as its provider. Authenticate with a personal token as the API key (`Authorization: Bearer pgk_...`).
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/openai/v1/models` | `smart` plus every model the caller may use, in the OpenAI list shape |
+| POST | `/openai/v1/chat/completions` | Chat completion with policy, budget, Smart routing, key resolution and metering (feature `sdk`); supports `stream`, `stream_options.include_usage`, `tools` and content parts; `X-Trace-Id` groups calls into one trace; errors in the OpenAI error shape |
+
+## Built-in tools, framework runs and traces
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/tools/builtin` | The built-in tools a wizard agent may use (`builtin_tools` on custom agents) |
+| POST | `/v1/blueprints/{id}/flavor/{framework}/run` | Run the rendered project in the caller's sandbox: `mode: smoke` (offline test) or `live` (install the SDK, run agent.py through the gateway with a short-lived token) |
+| GET | `/v1/traces` | Runs, SDK sessions and chats for a window (`days`, `kind`); organisation-wide for admins and champions |
+| GET | `/v1/traces/{kind}/{id}` | A timeline of steps and metered calls |
+
 ## MCP Marketplace and Popular Git repos
 
 | Method | Path | Purpose |

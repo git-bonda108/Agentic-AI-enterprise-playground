@@ -96,4 +96,4 @@ export function findNavItem(pathname: string): { section: NavSection; item: NavI
   return null;
 }
 
-export const CURRENT_BATCH = 13;  // items with a higher batch number stay hidden until they ship; never shown to people
+export const CURRENT_BATCH = 14;  // items with a higher batch number stay hidden until they ship; never shown to people

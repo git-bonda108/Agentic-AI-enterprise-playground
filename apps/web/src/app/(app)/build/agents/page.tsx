@@ -5,14 +5,14 @@ import { BlueprintGrid } from "@/components/agents/blueprint-grid";
 import { RunsTable } from "@/components/runs/runs-table";
 import { AgentWizard } from "@/components/agents/agent-wizard";
 import { auth } from "@/auth";
-import type { BlueprintManifest, Connector, CustomAgent, KnowledgeSpace, RunRecord, Skill } from "@/lib/playground-types";
+import type { BlueprintManifest, BuiltinTool, Connector, CustomAgent, KnowledgeSpace, RunRecord, Skill } from "@/lib/playground-types";
 
 export const metadata: Metadata = { title: "Agents" };
 export const dynamic = "force-dynamic";
 
 export default async function AgentsPage({ searchParams }: { searchParams: Promise<{ blueprint?: string; skill?: string }> }) {
   const { blueprint, skill } = await searchParams;
-  const [bps, runs, custom, session, skills, connectors, spaces] = await Promise.all([
+  const [bps, runs, custom, session, skills, connectors, spaces, builtins] = await Promise.all([
     apiGet<{ blueprints: BlueprintManifest[] }>("/v1/blueprints"),
     apiGet<{ runs: RunRecord[]; waiting_review: number }>("/v1/runs?limit=8"),
     apiGet<{ agents: CustomAgent[] }>("/v1/custom-agents"),
@@ -20,6 +20,7 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
     apiGet<{ skills: Skill[] }>("/v1/skills?limit=400"),
     apiGet<{ connectors: Connector[] }>("/v1/connectors?approval=approved&transport=remote&limit=24"),
     apiGet<{ spaces: KnowledgeSpace[] }>("/v1/knowledge/spaces"),
+    apiGet<{ tools: BuiltinTool[] }>("/v1/tools/builtin"),
   ]);
   if (!bps) return <div className="mx-auto max-w-xl rounded-2xl border bg-card p-8 text-center text-sm text-muted-foreground">The API is not reachable, so the Agent Hub could not load.</div>;
   return (
@@ -38,6 +39,7 @@ export default async function AgentsPage({ searchParams }: { searchParams: Promi
         presetSkill={skill}
         skills={(skills?.skills ?? []).map((s) => ({ id: s.id, name: s.name, hint: s.category }))}
         connectors={(connectors?.connectors ?? []).map((c) => ({ id: c.id, name: c.title }))}
+        builtins={(builtins?.tools ?? []).map((t) => ({ id: t.id, blurb: t.blurb }))}
         spaces={(spaces?.spaces ?? []).map((s) => ({ id: s.id, name: s.name }))}
       />
       <section>

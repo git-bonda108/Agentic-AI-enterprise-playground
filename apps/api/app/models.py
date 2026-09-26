@@ -82,6 +82,7 @@ class UsageEvent(Base):
     routed: Mapped[bool] = mapped_column(Boolean, default=False)
     routed_tier: Mapped[str | None] = mapped_column(String(16), nullable=True)
     key_source: Mapped[str] = mapped_column(String(16), default="platform")  # platform | personal | none
+    trace_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)  # groups SDK gateway calls into one trace
     savings_usd: Mapped[float] = mapped_column(Float, default=0.0)
     run_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
     blueprint_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
@@ -149,6 +150,7 @@ class CustomAgent(Base):
     knowledge: Mapped[list[str]] = mapped_column(JSON, default=list)
     tools: Mapped[list[str]] = mapped_column(JSON, default=list)
     skills: Mapped[list[str]] = mapped_column(JSON, default=list)
+    builtin_tools: Mapped[list[str]] = mapped_column(JSON, default=list)  # names from app.agents.tools
     starters: Mapped[list[str]] = mapped_column(JSON, default=list)
     published: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)

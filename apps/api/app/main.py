@@ -27,10 +27,12 @@ from app.routers import (
     lowcode,
     mcp,
     models,
+    openai_compat,
     repos,
     route,
     runs,
     skills,
+    traces,
     usage,
 )
 from app.security import RateLimitMiddleware, SecurityHeadersMiddleware, assert_safe_configuration
@@ -82,6 +84,8 @@ app.include_router(adoption.router)
 app.include_router(keys.router)
 app.include_router(lowcode.router)
 app.include_router(repos.router)
+app.include_router(traces.router)
+app.include_router(openai_compat.router)
 
 
 @app.get("/health")
@@ -95,6 +99,6 @@ def meta() -> dict[str, object]:
     return {
         "app": settings.app_name,
         "version": app.version,
-        "batch": 10,
+        "batch": 14,
         "sections": ["home", "discover", "build", "evaluate", "operate", "community", "admin"],
     }
