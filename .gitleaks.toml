@@ -1,0 +1,11 @@
+title = "Enterprise AI Playground gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test suites use synthetic provider keys (nvapi-..., sk-ant-...) to exercise prefix validation; real keys never live in the tree."
+paths = [
+  '''apps/api/tests/.*''',
+  '''apps/web/e2e/.*''',
+]

@@ -30,7 +30,7 @@ Outside `local`, `e2e`, `test` and `development` environments the API refuses to
 ## Secrets hygiene
 
 - `.env` is ignored by git; `.env.example` contains placeholders only.
-- CI runs gitleaks over the full history on every push, plus `npm audit` and `pip-audit`.
+- CI runs gitleaks on every push (`.gitleaks.toml` allowlists only the test directories, whose keys are synthetic), plus `npm audit` and `pip-audit`.
 - Personal tokens and the internal key never appear in logs or responses after creation.
 - Personal provider keys are stored as Fernet ciphertext; the encryption key is required outside local environments and rotating it invalidates stored keys (people re-enter them). The judge, canaries and platform agents never use personal keys.
 
