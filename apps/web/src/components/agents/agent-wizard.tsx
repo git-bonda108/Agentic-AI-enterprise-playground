@@ -22,7 +22,10 @@ export function AgentWizard({ initial, ownerId, skills = [], connectors = [], sp
   const [skillQuery, setSkillQuery] = useState("");
   const toggle = (key: "knowledge" | "skills" | "tools", id: string, on: boolean) => setForm((f) => ({ ...f, [key]: on ? [...f[key], id] : f[key].filter((x) => x !== id) }));
   const knownSkills = presetSkill && !skills.some((s) => s.id === presetSkill) ? [{ id: presetSkill, name: presetSkill }, ...skills] : skills;
-  const shownSkills = knownSkills.filter((s) => form.skills.includes(s.id) || !skillQuery || `${s.name} ${s.hint ?? ""}`.toLowerCase().includes(skillQuery.toLowerCase())).slice(0, 14);
+  // selected skills always show first, then the best matches for the search box
+  const selectedSkills = knownSkills.filter((s) => form.skills.includes(s.id));
+  const matchingSkills = knownSkills.filter((s) => !form.skills.includes(s.id) && (!skillQuery || `${s.name} ${s.hint ?? ""}`.toLowerCase().includes(skillQuery.toLowerCase())));
+  const shownSkills = [...selectedSkills, ...matchingSkills].slice(0, Math.max(14, selectedSkills.length));
   const [saving, setSaving] = useState(false);
   const [runTarget, setRunTarget] = useState<RunTarget | null>(null);
 
@@ -101,7 +104,7 @@ export function AgentWizard({ initial, ownerId, skills = [], connectors = [], sp
               </div>
               <div className="mt-1 flex flex-wrap gap-2" data-testid="skill-picker">
                 {shownSkills.map((s) => (
-                  <label key={s.id} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" className="accent-[var(--brand-violet)]" checked={form.skills.includes(s.id)} onChange={(e) => toggle("skills", s.id, e.target.checked)} aria-label={`Skill ${s.name}`} /> {s.name}</label>
+                  <label key={s.id} className="flex items-center gap-1.5 rounded-lg border px-2 py-1"><input type="checkbox" value={s.id} className="accent-[var(--brand-violet)]" checked={form.skills.includes(s.id)} onChange={(e) => toggle("skills", s.id, e.target.checked)} aria-label={`Skill ${s.name}`} /> {s.name}</label>
                 ))}
                 {shownSkills.length === 0 && <span className="text-muted-foreground">No skills match.</span>}
               </div>

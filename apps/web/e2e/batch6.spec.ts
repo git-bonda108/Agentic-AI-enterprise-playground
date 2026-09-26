@@ -30,13 +30,13 @@ test.describe("Batch 6 connectors, knowledge, skills", () => {
     await page.getByLabel("Search skills").fill("tdd");
     const first = page.getByTestId("skill-cards").getByRole("button").first();
     await expect(first).toHaveAttribute("aria-label", /tdd/i, { timeout: 10_000 });  // wait for the debounced search to apply
-    const name = (await first.getAttribute("aria-label"))!;
     await first.click();
     await expect(page.getByTestId("skill-body")).toBeVisible();
     await page.getByRole("link", { name: "Attach to a new agent" }).click();
     await expect(page).toHaveURL(/\/build\/agents\?skill=/);
     await expect(page.getByRole("dialog")).toContainText("Create your own agent");
-    await expect(page.getByTestId("skill-picker").getByLabel(`Skill ${name}`)).toBeChecked();
+    const skillId = new URL(page.url()).searchParams.get("skill")!;
+    await expect(page.getByTestId("skill-picker").locator(`input[value="${skillId}"]`)).toBeChecked();
   });
 
   test("knowledge space: create, add text, search, ask, map a repository and draw the graph", async ({ page }) => {
