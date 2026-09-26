@@ -191,6 +191,14 @@ All routes require the internal key and identity headers, which the web applicat
 | POST | `/v1/notebooks/heartbeat` | Zero-cost editor activity for notebook hours |
 | GET | `/v1/data`, `/v1/data/{id}` | Mock datasets: catalog with previews, and all rows of one dataset |
 
+## MCP Marketplace and Popular Git repos
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/v1/connectors/featured` | The featured shelf (the playground first, then admin-approved servers by signal) and external directories |
+| GET | `/v1/connectors/{id}/clients` | Configuration for Claude Desktop, Claude Code, Cursor, VS Code, Copilot Studio, Langflow and n8n, each with a snippet in that client's format, steps and the vendor's documentation page |
+| GET | `/v1/repos` | The curated repository snapshot with categories, stars, licences and relations; `?category=` and `?q=` filter |
+
 ## Two ways to build (low-code studios)
 
 | Method | Path | Purpose |

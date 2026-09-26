@@ -71,6 +71,29 @@ def connector_stats(_: User = Depends(current_user), db: Session = Depends(get_d
     return {"total": total, "by_approval": by_approval, "by_transport": by_transport, "by_category": by_category, "categories": [c[0] for c in CATEGORIES] + ["Other"], "registry_newest": newest}
 
 
+@router.get("/featured")
+def featured(_: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """The shelf at the top of the marketplace: the playground itself, then admin-approved servers by signal strength."""
+    from app.connectors import PLAYGROUND_CONNECTOR_ID
+    from app.mcp_clients import DIRECTORIES
+
+    own = db.get(Connector, PLAYGROUND_CONNECTOR_ID)
+    approved = db.scalars(select(Connector).where(Connector.approval == "approved", Connector.id != PLAYGROUND_CONNECTOR_ID).order_by(Connector.signals.desc(), Connector.title).limit(11)).all()
+    rows = ([own] if own else []) + list(approved)
+    return {"featured": [payload(c) for c in rows], "directories": DIRECTORIES}
+
+
+@router.get("/{connector_id:path}/clients")
+def clients(connector_id: str, _: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Configuration for every supported client, in that client's own format."""
+    from app.mcp_clients import client_configs
+
+    c = db.get(Connector, connector_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="Unknown connector")
+    return {"connector": payload(c), "clients": client_configs(payload(c))}
+
+
 @router.post("/sync")
 def sync(_: User = Depends(require_admin), db: Session = Depends(get_db)) -> dict:
     try:

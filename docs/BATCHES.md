@@ -17,7 +17,7 @@ The playground was built in ten batches, then extended in a second series that t
 | 10 | Bring-your-own keys, platform key scope, thirteen more models across NVIDIA NIM, Mistral, xAI, Groq and Cohere | Done |
 | 11 | Runnable notebooks: every blueprint ships an MVP notebook that executes end to end on mock data with minimal setup; compute picker, package installs, examples gallery | Done |
 | 12 | Two ways to build: blueprints split into Gen AI and Agentic AI, each with a low-code track (Langflow flow, n8n workflow, Copilot Studio recipe) and a code track (notebook, framework flavor); low-code landscape page | Done |
-| 13 | MCP Marketplace (Connectors reborn): client configuration generator, featured shelf, per-blueprint recommendations, the playground as a server for Langflow, n8n, Copilot Studio and Claude; Popular Git repos | Planned |
+| 13 | MCP Marketplace (Connectors reborn): client configuration generator, featured shelf, per-blueprint recommendations, the playground as a server for Langflow, n8n, Copilot Studio and Claude; Popular Git repos | Done |
 | 14 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Planned |
 | 15 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Planned |
 | 16 | Datasets section with mock data and trusted sources; cost and token drill-down; hours tiles on the console | Planned |
@@ -150,6 +150,14 @@ Delivered 2026-09-27. A `playground` helper module (standard library only, ident
 The Notebooks page opens on a gallery of twelve runnable notebooks grouped into Gen AI and Agentic AI with levels and minutes: six getting-started notebooks (hello, compare models, pandas with a narrator model and a package install, retrieval Q&A over a Knowledge Space, an agent that pauses for human review, a 40-line tool loop) and one MVP per domain blueprint that meets its data, runs it, reads the trace and output, handles the review gate and ends with next steps and reference implementations. The sandbox runs a whole notebook top to bottom in one process, shows every cell's output and stops at the first error; `%pip install` inside a cell or the Install box installs into a per-person environment that keeps the platform's packages visible. A compute picker offers the browser, the sandbox and external targets (NVIDIA Brev launchable deep link, Google Colab, GitHub Codespaces) with download-first guidance until the playground has a public address. Notebook time is measured through a zero-cost heartbeat.
 
 Verification at close: 105 API tests (18 new, including one that starts a real HTTP server and executes all twelve notebooks in the sandbox), 46 end-to-end tests, strict types and lint clean. Live check: the hello notebook ran against real providers in 16 seconds with a Claude Sonnet reply metered at $0.0017.
+
+### Batch 13 as shipped
+
+Delivered 2026-09-27. Connectors became the **MCP Marketplace**: the same 7,547 registry entries with a featured shelf (the playground first, then admin-approved servers by signal), links to the external directories, and, on every tile, **Connect from** tabs that generate configuration for Claude Desktop, Claude Code, Cursor, VS Code, Copilot Studio, Langflow and n8n from the server's registry entry, each in the client's own format with the steps around it and the vendor's documentation page. Secrets stay placeholders. The playground's own server carries the same seven configurations, so any of those clients can run blueprints and search Knowledge Spaces under the caller's policy and ledger. Every client documentation URL and directory URL was checked to resolve when the batch shipped.
+
+**Popular Git repos** is a new Discover page: a curated, categorised catalogue of 60 repositories (34 chosen for what they mean to the playground, plus the author's 26 public repositories as reference implementations) with stars, forks, licence, language and last activity from GitHub, a sentence on what each is for, how it relates to the playground, and official links. The snapshot is committed and refreshed by `npm run import:repos`; repositories GitHub could not find would have been dropped, and three that had been renamed were recorded under their current names.
+
+Verification at close: 124 API tests (4 new), 50 end-to-end tests (2 new), strict types and lint clean.
 
 ### Batches 14 to 17
 

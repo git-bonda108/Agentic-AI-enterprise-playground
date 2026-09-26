@@ -27,6 +27,7 @@ from app.routers import (
     lowcode,
     mcp,
     models,
+    repos,
     route,
     runs,
     skills,
@@ -80,6 +81,7 @@ app.include_router(community.router)
 app.include_router(adoption.router)
 app.include_router(keys.router)
 app.include_router(lowcode.router)
+app.include_router(repos.router)
 
 
 @app.get("/health")

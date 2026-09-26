@@ -18,6 +18,7 @@
     "seed:reset": "cd apps/api && uv run python scripts/seed_demo.py --reset",
     "start:local": "bash scripts/dev.sh",
     "start:offline": "bash scripts/dev.sh --offline",
-    "diagrams": "node scripts/render-diagrams.mjs"
+    "diagrams": "node scripts/render-diagrams.mjs",
+    "import:repos": "cd apps/api && uv run python scripts/import_repos.py"
   }
 }

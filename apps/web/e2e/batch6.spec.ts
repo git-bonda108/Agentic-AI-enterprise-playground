@@ -5,7 +5,7 @@ test.describe("Batch 6 connectors, knowledge, skills", () => {
   test("connectors page lists the registry, tests a connection and lets an admin approve", async ({ page }) => {
     await loginAs(page);
     await page.goto("/discover/connectors");
-    await expect(page.getByRole("heading", { level: 1, name: "Connectors" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "MCP Marketplace" })).toBeVisible();
     await expect(page.getByTestId("connector-cards").getByRole("button").first()).toBeVisible();
     await page.getByLabel("Search connectors").fill("Enterprise AI Playground");
     await page.getByRole("button", { name: "Enterprise AI Playground", exact: true }).click();

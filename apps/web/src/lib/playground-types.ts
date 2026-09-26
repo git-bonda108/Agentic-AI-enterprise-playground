@@ -219,6 +219,10 @@ export type Connector = {
   env_vars: string[]; repo_url: string; website: string; status: string; approval: "pending" | "approved" | "blocked";
   approved_by: string | null; approval_note: string; signals: number; registry_updated_at: string; install: Record<string, unknown>;
 };
+export type ClientConfig = { client: string; name: string; format: "json" | "bash" | "text"; file: string; snippet: string; steps: string[]; docs: string };
+export type Directory = { name: string; url: string; blurb: string };
+export type Repo = { id: string; full_name: string; name: string; category: string; blurb: string; relation: string; playground_href: string; url: string; homepage: string; stars: number; forks: number; license: string; language: string; pushed_at: string; topics: string[]; archived: boolean };
+export type RepoCategory = { id: string; count: number; blurb: string };
 export type ConnectorStats = { total: number; by_approval: Record<string, number>; by_transport: Record<string, number>; by_category: Record<string, number>; categories: string[]; registry_newest: string | null };
 export type ProbeResult = { ok: boolean; server: { name?: string; version?: string }; protocol: string; tools: { name: string; description: string; input_schema: Record<string, unknown> }[]; tool_count: number; latency_ms: number; auth_required: boolean; error: string | null };
 

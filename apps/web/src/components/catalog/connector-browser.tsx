@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CopyButton } from "@/components/playground/copy-button";
-import type { Connector, ConnectorStats, ProbeResult } from "@/lib/playground-types";
+import type { ClientConfig, Connector, ConnectorStats, Directory, ProbeResult } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
 
 const APPROVAL_STYLE: Record<string, string> = {
@@ -16,8 +16,10 @@ const APPROVAL_STYLE: Record<string, string> = {
 };
 const TRANSPORTS = ["", "remote", "npm", "pypi", "oci", "mcpb"];
 
-export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { initial: Connector[]; stats: ConnectorStats; isAdmin: boolean }) {
-  const [q, setQ] = useState("");
+const CLIENT_LABEL: Record<string, string> = { "claude-desktop": "Claude Desktop", "claude-code": "Claude Code", cursor: "Cursor", vscode: "VS Code", "copilot-studio": "Copilot Studio", langflow: "Langflow", n8n: "n8n" };
+
+export function ConnectorBrowser({ initial, stats: initialStats, isAdmin, featured, directories, initialQuery }: { initial: Connector[]; stats: ConnectorStats; isAdmin: boolean; featured: Connector[]; directories: Directory[]; initialQuery?: string }) {
+  const [q, setQ] = useState(initialQuery ?? "");
   const [category, setCategory] = useState("");
   const [transport, setTransport] = useState("");
   const [approval, setApproval] = useState("");
@@ -26,6 +28,8 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
   const [stats, setStats] = useState(initialStats);
   const [detail, setDetail] = useState<Connector | null>(null);
   const [probe, setProbe] = useState<ProbeResult | null>(null);
+  const [clients, setClients] = useState<ClientConfig[] | null>(null);
+  const [clientTab, setClientTab] = useState("claude-code");
   const [probing, setProbing] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
@@ -45,7 +49,10 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
 
   const refreshStats = async () => { const r = await fetch("/api/pg/v1/connectors/stats"); if (r.ok) setStats(await r.json()); };
 
-  const open = (c: Connector) => { setDetail(c); setProbe(null); };
+  const open = (c: Connector) => {
+    setDetail(c); setProbe(null); setClients(null);
+    fetch(`/api/pg/v1/connectors/${c.id}/clients`).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j) setClients(j.clients); }).catch(() => {});
+  };
   const runProbe = async (c: Connector) => {
     setProbing(true);
     const res = await fetch(`/api/pg/v1/connectors/${c.id}/probe`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
@@ -76,8 +83,8 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Discover</p>
-          <h1 className="text-2xl font-semibold tracking-tight">Connectors</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{stats.total.toLocaleString()} MCP servers from the official registry, {stats.by_approval.approved ?? 0} approved by your admins. Every agent can use approved connectors as tools; the playground itself is one of them.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">MCP Marketplace</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{stats.total.toLocaleString()} MCP servers from the official registry, {stats.by_approval.approved ?? 0} approved by your admins. Open any tile for ready-made configuration for Claude Desktop, Claude Code, Cursor, VS Code, Copilot Studio, Langflow and n8n. The playground itself is a server here.</p>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <span className="rounded-full bg-brand-emerald/15 px-2.5 py-1 font-medium text-emerald-700 dark:text-emerald-300" data-testid="approved-count">{stats.by_approval.approved ?? 0} approved</span>
@@ -85,6 +92,25 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
           {isAdmin && <Button size="sm" variant="outline" onClick={sync} disabled={syncing} aria-label="Sync registry"><RefreshCw className={cn("size-3.5", syncing && "animate-spin")} /> {syncing ? "Syncing…" : "Sync registry"}</Button>}
         </div>
       </div>
+
+      {featured.length > 0 && (
+        <section className="mt-5" aria-label="Featured servers" data-testid="featured-shelf">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Featured · the playground and admin-approved servers</p>
+          <div className="mt-2 flex gap-3 overflow-x-auto pb-2">
+            {featured.map((c) => (
+              <button key={c.id} type="button" onClick={() => open(c)} className={cn("card-hover w-56 shrink-0 rounded-2xl border bg-card p-3 text-left", c.id === "playground/mcp" && "border-brand-violet/60")} aria-label={`Featured: ${c.title}`}>
+                <p className="flex items-center gap-1.5 text-sm font-semibold"><Plug className="size-3.5 shrink-0 text-brand-violet-soft" /> <span className="truncate">{c.title}</span></p>
+                <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">{c.description}</p>
+                <p className="mt-2 truncate font-mono text-[10px] text-muted-foreground">{c.publisher} · {c.transport}</p>
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground" data-testid="directories">
+            <span>More directories:</span>
+            {directories.map((d) => <a key={d.url} href={d.url} target="_blank" rel="noreferrer" title={d.blurb} className="inline-flex items-center gap-1 text-brand-violet-soft hover:underline">{d.name} <ExternalLink className="size-3" /></a>)}
+          </p>
+        </section>
+      )}
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <label className="relative">
@@ -138,9 +164,14 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
                 {detail.repo_url && <><dt className="text-muted-foreground">Source</dt><dd><a href={detail.repo_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-violet-soft hover:underline">{detail.repo_url.replace("https://", "")} <ExternalLink className="size-3" /></a></dd></>}
                 {detail.approval_note && <><dt className="text-muted-foreground">Admin note</dt><dd>{detail.approval_note}</dd></>}
               </dl>
-              <div>
-                <div className="flex items-center justify-between"><p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Client configuration</p><CopyButton text={JSON.stringify({ mcpServers: detail.install }, null, 2)} /></div>
-                <pre className="mt-1 max-h-40 overflow-auto rounded-lg bg-[#0d0d18] p-3 font-mono text-[11px] text-slate-100" data-testid="install-snippet">{JSON.stringify({ mcpServers: detail.install }, null, 2)}</pre>
+              <div data-testid="connect-from">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Connect from</p>
+                <div className="mt-1 flex flex-wrap gap-1" role="tablist" aria-label="Client">
+                  {(clients ?? []).map((c) => (
+                    <button key={c.client} type="button" role="tab" aria-selected={clientTab === c.client} onClick={() => setClientTab(c.client)} className={cn("h-7 rounded-md border px-2 text-[11px]", clientTab === c.client ? "border-brand-violet/60 bg-secondary" : "text-muted-foreground hover:text-foreground")}>{CLIENT_LABEL[c.client] ?? c.name}</button>
+                  ))}
+                </div>
+                <ClientPanel config={(clients ?? []).find((c) => c.client === clientTab) ?? clients?.[0] ?? null} />
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button size="sm" onClick={() => runProbe(detail)} disabled={probing} aria-label="Test connection"><Wifi className="size-3.5" /> {probing ? "Connecting…" : "Test connection"}</Button>
@@ -165,6 +196,18 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin }: { in
           )}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function ClientPanel({ config }: { config: ClientConfig | null }) {
+  if (!config) return <p className="mt-2 text-xs text-muted-foreground">Loading client configuration…</p>;
+  return (
+    <div className="mt-2">
+      <div className="flex items-center justify-between text-[11px] text-muted-foreground"><span>{config.file || (config.format === "bash" ? "Terminal" : "Wizard")}</span><CopyButton text={config.snippet} /></div>
+      <pre className="mt-1 max-h-40 overflow-auto rounded-lg bg-[#0d0d18] p-3 font-mono text-[11px] text-slate-100 whitespace-pre-wrap" data-testid="install-snippet">{config.snippet}</pre>
+      <ol className="mt-2 list-decimal space-y-0.5 pl-4 text-[11px] text-muted-foreground">{config.steps.map((s) => <li key={s}>{s}</li>)}</ol>
+      <a href={config.docs} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[11px] text-brand-violet-soft hover:underline">{config.name} MCP documentation <ExternalLink className="size-3" /></a>
     </div>
   );
 }
