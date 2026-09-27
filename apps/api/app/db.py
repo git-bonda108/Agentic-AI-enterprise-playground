@@ -48,3 +48,14 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+def fit_columns(model: type, values: dict) -> dict:
+    """Clip string values to their column lengths. SQLite ignores VARCHAR limits; PostgreSQL rejects the row."""
+    out = dict(values)
+    for column in model.__table__.columns:
+        limit = getattr(column.type, "length", None)
+        v = out.get(column.name)
+        if limit and isinstance(v, str) and len(v) > limit:
+            out[column.name] = v[: limit - 1] + "…"
+    return out

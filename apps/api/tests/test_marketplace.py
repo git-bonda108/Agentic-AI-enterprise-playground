@@ -70,3 +70,24 @@ def test_popular_repos_snapshot(client, headers):
     only = client.get("/v1/repos?category=MCP", headers=headers).json()["repos"]
     assert only and all(r["category"] == "MCP" for r in only)
     assert client.get("/v1/repos?q=langgraph", headers=headers).json()["repos"]
+
+
+def test_seeded_connectors_fit_their_column_lengths(client, headers):
+    """PostgreSQL enforces VARCHAR limits that SQLite ignores; the registry snapshot holds descriptions and URLs longer than the columns."""
+    from sqlalchemy import select
+
+    from app.connectors import SNAPSHOT
+    from app.db import SessionLocal, fit_columns
+    from app.models import Connector
+
+    limits = {c.name: c.type.length for c in Connector.__table__.columns if getattr(c.type, "length", None)}
+    assert fit_columns(Connector, {"remote_url": "x" * 600})["remote_url"].endswith("…") and len(fit_columns(Connector, {"remote_url": "x" * 600})["remote_url"]) == 512
+    assert fit_columns(Connector, {"title": "short"})["title"] == "short"
+    with SessionLocal() as db:
+        for c in db.scalars(select(Connector)).all():
+            for name, limit in limits.items():
+                v = getattr(c, name)
+                assert v is None or len(v) <= limit, (c.id, name)
+    import json
+    rows = json.loads(SNAPSHOT.read_text())
+    assert any(len(r.get("description") or "") > 400 or len(r.get("remote_url") or "") > 512 or len(r.get("website") or "") > 512 or len(r.get("repo_url") or "") > 512 for r in rows), "the snapshot should contain the overlong values this test guards against"

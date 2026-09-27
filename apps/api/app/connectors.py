@@ -17,6 +17,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.config import API_DIR, settings
+from app.db import fit_columns
 from app.models import Connector
 
 REGISTRY_URL = "https://registry.modelcontextprotocol.io/v0.1/servers"
@@ -142,11 +143,12 @@ def playground_connector() -> dict:
 
 
 def _row_to_model(row: dict, approval: str | None = None) -> Connector:
-    return Connector(
-        id=row["id"], title=row["title"], description=row["description"], version=row["version"], publisher=row["publisher"], category=row["category"],
-        transport=row["transport"], remote_url=row["remote_url"], package=row["package"], env_vars=row["env_vars"], repo_url=row["repo_url"], website=row["website"],
-        status=row["status"], registry_updated_at=row["updated_at"], signals=quality_signals(row), approval=approval or default_approval(row),
-    )
+    values = {
+        "id": row["id"], "title": row["title"], "description": row["description"], "version": row["version"], "publisher": row["publisher"], "category": row["category"],
+        "transport": row["transport"], "remote_url": row["remote_url"], "package": row["package"], "env_vars": row["env_vars"], "repo_url": row["repo_url"], "website": row["website"],
+        "status": row["status"], "registry_updated_at": row["updated_at"], "signals": quality_signals(row), "approval": approval or default_approval(row),
+    }
+    return Connector(**fit_columns(Connector, values))
 
 
 def seed_connectors(db: Session) -> int:
