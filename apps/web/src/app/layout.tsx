@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-const sans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"], display: "swap", axes: ["opsz"] });
+const sans = Instrument_Sans({ variable: "--font-sans-face", subsets: ["latin"], display: "swap", axes: ["wdth"] });
 const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {

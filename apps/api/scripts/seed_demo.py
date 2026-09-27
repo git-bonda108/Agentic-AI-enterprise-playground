@@ -71,7 +71,7 @@ PEOPLE = [
     ("u11", "Arbaz Sayed", "arbazsayed105@gmail.com", "builder", "Partners"),  # real pilot participants: seeded as people, never with fabricated activity
     ("u12", "Toral Rathod", "Toral.Rathod@eduramp.in", "builder", "Eduramp"),
     ("u13", "Joy Das", "Joy.Das@wns.com", "builder", "WNS"),
-    ("u14", "Amal Socratles", "Amal.Socraties@wns.com", "builder", "WNS"),
+    ("u14", "Amal Socraties", "Amal.Socraties@wns.com", "builder", "WNS"),
 ]
 ACTIVITY = {"u1": 6, "u2": 5, "u3": 4, "u4": 5, "u5": 2, "u6": 2, "u7": 3, "u8": 1, "u9": 3, "u10": 2, "u11": 0, "u12": 0, "u13": 0, "u14": 0}  # sessions per week; real people get none
 MODEL_MIX = ["claude-sonnet-5", "claude-sonnet-5", "claude-haiku-4-5", "claude-haiku-4-5", "claude-haiku-4-5", "gpt-5.6-terra", "deepseek-v4-flash", "claude-opus-5-5"]

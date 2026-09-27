@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" width="1200" height="720" font-family="Instrument Sans, Inter, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0b16"/><stop offset="1" stop-color="#0a0a14"/></linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8b5cf6"/><stop offset="0.55" stop-color="#ec4899"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffffff"/><stop offset="0.35" stop-color="#a5f3fc"/><stop offset="1" stop-color="#06b6d4" stop-opacity="0"/></radialGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+    <style>
+      .band { fill: #12121a; stroke: #2a2a3a; }
+      .box { fill: #171628; stroke: #3b2a6a; rx: 12; }
+      .title { fill: #ececf4; font-size: 15px; font-weight: 600; }
+      .sub { fill: #a4a4b8; font-size: 12px; }
+      .layer { fill: #8b5cf6; font-size: 11px; font-weight: 600; letter-spacing: .12em; }
+      .wire { fill: none; stroke: #2f2f44; stroke-width: 2; }
+      .lit { fill: none; stroke: url(#brand); stroke-width: 2.5; stroke-linecap: round; opacity: 0; }
+    </style>
+  </defs>
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <text x="40" y="44" fill="#ececf4" font-size="22" font-weight="600">Enterprise AI Playground · how a request travels</text>
+  <text x="40" y="66" class="sub">Every call passes the same layers in the same order: identity, policy, budget, reasoning, providers, ledger. The light shows one request.</text>
+
+  <g>
+    <rect x="40" y="96" width="1120" height="86" class="band" rx="14"/><text x="56" y="114" class="layer">PEOPLE AND CLIENTS</text>
+    <rect x="40" y="200" width="1120" height="86" class="band" rx="14"/><text x="56" y="218" class="layer">GOVERNANCE</text>
+    <rect x="40" y="304" width="1120" height="110" class="band" rx="14"/><text x="56" y="322" class="layer">REASONING · AGENT RUNTIME</text>
+    <rect x="40" y="432" width="1120" height="86" class="band" rx="14"/><text x="56" y="450" class="layer">KNOWLEDGE AND DATA</text>
+    <rect x="40" y="536" width="1120" height="86" class="band" rx="14"/><text x="56" y="554" class="layer">PROVIDERS AND INTEGRATIONS</text>
+    <rect x="40" y="640" width="1120" height="56" class="band" rx="14"/><text x="56" y="658" class="layer">LEDGER</text>
+  </g>
+
+  <g>
+    <rect x="80" y="124" width="200" height="48" class="box"/><text x="96" y="144" class="title">Web app</text><text x="96" y="162" class="sub">playground · agents · notebooks</text>
+    <rect x="320" y="124" width="200" height="48" class="box"/><text x="336" y="144" class="title">OpenAI-compatible SDKs</text><text x="336" y="162" class="sub">LangGraph · CrewAI · ADK …</text>
+    <rect x="560" y="124" width="200" height="48" class="box"/><text x="576" y="144" class="title">MCP clients</text><text x="576" y="162" class="sub">Claude · Cursor · VS Code</text>
+    <rect x="800" y="124" width="200" height="48" class="box"/><text x="816" y="144" class="title">Low-code studios</text><text x="816" y="162" class="sub">Langflow · n8n · Copilot Studio</text>
+  </g>
+  <g>
+    <rect x="80" y="228" width="200" height="48" class="box"/><text x="96" y="248" class="title">Identity</text><text x="96" y="266" class="sub">Entra · Google · Okta · OIDC</text>
+    <rect x="320" y="228" width="200" height="48" class="box"/><text x="336" y="248" class="title">Role policy</text><text x="336" y="266" class="sub">which models, tools, connectors</text>
+    <rect x="560" y="228" width="200" height="48" class="box"/><text x="576" y="248" class="title">Budget</text><text x="576" y="266" class="sub">person · department · organisation</text>
+    <rect x="800" y="228" width="200" height="48" class="box"/><text x="816" y="248" class="title">Keys</text><text x="816" y="266" class="sub">platform or personal, encrypted</text>
+  </g>
+  <g>
+    <rect x="80" y="336" width="200" height="66" class="box"/><text x="96" y="358" class="title">Smart routing</text><text x="96" y="376" class="sub">cheapest capable tier</text><text x="96" y="392" class="sub">savings recorded</text>
+    <rect x="320" y="336" width="200" height="66" class="box"/><text x="336" y="358" class="title">Blueprints</text><text x="336" y="376" class="sub">LangGraph graphs · steps</text><text x="336" y="392" class="sub">deterministic tools</text>
+    <rect x="560" y="336" width="200" height="66" class="box"/><text x="576" y="358" class="title">Review gates</text><text x="576" y="376" class="sub">pause · approve · resume</text><text x="576" y="392" class="sub">checkpointed state</text>
+    <rect x="800" y="336" width="200" height="66" class="box"/><text x="816" y="358" class="title">Evaluation</text><text x="816" y="376" class="sub">golden sets · judge · gates</text><text x="816" y="392" class="sub">nightly canary · rollback</text>
+  </g>
+  <g>
+    <rect x="80" y="460" width="200" height="48" class="box"/><text x="96" y="480" class="title">Knowledge Spaces</text><text x="96" y="498" class="sub">hybrid search · citations</text>
+    <rect x="320" y="460" width="200" height="48" class="box"/><text x="336" y="480" class="title">Datasets</text><text x="336" y="498" class="sub">mock sets · trusted sources</text>
+    <rect x="560" y="460" width="200" height="48" class="box"/><text x="576" y="480" class="title">Sandboxes</text><text x="576" y="498" class="sub">notebooks · framework projects</text>
+    <rect x="800" y="460" width="200" height="48" class="box"/><text x="816" y="480" class="title">PostgreSQL</text><text x="816" y="498" class="sub">runs · evals · spaces · ledger</text>
+  </g>
+  <g>
+    <rect x="80" y="564" width="200" height="48" class="box"/><text x="96" y="584" class="title">Model providers</text><text x="96" y="602" class="sub">30 models · 11 providers</text>
+    <rect x="320" y="564" width="200" height="48" class="box"/><text x="336" y="584" class="title">MCP servers</text><text x="336" y="602" class="sub">7,500 · admin approved</text>
+    <rect x="560" y="564" width="200" height="48" class="box"/><text x="576" y="584" class="title">Cloud runtimes</text><text x="576" y="602" class="sub">Foundry · AgentCore · Google · Anthropic</text>
+    <rect x="800" y="564" width="200" height="48" class="box"/><text x="816" y="584" class="title">Git and skills</text><text x="816" y="602" class="sub">reference implementations</text>
+  </g>
+  <rect x="80" y="656" width="920" height="30" class="box"/><text x="96" y="676" class="title">One row per call: who, feature, model, tokens in · out · cached, cost, latency, key, trace</text>
+
+  <path class="wire" d="M180 172 C180 200 180 200 180 228"/>
+  <path class="wire" d="M180 276 C180 300 420 300 420 336"/>
+  <path class="wire" d="M420 402 C420 430 180 430 180 460"/>
+  <path class="wire" d="M180 508 C180 540 180 540 180 564"/>
+  <path class="wire" d="M180 612 C180 640 540 640 540 656"/>
+  <path class="wire" d="M420 172 C420 200 420 200 420 228"/>
+  <path class="wire" d="M660 172 C660 200 660 200 660 228"/>
+  <path class="wire" d="M900 172 C900 200 900 200 900 228"/>
+  <path class="wire" d="M660 402 C660 430 660 430 660 460"/>
+  <path class="wire" d="M900 402 C900 430 900 430 900 460"/>
+  <path class="wire" d="M420 508 C420 540 420 540 420 564"/>
+  <path class="wire" d="M660 508 C660 540 660 540 660 564"/>
+
+  <path class="lit" d="M180 172 C180 200 180 200 180 228"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.2;0.3" dur="10s" repeatCount="indefinite"/></path>
+  <path class="lit" d="M180 276 C180 300 420 300 420 336"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.2;0.28;0.42;0.5" dur="10s" repeatCount="indefinite"/></path>
+  <path class="lit" d="M420 402 C420 430 180 430 180 460"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.42;0.5;0.62;0.7" dur="10s" repeatCount="indefinite"/></path>
+  <path class="lit" d="M180 508 C180 540 180 540 180 564"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.62;0.68;0.8;0.86" dur="10s" repeatCount="indefinite"/></path>
+  <path class="lit" d="M180 612 C180 640 540 640 540 656"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.86;0.98;1" dur="10s" repeatCount="indefinite"/></path>
+
+  <rect x="80" y="124" width="200" height="48" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.1;0.2;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="80" y="228" width="200" height="48" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.16;0.22;0.3;0.38;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="320" y="228" width="200" height="48" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.2;0.26;0.34;0.42;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="560" y="228" width="200" height="48" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.24;0.3;0.38;0.46;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="320" y="336" width="200" height="66" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.4;0.46;0.56;0.64;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="560" y="336" width="200" height="66" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.46;0.52;0.6;0.66;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="80" y="460" width="200" height="48" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.6;0.66;0.74;0.8;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="80" y="564" width="200" height="48" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.78;0.84;0.9;0.96;1" dur="10s" repeatCount="indefinite"/></rect>
+  <rect x="80" y="656" width="920" height="30" rx="12" fill="none" stroke="url(#brand)" stroke-width="2"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.9;0.96;1" dur="10s" repeatCount="indefinite"/></rect>
+
+  <g>
+    <circle r="14" fill="url(#glow)" filter="url(#blur)"><animateMotion dur="10s" repeatCount="indefinite" path="M180 148 L180 252 C180 300 420 300 420 369 C420 430 180 430 180 484 L180 588 C180 640 540 640 540 671"/></circle>
+    <circle r="4" fill="#ffffff"><animateMotion dur="10s" repeatCount="indefinite" path="M180 148 L180 252 C180 300 420 300 420 369 C420 430 180 430 180 484 L180 588 C180 640 540 640 540 671"/></circle>
+  </g>
+
+  <g font-size="13" fill="#ececf4">
+    <text x="1040" y="152"><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.12;0.2;1" dur="10s" repeatCount="indefinite"/>1 · A person asks, or an agent runs</text>
+    <text x="1040" y="256"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.16;0.22;0.36;0.44;1" dur="10s" repeatCount="indefinite"/>2 · Identity, policy, budget, key</text>
+    <text x="1040" y="364"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.4;0.46;0.62;0.68;1" dur="10s" repeatCount="indefinite"/>3 · Route, reason, pause for review</text>
+    <text x="1040" y="488"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.6;0.66;0.78;0.84;1" dur="10s" repeatCount="indefinite"/>4 · Retrieve, compute, cite</text>
+    <text x="1040" y="592"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.78;0.84;0.94;0.98;1" dur="10s" repeatCount="indefinite"/>5 · The model call itself</text>
+    <text x="1040" y="676"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.9;0.96;1" dur="10s" repeatCount="indefinite"/>6 · Metered to the person</text>
+  </g>
+</svg>

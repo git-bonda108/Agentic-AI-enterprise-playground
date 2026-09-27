@@ -25,7 +25,7 @@ export const DEV_USERS: DevUser[] = [
   { id: "u11", name: "Arbaz Sayed", email: "arbazsayed105@gmail.com", role: "builder", department: "Partners", initials: "AS", hue: 95 },
   { id: "u12", name: "Toral Rathod", email: "Toral.Rathod@eduramp.in", role: "builder", department: "Eduramp", initials: "TR", hue: 250 },
   { id: "u13", name: "Joy Das", email: "Joy.Das@wns.com", role: "builder", department: "WNS", initials: "JD", hue: 175 },
-  { id: "u14", name: "Amal Socratles", email: "Amal.Socraties@wns.com", role: "builder", department: "WNS", initials: "AS", hue: 45 },
+  { id: "u14", name: "Amal Socraties", email: "Amal.Socraties@wns.com", role: "builder", department: "WNS", initials: "AS", hue: 45 },
 ];
 
 export const DEV_PASSWORD = "playground";

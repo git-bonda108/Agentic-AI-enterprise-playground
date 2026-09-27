@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the system as built through Batch 5, and the Azure topology it is designed to run on. It is written for engineers who will operate or extend the playground, and for reviewers assessing its security posture.
+This document describes the system as built, and the Azure topology it is designed to run on. It is written for engineers who will operate or extend the playground, and for reviewers assessing its security posture.
 
 ## 1. System context
 
@@ -166,7 +166,7 @@ flowchart TB
   WEB & API -.logs, metrics.-> MON
 ```
 
-Sizing for a pilot of up to ten users is two small Container Apps, a burstable Postgres, a C1 Redis and a sessions pool that scales to zero. Each of these has a published pay-as-you-go price, and the cost cockpit's platform layer is designed to show them next to model spend. Bicep templates land in Batch 9.
+Sizing for a pilot of up to ten users is two small Container Apps, a burstable Postgres and a sessions pool that scales to zero. Each of these has a published pay-as-you-go price, and the cost cockpits platform layer is designed to show them next to model spend. The Bicep template in `infra/bicep` provisions all of it.
 
 ## 7. Local development
 

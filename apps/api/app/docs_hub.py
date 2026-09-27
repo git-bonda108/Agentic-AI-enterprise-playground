@@ -20,6 +20,7 @@ _REPO_DOCS = _HERE.parents[2] / "docs" if len(_HERE.parents) > 2 else _CATALOG_D
 START, BUILD, OPERATE, PLATFORM = "Start here", "Build", "Operate", "Platform"
 
 GUIDES: list[dict] = [
+    {"slug": "design", "file": "DESIGN.md", "title": "Design overview", "section": START, "summary": "What the playground is, how a request travels through its layers, how each agent works behind the scenes, and what every page offers.", "page": "/home", "page_label": "Console"},
     {"slug": "tour", "file": "DEMO_SCRIPT.md", "title": "Guided tour", "section": START, "summary": "Every capability in the order a first walk-through flows, with what to click and what you should see.", "page": "/home", "page_label": "Console"},
     {"slug": "workflows", "file": "WORKFLOWS.md", "title": "Workflows", "section": START, "summary": "How people use the playground day to day, and how it is built, tested and shipped.", "page": "/build/playground", "page_label": "Playground"},
     {"slug": "agents", "file": "AGENTS.md", "title": "Agents", "section": BUILD, "summary": "Run a blueprint, build your own in the wizard, or bring your own SDK through the gateway; tools, review gates and traces.", "page": "/build/agents", "page_label": "Agent Hub"},

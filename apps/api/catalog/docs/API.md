@@ -253,7 +253,7 @@ People bring their own provider keys, as in the OpenAI or Claude playgrounds. A 
 
 Every ledger row records `key_source`, and `/v1/usage/breakdown?by=key_source` splits spend between personal and platform keys.
 
-### Cost drill-down (Batch 16)
+### Cost drill-down
 
 `GET /v1/usage/breakdown` takes a layer (`by=day|department|user|feature|model|provider|key_source|conversation|blueprint`) and stackable filters (`department`, `user_id`, `feature`, `model`, `provider`, `key_source`, `conversation_id`, `blueprint_id`, `day`); totals carry `tokens_in`, `tokens_out` and `tokens_cached`, and `format=csv` returns the view as a file. `GET /v1/usage/events` returns the raw ledger rows behind the same filters, newest first, paged with `limit` and `offset`, also with `format=csv`. `GET /v1/usage/summary` carries `hours` (chat, agent, notebook, sdk, other, total for the window and the previous window, plus people per bucket) derived from ledger sessions.
 

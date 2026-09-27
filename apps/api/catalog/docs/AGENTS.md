@@ -6,7 +6,7 @@ This guide covers the three ways to get an agent in the playground and how each 
 
 Build → Agent Hub lists every runnable blueprint: the six domain blueprints, the platform agents and your wizard agents. Pick a sample input, start the run, and watch the run viewer or the control room. Runs are checkpointed, so a review gate can wait for hours and resume where it stopped. Every model call is metered to you and appears in Traces.
 
-**Platform agents** run the playground itself. As of Batch 14 there are six: Adoption digest, Showcase writer, Key health check (probes every platform key and raises an alert for any provider that rejects it), Cost sentinel (compares the last day's spend per department and feature with the trailing week and alerts on jumps), Connector reviewer (prepares the MCP approval queue with approve, hold or block recommendations) and Onboarding coach (reads a person's ledger and suggests their next three steps).
+**Platform agents** run the playground itself. There are six: Adoption digest, Showcase writer, Key health check (probes every platform key and raises an alert for any provider that rejects it), Cost sentinel (compares the last day's spend per department and feature with the trailing week and alerts on jumps), Connector reviewer (prepares the MCP approval queue with approve, hold or block recommendations) and Onboarding coach (reads a person's ledger and suggests their next three steps).
 
 ## 2. Build one in the wizard
 
@@ -47,7 +47,7 @@ What the gateway does with every call: resolves `smart` through Smart routing, a
 
 ### Framework projects that run
 
-Discover → Frameworks renders any blueprint as a project for the OpenAI Agents SDK, LangGraph, CrewAI, Microsoft Agent Framework or Google ADK. Since Batch 14 every project points at the gateway, so it needs no provider key. Two buttons run it in your sandbox:
+Discover → Frameworks renders any blueprint as a project for the OpenAI Agents SDK, LangGraph, CrewAI, Microsoft Agent Framework or Google ADK. Every project points at the gateway, so it needs no provider key. Two buttons run it in your sandbox:
 
 - **Run smoke test** executes the project's offline test (the module parses, the tool stubs are wired).
 - **Run live in sandbox** installs the framework into your sandbox environment (once), mints a short-lived personal token, runs `agent.py` through the gateway, and removes the token. The calls appear in Traces under `sandbox-<framework>`. Google ADK projects are interactive (`adk run`), so they run locally after download.

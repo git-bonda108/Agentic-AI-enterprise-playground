@@ -23,7 +23,7 @@ def test_guides_list_carries_sections_reading_time_and_headings(client, headers)
     body = client.get("/v1/docs", headers=headers).json()
     assert body["sections"] == SECTIONS and len(body["guides"]) == len(GUIDES)
     slugs = [g["slug"] for g in body["guides"]]
-    assert len(slugs) == len(set(slugs)) and slugs[0] == "tour"
+    assert len(slugs) == len(set(slugs)) and slugs[0] == "design"
     for g in body["guides"]:
         assert g["section"] in SECTIONS and g["summary"] and g["page"].startswith("/") and g["minutes"] >= 1
         assert g["headings"] and all(h["id"] and h["text"] for h in g["headings"])
@@ -36,7 +36,7 @@ def test_one_guide_returns_markdown_with_neighbours_and_unknown_is_404(client, h
     assert g["prev"]["slug"] == "security" and g["next"] is None
     assert {"text": "3. Deploy in one command", "id": "3-deploy-in-one-command"} in g["headings"]
     first = client.get("/v1/docs/tour", headers=headers).json()
-    assert first["prev"] is None and first["next"]["slug"] == "workflows"
+    assert first["prev"]["slug"] == "design" and first["next"]["slug"] == "workflows"
     assert client.get("/v1/docs/nope", headers=headers).status_code == 404
 
 

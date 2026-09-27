@@ -20,6 +20,7 @@
     "start:offline": "bash scripts/dev.sh --offline",
     "diagrams": "node scripts/render-diagrams.mjs",
     "import:repos": "cd apps/api && uv run python scripts/import_repos.py",
-    "sync:docs": "bash scripts/sync-docs.sh"
+    "sync:docs": "bash scripts/sync-docs.sh",
+    "diagrams:gif": "node scripts/render-gifs.mjs && uvx --with pillow python scripts/frames_to_gif.py"
   }
 }

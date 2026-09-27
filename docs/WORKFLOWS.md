@@ -89,5 +89,5 @@ npm run test:e2e                         # Playwright, builds the web app first
 
 1. Merge to `main` with the full suite green.
 2. Build the two container images (web and API) and the JupyterLite bundle.
-3. Deploy to the Container Apps environment with the Bicep templates (Batch 9) and run the smoke suite against the deployed URL.
+3. Deploy to the Container Apps environment with the Bicep templates and run the smoke suite against the deployed URL.
 4. Roll forward only; database migrations are additive.

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" font-family="Instrument Sans, Inter, ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0b16"/><stop offset="1" stop-color="#0a0a14"/></linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8b5cf6"/><stop offset="0.55" stop-color="#ec4899"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffffff"/><stop offset="0.35" stop-color="#a5f3fc"/><stop offset="1" stop-color="#06b6d4" stop-opacity="0"/></radialGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+    <style>
+      .box { fill: #171628; stroke: #3b2a6a; }
+      .title { fill: #ececf4; font-size: 14px; font-weight: 600; }
+      .sub { fill: #a4a4b8; font-size: 11.5px; }
+      .num { fill: #8b5cf6; font-size: 11px; font-weight: 600; letter-spacing: .1em; }
+      .wire { fill: none; stroke: #2f2f44; stroke-width: 2; }
+    </style>
+  </defs>
+  <rect width="1200" height="420" fill="url(#bg)"/>
+  <text x="40" y="44" fill="#ececf4" font-size="22" font-weight="600">One agent run, start to finish</text>
+  <text x="40" y="66" class="sub">What happens between "Start run" and the answer, and where people stay in control.</text>
+
+  <g>
+    <rect x="40" y="110" width="250" height="92" rx="14" class="box"/><text x="56" y="132" class="num">01 · ASK</text><text x="56" y="154" class="title">Blueprint + input</text><text x="56" y="172" class="sub">a person, a schedule, an SDK</text><text x="56" y="188" class="sub">or an MCP client starts it</text>
+    <rect x="330" y="110" width="250" height="92" rx="14" class="box"/><text x="346" y="132" class="num">02 · GOVERN</text><text x="346" y="154" class="title">Policy · budget · key</text><text x="346" y="172" class="sub">role decides models and tools;</text><text x="346" y="188" class="sub">caps stop the call before it costs</text>
+    <rect x="620" y="110" width="250" height="92" rx="14" class="box"/><text x="636" y="132" class="num">03 · ROUTE</text><text x="636" y="154" class="title">Smart routing</text><text x="636" y="172" class="sub">cheapest capable tier for the task;</text><text x="636" y="188" class="sub">the saving is recorded</text>
+    <rect x="910" y="110" width="250" height="92" rx="14" class="box"/><text x="926" y="132" class="num">04 · REASON</text><text x="926" y="154" class="title">Steps, tools, retrieval</text><text x="926" y="172" class="sub">deterministic code where it can be;</text><text x="926" y="188" class="sub">the model only where judgement is needed</text>
+
+    <rect x="910" y="260" width="250" height="92" rx="14" class="box"/><text x="926" y="282" class="num">05 · REVIEW</text><text x="926" y="304" class="title">Human gate</text><text x="926" y="322" class="sub">the run pauses on an exception;</text><text x="926" y="338" class="sub">approve or reject, it resumes</text>
+    <rect x="620" y="260" width="250" height="92" rx="14" class="box"/><text x="636" y="282" class="num">06 · ANSWER</text><text x="636" y="304" class="title">Output + trace</text><text x="636" y="322" class="sub">every step, token, dollar and citation</text><text x="636" y="338" class="sub">visible in Runs, Traces and Cost</text>
+    <rect x="330" y="260" width="250" height="92" rx="14" class="box"/><text x="346" y="282" class="num">07 · IMPROVE</text><text x="346" y="304" class="title">Evaluate · canary</text><text x="346" y="322" class="sub">golden cases graded by a judge;</text><text x="346" y="338" class="sub">drift demotes and rolls back</text>
+    <rect x="40" y="260" width="250" height="92" rx="14" class="box"/><text x="56" y="282" class="num">08 · SHARE</text><text x="56" y="304" class="title">Notebook · SDK · cloud</text><text x="56" y="322" class="sub">the same run as a notebook, a framework</text><text x="56" y="338" class="sub">project or a deploy guide for a cloud</text>
+  </g>
+
+  <path class="wire" d="M290 156 L330 156"/><path class="wire" d="M580 156 L620 156"/><path class="wire" d="M870 156 L910 156"/>
+  <path class="wire" d="M1035 202 L1035 260"/><path class="wire" d="M910 306 L870 306"/><path class="wire" d="M620 306 L580 306"/><path class="wire" d="M330 306 L290 306"/>
+
+  <g fill="none" stroke="url(#brand)" stroke-width="2.5">
+    <rect x="40" y="110" width="250" height="92" rx="14"><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.11;0.17;1" dur="12s" repeatCount="indefinite"/></rect>
+    <rect x="330" y="110" width="250" height="92" rx="14"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.11;0.14;0.24;0.3;1" dur="12s" repeatCount="indefinite"/></rect>
+    <rect x="620" y="110" width="250" height="92" rx="14"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.24;0.27;0.37;0.43;1" dur="12s" repeatCount="indefinite"/></rect>
+    <rect x="910" y="110" width="250" height="92" rx="14"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.37;0.4;0.5;0.56;1" dur="12s" repeatCount="indefinite"/></rect>
+    <rect x="910" y="260" width="250" height="92" rx="14"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.5;0.53;0.63;0.69;1" dur="12s" repeatCount="indefinite"/></rect>
+    <rect x="620" y="260" width="250" height="92" rx="14"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.63;0.66;0.76;0.82;1" dur="12s" repeatCount="indefinite"/></rect>
+    <rect x="330" y="260" width="250" height="92" rx="14"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.76;0.79;0.89;0.95;1" dur="12s" repeatCount="indefinite"/></rect>
+    <rect x="40" y="260" width="250" height="92" rx="14"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.89;0.92;1" dur="12s" repeatCount="indefinite"/></rect>
+  </g>
+
+  <g>
+    <circle r="14" fill="url(#glow)" filter="url(#blur)"><animateMotion dur="12s" repeatCount="indefinite" path="M60 156 L1035 156 L1035 306 L60 306"/></circle>
+    <circle r="4" fill="#ffffff"><animateMotion dur="12s" repeatCount="indefinite" path="M60 156 L1035 156 L1035 306 L60 306"/></circle>
+  </g>
+
+  <text x="40" y="396" class="sub">Steps 02, 05, 06 and 07 are what make it enterprise-grade: nothing runs ungoverned, nothing exceptional ships without a person, nothing is invisible, nothing degrades unnoticed.</text>
+</svg>
