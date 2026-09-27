@@ -105,12 +105,11 @@ resource logs 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
 
 // ---------------------------------------------------------------- registry and secrets ----------------------------------------------------------------
 
-resource registry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
-  name: '${prefix}acr${suffix}'
-  location: location
-  tags: tags
-  sku: { name: 'Basic' }
-  properties: { adminUserEnabled: true }
+@description('Name of the container registry that already holds the images (deploy.sh creates it before the template runs, so images can be pushed by ACR Tasks or by the images workflow).')
+param registryName string
+
+resource registry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
+  name: registryName
 }
 
 resource vault 'Microsoft.KeyVault/vaults@2023-07-01' = {
@@ -184,18 +183,6 @@ resource postgresAzureAccess 'Microsoft.DBforPostgreSQL/flexibleServers/firewall
   properties: { startIpAddress: '0.0.0.0', endIpAddress: '0.0.0.0' }
 }
 
-resource redis 'Microsoft.Cache/redis@2023-08-01' = {
-  name: '${prefix}-redis-${suffix}'
-  location: location
-  tags: tags
-  properties: {
-    sku: { name: 'Basic', family: 'C', capacity: 1 }
-    enableNonSslPort: false
-    minimumTlsVersion: '1.2'
-    redisConfiguration: { 'maxmemory-policy': 'allkeys-lru' }
-  }
-}
-
 // ---------------------------------------------------------------- compute ----------------------------------------------------------------
 
 resource environmentAca 'Microsoft.App/managedEnvironments@2024-03-01' = {
@@ -224,8 +211,21 @@ resource sessionsPool 'Microsoft.App/sessionPools@2024-02-02-preview' = {
   }
 }
 
+// Provider keys that were supplied. Container Apps reject secrets with empty values, and an empty environment variable
+// would make the catalog think a key exists; keys left unset are simply not deployed.
+var providerKeys = [
+  { secret: 'anthropic-api-key', env: 'ANTHROPIC_API_KEY', value: anthropicApiKey }
+  { secret: 'openai-api-key', env: 'OPENAI_API_KEY', value: openaiApiKey }
+  { secret: 'gemini-api-key', env: 'GEMINI_API_KEY', value: geminiApiKey }
+  { secret: 'deepseek-api-key', env: 'DEEPSEEK_API_KEY', value: deepseekApiKey }
+  { secret: 'nvidia-nim-api-key', env: 'NVIDIA_NIM_API_KEY', value: nvidiaNimApiKey }
+  { secret: 'mistral-api-key', env: 'MISTRAL_API_KEY', value: mistralApiKey }
+  { secret: 'xai-api-key', env: 'XAI_API_KEY', value: xaiApiKey }
+  { secret: 'groq-api-key', env: 'GROQ_API_KEY', value: groqApiKey }
+]
+var presentProviderKeys = filter(providerKeys, k => !empty(k.value))
+
 var postgresUrl = 'postgresql+psycopg://${postgresAdmin}:${postgresPassword}@${postgres.properties.fullyQualifiedDomainName}:5432/${databaseName}?sslmode=require'
-var redisUrl = 'rediss://:${redis.listKeys().primaryKey}@${redis.properties.hostName}:6380/0'
 
 resource api 'Microsoft.App/containerApps@2024-03-01' = {
   name: '${prefix}-api'
@@ -237,46 +237,28 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
     configuration: {
       ingress: { external: false, targetPort: 8000, transport: 'http', allowInsecure: false }
       registries: [{ server: registry.properties.loginServer, username: registry.name, passwordSecretRef: 'acr-password' }]
-      secrets: [
+      secrets: concat([
         { name: 'acr-password', value: registry.listCredentials().passwords[0].value }
         { name: 'database-url', value: postgresUrl }
-        { name: 'redis-url', value: redisUrl }
         { name: 'internal-key', value: internalKey }
-        { name: 'anthropic-api-key', value: anthropicApiKey }
-        { name: 'openai-api-key', value: openaiApiKey }
-        { name: 'gemini-api-key', value: geminiApiKey }
-        { name: 'deepseek-api-key', value: deepseekApiKey }
-        { name: 'nvidia-nim-api-key', value: nvidiaNimApiKey }
-        { name: 'mistral-api-key', value: mistralApiKey }
-        { name: 'xai-api-key', value: xaiApiKey }
-        { name: 'groq-api-key', value: groqApiKey }
         { name: 'key-encryption-key', value: keyEncryptionKey }
-      ]
+      ], map(presentProviderKeys, k => { name: k.secret, value: k.value }))
     }
     template: {
       containers: [{
         name: 'api'
         image: apiImage
         resources: { cpu: json('1.0'), memory: '2Gi' }
-        env: [
+        env: concat([
           { name: 'PLAYGROUND_ENVIRONMENT', value: environment }
           { name: 'PLAYGROUND_DATABASE_URL', secretRef: 'database-url' }
-          { name: 'PLAYGROUND_REDIS_URL', secretRef: 'redis-url' }
           { name: 'PLAYGROUND_INTERNAL_KEY', secretRef: 'internal-key' }
           { name: 'PLAYGROUND_CORS_ORIGINS', value: '["https://${prefix}-web.${environmentAca.properties.defaultDomain}"]' }
           { name: 'PLAYGROUND_SELF_URL', value: 'https://${prefix}-web.${environmentAca.properties.defaultDomain}/api/pg' }
           { name: 'PLAYGROUND_SANDBOX_ENDPOINT', value: sessionsPool.properties.poolManagementEndpoint }
           { name: 'PLAYGROUND_CHECKPOINT_PATH', value: '/data/checkpoints.db' }
-          { name: 'ANTHROPIC_API_KEY', secretRef: 'anthropic-api-key' }
-          { name: 'OPENAI_API_KEY', secretRef: 'openai-api-key' }
-          { name: 'GEMINI_API_KEY', secretRef: 'gemini-api-key' }
-          { name: 'DEEPSEEK_API_KEY', secretRef: 'deepseek-api-key' }
-          { name: 'NVIDIA_NIM_API_KEY', secretRef: 'nvidia-nim-api-key' }
-          { name: 'MISTRAL_API_KEY', secretRef: 'mistral-api-key' }
-          { name: 'XAI_API_KEY', secretRef: 'xai-api-key' }
-          { name: 'GROQ_API_KEY', secretRef: 'groq-api-key' }
           { name: 'PLAYGROUND_KEY_ENCRYPTION_KEY', secretRef: 'key-encryption-key' }
-        ]
+        ], map(presentProviderKeys, k => { name: k.env, secretRef: k.secret }))
         probes: [
           { type: 'Liveness', httpGet: { path: '/health', port: 8000 }, periodSeconds: 30 }
           { type: 'Readiness', httpGet: { path: '/health', port: 8000 }, periodSeconds: 10 }
@@ -298,28 +280,28 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = {
     configuration: {
       ingress: { external: true, targetPort: 3000, transport: 'http', allowInsecure: false }
       registries: [{ server: registry.properties.loginServer, username: registry.name, passwordSecretRef: 'acr-password' }]
-      secrets: [
+      secrets: concat([
         { name: 'acr-password', value: registry.listCredentials().passwords[0].value }
         { name: 'auth-secret', value: authSecret }
         { name: 'internal-key', value: internalKey }
-        { name: 'entra-client-secret', value: entraClientSecret }
-      ]
+      ], empty(entraClientSecret) ? [] : [{ name: 'entra-client-secret', value: entraClientSecret }])
     }
     template: {
       containers: [{
         name: 'web'
         image: webImage
         resources: { cpu: json('0.5'), memory: '1Gi' }
-        env: [
+        env: concat([
           { name: 'AUTH_SECRET', secretRef: 'auth-secret' }
           { name: 'AUTH_TRUST_HOST', value: 'true' }
           { name: 'PLAYGROUND_API_URL', value: 'https://${prefix}-api.internal.${environmentAca.properties.defaultDomain}' }
           { name: 'PLAYGROUND_INTERNAL_KEY', secretRef: 'internal-key' }
           { name: 'ALLOW_DEV_LOGIN', value: environment == 'pilot' && empty(entraClientId) ? 'true' : 'false' }
+        ], empty(entraClientId) ? [] : [
           { name: 'AUTH_MICROSOFT_ENTRA_ID_ID', value: entraClientId }
           { name: 'AUTH_MICROSOFT_ENTRA_ID_SECRET', secretRef: 'entra-client-secret' }
           { name: 'AUTH_MICROSOFT_ENTRA_ID_ISSUER', value: entraIssuer }
-        ]
+        ])
         probes: [{ type: 'Liveness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 30 }]
       }]
       scale: { minReplicas: 1, maxReplicas: 3 }

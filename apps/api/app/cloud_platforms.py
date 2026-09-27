@@ -161,7 +161,7 @@ PLATFORMS: dict[str, dict] = {
 
 SELF_HOSTING = {
     "title": "Run the playground itself on your Azure subscription",
-    "intro": "The playground deploys as two Container Apps, PostgreSQL, Redis, Key Vault and a dynamic sessions pool from the Bicep template in the repository. The repository is private, so there is no public Deploy to Azure button: clone it with an account that has access and run the script.",
+    "intro": "The playground deploys as two Container Apps, PostgreSQL, Key Vault and a dynamic sessions pool from the Bicep template in the repository. The repository is private, so there is no public Deploy to Azure button: clone it with an account that has access and run the script.",
     "steps": [
         {"title": "Sign in to Azure", "body": "Use an account that can create resources in the subscription.", "commands": ["az login", "az account set --subscription <subscription-id>"], "links": [{"label": "Azure portal", "href": "https://portal.azure.com"}]},
         {"title": "Clone the repository", "body": "Access is granted per GitHub account; ask the playground owner if the clone is refused.", "commands": ["gh auth login", "gh repo clone git-bonda108/Agentic-AI-enterprise-playground", "cd Agentic-AI-enterprise-playground"], "links": [{"label": "GitHub CLI", "href": "https://cli.github.com"}]},
@@ -175,7 +175,7 @@ SELF_HOSTING = {
         {"title": "Deploy in one command", "body": "The script creates the resource group, builds both images in Azure Container Registry, deploys the template and waits for the health check. Rerunning it rolls a new revision; Container Apps keeps the previous one for rollback.", "commands": ["infra/deploy.sh rg-ai-playground westeurope aiplay"], "links": []},
         {"title": "Switch sign-in to Microsoft Entra ID", "body": "Register an application in the tenant with the redirect URI https://<web-fqdn>/api/auth/callback/microsoft-entra-id and export the three variables before rerunning the script. Development sign-in switches itself off as soon as a client id is present.", "commands": ["export AUTH_MICROSOFT_ENTRA_ID_ID=<client-id> AUTH_MICROSOFT_ENTRA_ID_SECRET=<client-secret> AUTH_MICROSOFT_ENTRA_ID_ISSUER=https://login.microsoftonline.com/<tenant-id>/v2.0"], "links": []},
     ],
-    "cost": "About 190 to 250 USD a month at pilot sizing; near 100 USD without Redis. Model spend is separate and shown in the cost cockpit.",
+    "cost": "About 90 to 150 USD a month at pilot sizing. Model spend is separate and shown in the cost cockpit.",
     "docs": "https://github.com/git-bonda108/Agentic-AI-enterprise-playground/blob/main/docs/DEPLOYMENT.md",
 }
 

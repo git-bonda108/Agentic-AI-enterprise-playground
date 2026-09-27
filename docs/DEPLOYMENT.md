@@ -1,6 +1,6 @@
 # Deployment
 
-How the playground runs on Azure, what it costs to run, and the exact steps to deploy it. Everything here is in the repository: the Bicep template, the container images, the deploy script and the CI pipeline that validates them on every push.
+How the playground runs on Azure, what it costs to run, and the exact steps to deploy it. Everything here is in the repository: the Bicep template, the container images, the deploy script and the CI pipeline that validates them on every push. Provider keys you leave unset are simply not deployed; the catalog shows those providers as needing a key.
 
 ![Deployment topology](images/deployment.png)
 
@@ -13,7 +13,6 @@ How the playground runs on Azure, what it costs to run, and the exact steps to d
 | `api` container app | FastAPI, LangGraph runtime, canary scheduler, MCP endpoint, internal ingress only | 1 vCPU, 2 GiB, 1 to 3 replicas | Never exposed to the internet; only the web app reaches it |
 | Dynamic sessions pool | Executes notebook code in Hyper-V isolated sandboxes | 0 ready sessions, 10 concurrent | Untrusted code never runs in the API container |
 | Azure Database for PostgreSQL Flexible Server | Ledger, runs, knowledge chunks (pgvector), evaluations, community | Burstable B1ms, 32 GB | Managed backups, Entra authentication, vector extension enabled |
-| Azure Cache for Redis | Shared state when running more than one API replica | Basic C1 | Horizontal scaling |
 | Key Vault | Provider keys, internal key, Auth.js secret, Entra client secret | Standard | RBAC access from the API's managed identity |
 | Container Registry | Images built by CI or by `az acr build` | Basic | No local Docker needed |
 | Log Analytics | Logs and metrics for both apps | Pay per GB | Container Apps streams console and system logs |
@@ -29,13 +28,12 @@ Retail pay-as-you-go prices for West Europe, September 2026, rounded. Model spen
 | --- | --- |
 | Container Apps, two apps at minimum one replica each | 45 to 70 USD |
 | PostgreSQL Flexible Server B1ms with 32 GB | 25 to 35 USD |
-| Azure Cache for Redis C1 | 100 USD |
 | Dynamic sessions, occasional notebook use | 5 to 20 USD |
 | Container Registry Basic | 5 USD |
 | Log Analytics, Key Vault | 5 to 15 USD |
-| Total platform | about 190 to 250 USD |
+| Total platform | about 90 to 150 USD |
 
-Redis is the largest fixed line; drop it for a single-replica pilot (the API keeps rate-limit state in memory) and the platform lands near 100 USD a month. Production sizing (General Purpose D2ds_v5 Postgres with zone redundancy, two ready sessions, three replicas) is roughly 450 to 600 USD a month.
+The API keeps its per-process state in memory and shares everything else through PostgreSQL, so no cache tier is deployed; classic Azure Cache for Redis is being retired and the template no longer creates one. Production sizing (General Purpose D2ds_v5 Postgres with zone redundancy, two ready sessions, three replicas) is roughly 450 to 600 USD a month.
 
 ## 3. Deploy in one command
 
@@ -87,7 +85,7 @@ The playground is two services plus state: a Next.js web application (sign-in, t
 
 | Option | Web | API and sandbox | State | Verdict |
 | --- | --- | --- | --- | --- |
-| Azure Container Apps with the Bicep template in this repository | Container App with public ingress | Container App with internal ingress, dynamic sessions pool for sandboxes | PostgreSQL Flexible Server, Cache for Redis, Key Vault | **Recommended.** One command, one bill, one identity provider (Entra), the API never public, sandboxes isolated by Hyper-V. Everything in sections 1 to 6 is built and tested for it. |
+| Azure Container Apps with the Bicep template in this repository | Container App with public ingress | Container App with internal ingress, dynamic sessions pool for sandboxes | PostgreSQL Flexible Server, Key Vault | **Recommended.** One command, one bill, one identity provider (Entra), the API never public, sandboxes isolated by Hyper-V. Everything in sections 1 to 6 is built and tested for it. |
 | Vercel for the web, a container host for the API | Vercel (serverless Next.js) | Azure Container Apps, AWS App Runner or Fly.io for the API and sandboxes | A managed PostgreSQL and Redis from a third provider | Works, but splits the platform across two or three vendors and two bills, forces the API onto the public internet behind its own authentication, and adds cold starts to the proxy that fronts every API call. Choose it only when the organisation already standardises on Vercel for front ends. |
 | A single virtual machine with `infra/docker-compose.yml` | Container | Container, sandboxes as subprocesses on the same host | PostgreSQL and Redis containers | Fine for a private pilot behind a VPN for a handful of people. No isolation between sandboxes and the API, no managed backups, one machine to patch. |
 | Kubernetes (AKS, EKS, GKE) | Deployment behind an ingress | Deployment, sandboxes as jobs or a sessions-style pool | Managed PostgreSQL and Redis | Justified only when a cluster and a platform team already exist; the Container Apps template gives the same isolation with far less to run. |

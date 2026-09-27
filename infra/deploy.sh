@@ -46,6 +46,7 @@ az deployment group create \
   --resource-group "$RG" \
   --template-file "$ROOT/infra/bicep/main.bicep" \
   --parameters prefix="$PREFIX" \
+               registryName="$ACR_NAME" \
                apiImage="$LOGIN_SERVER/playground-api:$TAG" \
                webImage="$LOGIN_SERVER/playground-web:$TAG" \
                postgresPassword="$PG_PASSWORD" \
