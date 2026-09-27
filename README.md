@@ -21,7 +21,8 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 | Cloud platforms | Microsoft Foundry, AWS Bedrock AgentCore, Google Cloud Agent Runtime and Anthropic Managed Agents with portal links, CLI sign-in commands, framework fit, and a step-by-step deploy guide per blueprint, framework and model (gateway or native). See [docs/CLOUD_PLATFORMS.md](docs/CLOUD_PLATFORMS.md). |
 | Two ways to build | Every blueprint is a Gen AI or an Agentic AI blueprint with a low-code track (an importable Langflow flow, an importable n8n workflow, a Copilot Studio recipe with a workflow node map) and a code track. See [docs/LOW_CODE.md](docs/LOW_CODE.md). |
 | Runnable notebooks | A gallery of getting-started notebooks and one MVP notebook per blueprint, each executing end to end on mock data in the browser or in a server sandbox, with package installs and links to GPU compute. See [docs/NOTEBOOKS.md](docs/NOTEBOOKS.md). |
-| Cost management | A ledger that records every call with tokens, cached tokens, latency, cost and which key paid, and a cockpit that slices it by day, department, user, feature, model, provider, key source and conversation. |
+| Cost management | A ledger that records every call with tokens, cached tokens, latency, cost and which key paid, and a cockpit that slices it by day, department, user, feature, model, provider, key source, blueprint and conversation, drills from any row to the raw ledger calls, splits tokens into input, output and cached, and exports CSV. |
+| Datasets | Eight synthetic mock sets with columns, provenance, downloads and notebook snippets, plus curated trusted public sources (Kaggle, Hugging Face, UCI, OpenML, Data.gov, World Bank and more) with their loaders. See [docs/DATASETS.md](docs/DATASETS.md). |
 | Smart spend | A deterministic router that classifies each prompt into Economy, Workhorse or Premium and records the savings against a premium baseline. |
 | Agent building | Six runnable domain blueprints on a LangGraph runtime with checkpoints, human review gates and resumable runs, plus a catalog of 175 imported and authored agent definitions. |
 | From playground to production | Any blueprint renders into an OpenAI Agents SDK, LangGraph, CrewAI, Microsoft Agent Framework or Google ADK project, with deploy scripts for Azure AI Foundry, Anthropic Managed Agents, AWS AgentCore and Google Agent Engine. |
@@ -42,7 +43,7 @@ The application is organised into seven sections, laid out the way a cloud conso
 | --- | --- | --- |
 | Home | Console with credits, spend, tokens, models used and a live ledger | Live |
 | Discover | Models, Blueprints, Frameworks, Low-code studios, Cloud platforms, MCP Marketplace, Popular Git repos, Skills | Live |
-| Build | Playground, Agent Hub, Notebooks, Knowledge, Data | Live |
+| Build | Playground, Agent Hub, Notebooks, Knowledge, Datasets | Live |
 | Evaluate | Evals, Canary | Live |
 | Operate | Runs, Traces, Cost, Adoption | Live |
 | Community | Showcase, Challenges, Leaderboard | Live |

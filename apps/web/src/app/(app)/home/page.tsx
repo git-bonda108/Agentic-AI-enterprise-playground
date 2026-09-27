@@ -5,6 +5,7 @@ import { apiGet } from "@/lib/api-server";
 import type { UsageSummary } from "@/lib/playground-types";
 import { Greeting } from "@/components/home/greeting";
 import { StatCards } from "@/components/home/stat-cards";
+import { HoursTiles } from "@/components/home/hours-tiles";
 import { GatewayHero } from "@/components/home/gateway-hero";
 import { ModelCards } from "@/components/home/model-cards";
 import { BlueprintCards } from "@/components/home/blueprint-cards";
@@ -36,6 +37,7 @@ export default async function HomePage() {
       </div>
 
       <StatCards summary={summary} />
+      <HoursTiles hours={summary?.hours} />
       <GatewayHero />
 
       <section>

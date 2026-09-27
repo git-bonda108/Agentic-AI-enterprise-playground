@@ -47,7 +47,7 @@ export const NAV: NavSection[] = [
       { title: "Agent Hub", href: "/build/agents", icon: Bot, batch: 3, blurb: "Your configured blueprints and their runs." },
       { title: "Notebooks", href: "/build/notebooks", icon: NotebookPen, batch: 5, blurb: "In-browser or sandboxed Python, pre-filled from a run." },
       { title: "Knowledge", href: "/build/knowledge", icon: BookOpen, batch: 6, blurb: "Knowledge Spaces over your documents and repos." },
-      { title: "Data", href: "/build/data", icon: Database, batch: 3, blurb: "Mock datasets to test any blueprint safely." },
+      { title: "Datasets", href: "/build/data", icon: Database, batch: 3, blurb: "Mock datasets with schema, downloads and notebook snippets, plus trusted public sources such as Kaggle and Hugging Face." },
     ],
   },
   {
@@ -62,7 +62,7 @@ export const NAV: NavSection[] = [
     items: [
       { title: "Runs", href: "/operate/runs", icon: Play, batch: 3, blurb: "Every agent run with its state and review inbox." },
       { title: "Traces", href: "/operate/traces", icon: Waypoints, batch: 3, blurb: "Step-by-step traces with tokens and latency." },
-      { title: "Cost", href: "/operate/cost", icon: Coins, batch: 2, blurb: "Seven layers of cost, from org to conversation." },
+      { title: "Cost", href: "/operate/cost", icon: Coins, batch: 2, blurb: "Drill from organisation to a single ledger row: cost and tokens by department, user, feature, model, blueprint and conversation, with CSV export." },
       { title: "Adoption", href: "/operate/adoption", icon: TrendingUp, batch: 8, blurb: "Hours per feature, cost per outcome, ROI matrix." },
     ],
   },

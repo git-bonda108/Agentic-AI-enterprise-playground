@@ -12,7 +12,6 @@ export function ResourceCards() {
             <ArrowUpRight className="size-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-violet-soft" />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">{r.body}</p>
-          <p className="mt-3 font-mono text-[10px] text-muted-foreground">batch {r.batch}</p>
         </Link>
       ))}
     </div>

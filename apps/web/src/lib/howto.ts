@@ -39,6 +39,27 @@ export const HOWTO: Record<string, HowTo> = {
     ],
     docs: [{ label: "Cloud platforms guide", href: `${REPO_DOCS}/CLOUD_PLATFORMS.md` }, { label: "Foundry hosted agents", href: "https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/quickstart-hosted-agent" }, { label: "AgentCore CLI", href: "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-cli.html" }, { label: "Agent Runtime", href: "https://adk.dev/deploy/agent-runtime/deploy/" }, { label: "Managed Agents", href: "https://platform.claude.com/docs/en/managed-agents/quickstart" }],
   },
+  "/build/data": {
+    title: "Pick a dataset, then bring real data",
+    intro: "Every mock set is synthetic, deterministic and safe to run any blueprint against; each card shows its columns, what it is modelled on and who reads it.",
+    steps: [
+      { text: "Read the columns and the preview, download the set as CSV or JSON, or copy the two-line notebook snippet." },
+      { text: "Open the linked notebook to see the set in use with pandas or a Knowledge Space.", href: "/build/notebooks", label: "Notebooks" },
+      { text: "Trusted sources: Kaggle, Hugging Face, UCI, OpenML, Data.gov and more, each with the loader it publishes; run the %pip line in the sandbox, then the snippet." },
+    ],
+    docs: [{ label: "Datasets guide", href: `${REPO_DOCS}/DATASETS.md` }, { label: "Kaggle API", href: "https://www.kaggle.com/docs/api" }, { label: "Hugging Face Datasets", href: "https://huggingface.co/docs/datasets/index" }],
+  },
+  "/operate/cost": {
+    title: "Drill from the organisation to one call",
+    intro: "Every number reconciles to the same ledger rows. Click a row to filter by it and move one layer down; the chips at the top show where you are.",
+    steps: [
+      { text: "Pick a window, then a layer: department, user, feature, model, provider, key source, blueprint or conversation." },
+      { text: "Click a row to add it as a filter; the next layer opens already narrowed. Remove a chip to widen again." },
+      { text: "The ledger rows at the bottom are the raw calls behind the view, newest first; export any view or the rows as CSV." },
+      { text: "Tokens are split into input, output and cached so prompt caching shows up as savings.", href: "/operate/traces", label: "Traces" },
+    ],
+    docs: [{ label: "API: usage", href: `${REPO_DOCS}/API.md` }],
+  },
   "/build/notebooks": {
     title: "Run a notebook end to end",
     intro: "Every notebook starts with the playground helper and runs on mock data with your key.",

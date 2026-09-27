@@ -80,6 +80,7 @@ export type ConversationDetail = ConversationSummary & {
 export type UsageSummary = {
   scope: "organization" | "me";
   days: number;
+  hours: UsageHours;
   credits_usd: number;
   monthly_cap_usd: number;
   spend_month_usd: number;
@@ -128,7 +129,8 @@ export type Breakdown = {
   scope: "organization" | "me";
   by: string;
   days: number;
-  totals: { cost_usd: number; spend_month_usd: number; forecast_month_usd: number; savings_usd: number; routed_requests: number; requests: number; errors: number; tokens: number };
+  filters: Record<string, string>;
+  totals: { cost_usd: number; tokens_in: number; tokens_out: number; tokens_cached: number; spend_month_usd: number; forecast_month_usd: number; savings_usd: number; routed_requests: number; requests: number; errors: number; tokens: number };
   rows: BreakdownRow[];
 };
 
@@ -183,7 +185,20 @@ export type RunRecord = {
   cost_usd: number; tokens_in: number; tokens_out: number; created_at: string; updated_at: string; finished_at: string | null;
 };
 
-export type DatasetInfo = { id: string; file: string; title: string; source: string; used_by: string[]; rows: number; preview: Record<string, unknown>[] };
+export type DatasetColumn = { name: string; type: string; example: string | number | boolean };
+export type DatasetInfo = {
+  id: string; file: string; title: string; source: string; used_by: string[]; rows: number; preview: Record<string, unknown>[];
+  columns: DatasetColumn[]; shape: "table" | "keyed"; licence: { name: string; url: string }; modeled_on: { name: string; url: string; licence: string; licence_url: string } | null;
+  notebook: string | null; snippet: string; download: { csv: string; json: string };
+};
+export type DataSource = { id: string; name: string; url: string; kind: string; licence: string; install: string; python: string; docs: string; good_for: string };
+export type LedgerEvent = {
+  id: string; created_at: string; user: string; department: string; feature: string; model: string; provider: string; tokens_in: number; tokens_out: number; tokens_cached: number;
+  cost_usd: number; latency_ms: number; status: string; key_source: string; routed: boolean; savings_usd: number; conversation: string; conversation_id: string | null;
+  run_id: string | null; blueprint: string; blueprint_id: string | null; trace_id: string | null;
+};
+export type LedgerPage = { scope: "organization" | "me"; days: number; filters: Record<string, string>; total: number; offset: number; limit: number; rows: LedgerEvent[] };
+export type UsageHours = { window: Record<string, number>; previous: Record<string, number>; people: Record<string, number>; days: number };
 
 export type CatalogEntry = {
   id: string; name: string; family: string; group: string;

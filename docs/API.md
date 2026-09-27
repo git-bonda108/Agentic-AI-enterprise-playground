@@ -53,6 +53,10 @@ All routes require the internal key and identity headers, which the web applicat
 | --- | --- | --- |
 | GET | `/v1/blueprints` | Runnable blueprints with manifests |
 | GET | `/v1/blueprints/{id}` | One manifest |
+| GET | `/v1/data` | Mock datasets with columns and types, licence, the public set each is modelled on, consumers, a notebook snippet and export links |
+| GET | `/v1/data/{id}` | All rows of one mock dataset |
+| GET | `/v1/data/{id}/download?format=csv|json` | The dataset as a file with a filename |
+| GET | `/v1/data/sources` | Trusted public data sources (Kaggle, Hugging Face, UCI, OpenML, Data.gov and more) with the loader each publishes |
 | GET | `/v1/data` | Mock datasets with previews |
 | POST | `/v1/runs` | Start a run; `wait=true` blocks until it completes or pauses |
 | GET | `/v1/runs` | Runs visible to the caller |
@@ -244,6 +248,10 @@ People bring their own provider keys, as in the OpenAI or Claude playgrounds. A 
 | PUT | `/v1/keys/admin/scope` | Admin: `all` (platform keys serve everyone; pilot default) or `platform-only` (people bring their own) |
 
 Every ledger row records `key_source`, and `/v1/usage/breakdown?by=key_source` splits spend between personal and platform keys.
+
+### Cost drill-down (Batch 16)
+
+`GET /v1/usage/breakdown` takes a layer (`by=day|department|user|feature|model|provider|key_source|conversation|blueprint`) and stackable filters (`department`, `user_id`, `feature`, `model`, `provider`, `key_source`, `conversation_id`, `blueprint_id`, `day`); totals carry `tokens_in`, `tokens_out` and `tokens_cached`, and `format=csv` returns the view as a file. `GET /v1/usage/events` returns the raw ledger rows behind the same filters, newest first, paged with `limit` and `offset`, also with `format=csv`. `GET /v1/usage/summary` carries `hours` (chat, agent, notebook, sdk, other, total for the window and the previous window, plus people per bucket) derived from ledger sessions.
 
 ## Limits and headers
 

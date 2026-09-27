@@ -60,6 +60,6 @@ test.describe("Batch 10 provider keys and models", () => {
     await loginAs(page);
     await page.goto("/operate/cost");
     await page.getByRole("tab", { name: "Key source" }).click();
-    await expect(page.locator("table thead")).toContainText("Key source");
+    await expect(page.getByTestId("cost-table").locator("thead")).toContainText("Key source");
   });
 });

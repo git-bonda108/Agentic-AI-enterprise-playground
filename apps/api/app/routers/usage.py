@@ -1,13 +1,19 @@
+import csv
+import io
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.adoption import session_hours
+from app.agents.core import REGISTRY
 from app.auth import current_user
 from app.config import settings
 from app.db import get_db
 from app.models import Conversation, UsageEvent, User
+
+HOUR_BUCKETS = {"chat": ("chat", "compare"), "agent": ("agent", "eval", "canary"), "notebook": ("notebook",), "sdk": ("sdk",)}
 
 router = APIRouter(prefix="/v1/usage", tags=["usage"])
 
@@ -85,6 +91,7 @@ def summary_for(db: Session, user: User, days: int) -> dict:
     return {
         "scope": "organization" if org_wide else "me",
         "days": days,
+        "hours": hours_for(db, user, days),
         "credits_usd": settings.org_credits_usd,
         "monthly_cap_usd": settings.org_monthly_cap_usd,
         "spend_month_usd": round(spend_month, 6),
@@ -102,26 +109,123 @@ def summary_for(db: Session, user: User, days: int) -> dict:
     }
 
 
-LAYERS = ("day", "department", "user", "feature", "model", "provider", "key_source", "conversation")
+def hours_for(db: Session, user: User, days: int) -> dict:
+    """Hours per feature bucket for the window and the window before it, from ledger sessions (see app.adoption)."""
+    now = datetime.now(UTC)
+    since, before = now - timedelta(days=days), now - timedelta(days=2 * days)
+    org_wide = user.role in ("admin", "champion")
+    stmt = select(UsageEvent).where(UsageEvent.created_at >= before)
+    if not org_wide:
+        stmt = stmt.where(UsageEvent.user_id == user.id)
+    events = db.scalars(stmt).all()
+    current = [e for e in events if (e.created_at if e.created_at.tzinfo else e.created_at.replace(tzinfo=UTC)) >= since]
+    previous = [e for e in events if e not in current]
+
+    def bucketed(evs: list[UsageEvent]) -> dict[str, float]:
+        per_feature: dict[str, float] = {}
+        for feats in session_hours(evs).values():
+            for f, h in feats.items():
+                per_feature[f] = per_feature.get(f, 0.0) + h
+        out = {b: round(sum(per_feature.get(f, 0.0) for f in feats), 2) for b, feats in HOUR_BUCKETS.items()}
+        out["other"] = round(sum(h for f, h in per_feature.items() if not any(f in feats for feats in HOUR_BUCKETS.values())), 2)
+        out["total"] = round(sum(per_feature.values()), 2)
+        return out
+
+    cur, prev = bucketed(current), bucketed(previous)
+    people = {b: len({e.user_id for e in current if e.feature in feats}) for b, feats in HOUR_BUCKETS.items()}
+    return {"window": cur, "previous": prev, "people": people, "days": days}
 
 
-@router.get("/breakdown")
-def usage_breakdown(
-    days: int = Query(default=30, ge=1, le=365), by: str = Query(default="model"),
-    user: User = Depends(current_user), db: Session = Depends(get_db),
-) -> dict:
-    """The cost cockpit: one layer at a time, always reconciled to the same ledger rows."""
-    if by not in LAYERS:
-        by = "model"
+LAYERS = ("day", "department", "user", "feature", "model", "provider", "key_source", "conversation", "blueprint")
+FILTERS = ("department", "user_id", "feature", "model", "provider", "key_source", "conversation_id", "blueprint_id", "day")
+
+
+def _aware(dt: datetime) -> datetime:
+    return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
+
+
+def _blueprint_names() -> dict[str, str]:
+    return {bp_id: bp.name for bp_id, bp in REGISTRY.items()}
+
+
+def _filtered_events(db: Session, user: User, days: int, filters: dict[str, str]) -> tuple[list[UsageEvent], dict[str, User], bool]:
+    """Ledger rows in the window, scoped to the caller unless they lead the organisation, narrowed by the drill-down filters."""
     now = datetime.now(UTC)
     since = now - timedelta(days=days)
-    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     org_wide = user.role in ("admin", "champion")
     stmt = select(UsageEvent).where(UsageEvent.created_at >= since)
     if not org_wide:
         stmt = stmt.where(UsageEvent.user_id == user.id)
-    events = db.scalars(stmt).all()
+    for col in ("user_id", "feature", "model", "provider", "key_source", "conversation_id", "blueprint_id"):
+        if filters.get(col):
+            stmt = stmt.where(getattr(UsageEvent, col) == filters[col])
+    events = db.scalars(stmt.order_by(UsageEvent.created_at.desc())).all()
     users = {u.id: u for u in db.scalars(select(User))}
+    if filters.get("department"):
+        events = [e for e in events if (users.get(e.user_id).department if users.get(e.user_id) else "Unknown") == filters["department"]]
+    if filters.get("day"):
+        events = [e for e in events if _aware(e.created_at).date().isoformat() == filters["day"]]
+    return events, users, org_wide
+
+
+def _csv(rows: list[dict], filename: str) -> Response:
+    buf = io.StringIO()
+    names: list[str] = []
+    for r in rows:
+        for k in r:
+            if k not in names:
+                names.append(k)
+    w = csv.DictWriter(buf, fieldnames=names, extrasaction="ignore")
+    w.writeheader()
+    w.writerows(rows)
+    return Response(buf.getvalue(), media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="{filename}"'})
+
+
+@router.get("/events", response_model=None)
+def usage_events(
+    days: int = Query(default=30, ge=1, le=365), limit: int = Query(default=50, ge=1, le=500), offset: int = Query(default=0, ge=0),
+    department: str = "", user_id: str = "", feature: str = "", model: str = "", provider: str = "", key_source: str = "", conversation_id: str = "", blueprint_id: str = "", day: str = "",
+    format: str = Query(default="json", pattern="^(json|csv)$"),
+    user: User = Depends(current_user), db: Session = Depends(get_db),
+) -> Response | dict:
+    """The raw ledger rows behind any cost view: newest first, paged, the same filters as the breakdown, CSV on request."""
+    filters = {k: v for k, v in {"department": department, "user_id": user_id, "feature": feature, "model": model, "provider": provider, "key_source": key_source, "conversation_id": conversation_id, "blueprint_id": blueprint_id, "day": day}.items() if v}
+    events, users, org_wide = _filtered_events(db, user, days, filters)
+    names = _blueprint_names()
+    conv_ids = {e.conversation_id for e in events if e.conversation_id}
+    titles = {c.id: c.title for c in db.scalars(select(Conversation).where(Conversation.id.in_(list(conv_ids))))} if conv_ids else {}
+
+    def row(e: UsageEvent) -> dict:
+        u = users.get(e.user_id)
+        return {
+            "id": e.id, "created_at": _aware(e.created_at).isoformat(timespec="seconds"), "user": u.name if u else e.user_id, "department": u.department if u else "",
+            "feature": e.feature, "model": e.model, "provider": e.provider, "tokens_in": e.tokens_in, "tokens_out": e.tokens_out, "tokens_cached": e.tokens_cached,
+            "cost_usd": round(e.cost_usd, 6), "latency_ms": e.latency_ms, "status": e.status, "key_source": e.key_source or "platform", "routed": bool(e.routed),
+            "savings_usd": round(e.savings_usd or 0.0, 6), "conversation": titles.get(e.conversation_id or "", ""), "conversation_id": e.conversation_id,
+            "run_id": e.run_id, "blueprint": names.get(e.blueprint_id or "", e.blueprint_id or ""), "blueprint_id": e.blueprint_id, "trace_id": e.trace_id,
+        }
+
+    if format == "csv":
+        return _csv([row(e) for e in events], f"ledger-{days}d.csv")
+    page = events[offset:offset + limit]
+    return {"scope": "organization" if org_wide else "me", "days": days, "filters": filters, "total": len(events), "offset": offset, "limit": limit, "rows": [row(e) for e in page]}
+
+
+@router.get("/breakdown", response_model=None)
+def usage_breakdown(
+    days: int = Query(default=30, ge=1, le=365), by: str = Query(default="model"),
+    department: str = "", user_id: str = "", feature: str = "", model: str = "", provider: str = "", key_source: str = "", conversation_id: str = "", blueprint_id: str = "", day: str = "",
+    format: str = Query(default="json", pattern="^(json|csv)$"),
+    user: User = Depends(current_user), db: Session = Depends(get_db),
+) -> Response | dict:
+    """The cost cockpit: one layer at a time, always reconciled to the same ledger rows. Filters stack for the drill-down."""
+    if by not in LAYERS:
+        by = "model"
+    filters = {k: v for k, v in {"department": department, "user_id": user_id, "feature": feature, "model": model, "provider": provider, "key_source": key_source, "conversation_id": conversation_id, "blueprint_id": blueprint_id, "day": day}.items() if v}
+    now = datetime.now(UTC)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    events, users, org_wide = _filtered_events(db, user, days, filters)
+    bp_names = _blueprint_names()
     conv_titles: dict[str, str] = {}
     if by == "conversation":
         ids = {e.conversation_id for e in events if e.conversation_id}
@@ -147,6 +251,9 @@ def usage_breakdown(
         if by == "conversation":
             cid = e.conversation_id or "-"
             return cid, conv_titles.get(cid, "Unsaved (compare or agent)")
+        if by == "blueprint":
+            bid = e.blueprint_id or "-"
+            return bid, bp_names.get(bid, bid if e.blueprint_id else "Not a blueprint run")
         return e.model, e.model
 
     rows: dict[str, dict] = {}
@@ -169,16 +276,21 @@ def usage_breakdown(
         out.append(r)
     out.sort(key=lambda r: (r["key"] if by == "day" else -r["cost_usd"]))
 
+    if format == "csv":
+        return _csv([{"layer": by, **{k: v for k, v in r.items() if k != "latency_ms"}} for r in out], f"cost-by-{by}-{days}d.csv")
     total_cost = round(sum(e.cost_usd for e in events), 6)
-    month_events = [e for e in events if (e.created_at if e.created_at.tzinfo else e.created_at.replace(tzinfo=UTC)) >= month_start]
+    month_events = [e for e in events if _aware(e.created_at) >= month_start]
     spend_month = round(sum(e.cost_usd for e in month_events), 6)
     day_of_month = max(now.day, 1)
     days_in_month = 30
     return {
         "scope": "organization" if org_wide else "me",
-        "by": by, "days": days,
+        "by": by, "days": days, "filters": filters,
         "totals": {
             "cost_usd": total_cost,
+            "tokens_in": sum(e.tokens_in for e in events),
+            "tokens_out": sum(e.tokens_out for e in events),
+            "tokens_cached": sum(e.tokens_cached for e in events),
             "spend_month_usd": spend_month,
             "forecast_month_usd": round(spend_month / day_of_month * days_in_month, 4),
             "savings_usd": round(sum(e.savings_usd or 0.0 for e in events), 6),
