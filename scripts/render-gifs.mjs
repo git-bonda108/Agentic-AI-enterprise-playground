@@ -6,7 +6,7 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const DIAGRAMS = [
-  { name: "architecture-flow", width: 1200, height: 720, seconds: 10 },
+  { name: "architecture-flow", width: 1290, height: 720, seconds: 10 },
   { name: "workflow-flow", width: 1200, height: 420, seconds: 12 },
 ];
 const FPS = 6;
