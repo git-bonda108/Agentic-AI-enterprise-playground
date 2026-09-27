@@ -260,8 +260,8 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = {
           { name: 'PLAYGROUND_KEY_ENCRYPTION_KEY', secretRef: 'key-encryption-key' }
         ], map(presentProviderKeys, k => { name: k.env, secretRef: k.secret }))
         probes: [
-          { type: 'Liveness', httpGet: { path: '/health', port: 8000 }, periodSeconds: 30 }
-          { type: 'Readiness', httpGet: { path: '/health', port: 8000 }, periodSeconds: 10 }
+          { type: 'Liveness', httpGet: { path: '/health', port: 8000 }, periodSeconds: 30, timeoutSeconds: 5, initialDelaySeconds: 15, failureThreshold: 3 }
+          { type: 'Readiness', httpGet: { path: '/health', port: 8000 }, periodSeconds: 10, timeoutSeconds: 5, initialDelaySeconds: 5 }
         ]
         volumeMounts: [{ volumeName: 'data', mountPath: '/data' }]
       }]
@@ -302,7 +302,8 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = {
           { name: 'AUTH_MICROSOFT_ENTRA_ID_SECRET', secretRef: 'entra-client-secret' }
           { name: 'AUTH_MICROSOFT_ENTRA_ID_ISSUER', value: entraIssuer }
         ])
-        probes: [{ type: 'Liveness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 30 }]
+        // The health route pings the API; give the probe more than the one-second default so a slow API never restarts the web app.
+        probes: [{ type: 'Liveness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 30, timeoutSeconds: 5, initialDelaySeconds: 10, failureThreshold: 3 }]
       }]
       scale: { minReplicas: 1, maxReplicas: 3 }
     }
