@@ -26,9 +26,20 @@ if [[ -z "$ACR_NAME" ]]; then
   az acr create --resource-group "$RG" --name "$ACR_NAME" --sku Basic --admin-enabled true --output none
 fi
 LOGIN_SERVER=$(az acr show --name "$ACR_NAME" --query loginServer -o tsv)
-( cd "$ROOT" && npm run build:jupyterlite >/dev/null )
-az acr build --registry "$ACR_NAME" --image "playground-api:$TAG" --file "$ROOT/apps/api/Dockerfile" "$ROOT/apps/api" --output none
-az acr build --registry "$ACR_NAME" --image "playground-web:$TAG" --file "$ROOT/apps/web/Dockerfile" "$ROOT" --output none
+# IMAGE_BUILD=acr (default) builds in Azure with ACR Tasks. Subscriptions where ACR Tasks are not permitted use
+# IMAGE_BUILD=skip: build and push the images first with the "Build and push images" GitHub Actions workflow
+# (.github/workflows/images.yml, tag = the git sha) and rerun this script with the same tag.
+IMAGE_BUILD="${IMAGE_BUILD:-acr}"
+if [[ "$IMAGE_BUILD" == "acr" ]]; then
+  ( cd "$ROOT" && npm run build:jupyterlite >/dev/null )
+  az acr build --registry "$ACR_NAME" --image "playground-api:$TAG" --file "$ROOT/apps/api/Dockerfile" "$ROOT/apps/api" --output none
+  az acr build --registry "$ACR_NAME" --image "playground-web:$TAG" --file "$ROOT/apps/web/Dockerfile" "$ROOT" --output none
+else
+  for repo in playground-api playground-web; do
+    az acr repository show-tags --name "$ACR_NAME" --repository "$repo" --query "[?@=='$TAG'] | [0]" -o tsv | grep -q "$TAG" \
+      || { echo "image $repo:$TAG is not in $LOGIN_SERVER; run the images workflow with tag=$TAG first" >&2; exit 1; }
+  done
+fi
 
 echo "3/4 infrastructure"
 az deployment group create \

@@ -51,7 +51,9 @@ export NVIDIA_NIM_API_KEY='nvapi-...'
 infra/deploy.sh rg-ai-playground westeurope aiplay
 ```
 
-The script creates the resource group, builds both images in Azure Container Registry (no local Docker), deploys the Bicep template, writes the outputs to `infra/last-deployment.json` and waits until the web app answers its health check. Rerunning it with a new git commit builds new images and rolls a new revision; Container Apps keeps the previous revision for instant rollback.
+The script creates the resource group, builds both images in Azure Container Registry (no local Docker), deploys the Bicep template, writes the outputs to `infra/last-deployment.json` and waits until the web app answers its health check.
+
+Some subscriptions do not permit ACR Tasks (the cloud build), and the script then stops with `TasksOperationsNotAllowed`. In that case run the **Build and push images** GitHub Actions workflow (`.github/workflows/images.yml`; it needs the `ACR_LOGIN_SERVER`, `ACR_USERNAME` and `ACR_PASSWORD` repository secrets, taken from the registry's admin credential) with the tag you want, and rerun the script with `IMAGE_BUILD=skip` and that tag as the fourth argument; it verifies the images exist and continues with the template. Rerunning it with a new git commit builds new images and rolls a new revision; Container Apps keeps the previous revision for instant rollback.
 
 To sign in with Entra ID instead of the seeded pilot users, register an application in the tenant (web platform, redirect URI `https://<web-fqdn>/api/auth/callback/microsoft-entra-id`) and export `AUTH_MICROSOFT_ENTRA_ID_ID`, `AUTH_MICROSOFT_ENTRA_ID_SECRET` and `AUTH_MICROSOFT_ENTRA_ID_ISSUER` before running the script. Development sign-in switches itself off as soon as a client id is present.
 
