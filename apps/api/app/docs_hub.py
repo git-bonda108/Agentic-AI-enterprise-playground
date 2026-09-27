@@ -12,8 +12,10 @@ import re
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
-_REPO_DOCS = _HERE.parents[2] / "docs"
 _CATALOG_DOCS = _HERE.parent / "catalog" / "docs"
+# The repository checkout keeps the guides three levels up (apps/api/app -> docs); inside the container the package sits at
+# /app/app with nothing above it, so the mirror in catalog/docs is the only copy there.
+_REPO_DOCS = _HERE.parents[2] / "docs" if len(_HERE.parents) > 2 else _CATALOG_DOCS
 
 START, BUILD, OPERATE, PLATFORM = "Start here", "Build", "Operate", "Platform"
 
