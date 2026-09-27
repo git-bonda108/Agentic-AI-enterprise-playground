@@ -43,7 +43,7 @@ function HowToFor({ pathname }: { pathname: string }) {
             ))}
           </ol>
           <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-            {howto.docs.map((d) => <a key={d.href} href={d.href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-violet-soft hover:underline">{d.label} <ExternalLink className="size-3" /></a>)}
+            {howto.docs.map((d) => d.href.startsWith("/") ? <Link key={d.href} href={d.href} className="inline-flex items-center gap-1 text-brand-violet-soft hover:underline">{d.label}</Link> : <a key={d.href} href={d.href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-violet-soft hover:underline">{d.label} <ExternalLink className="size-3" /></a>)}
           </p>
         </section>
       )}

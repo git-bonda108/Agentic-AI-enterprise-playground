@@ -19,6 +19,9 @@ export const proxy = auth((req) => {
 
 export default proxy;
 
+// The API proxy is left out on purpose: its route handler checks the session itself and answers 401 rather than
+// redirecting, and running the auth wrapper there would re-issue the rolling session cookie on every background poll,
+// which can resurrect a session that was signed out while a poll was in flight.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)"],
+  matcher: ["/((?!api/pg|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)"],
 };

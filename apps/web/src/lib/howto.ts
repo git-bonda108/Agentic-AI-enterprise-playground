@@ -3,7 +3,7 @@
 export type HowToStep = { text: string; href?: string; label?: string };
 export type HowTo = { title: string; intro: string; steps: HowToStep[]; docs: { label: string; href: string }[] };
 
-const REPO_DOCS = "https://github.com/git-bonda108/Agentic-AI-enterprise-playground/blob/main/docs";
+const DOCS = "/docs";
 
 export const HOWTO: Record<string, HowTo> = {
   "/build/agents": {
@@ -15,7 +15,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Watch a run in the run viewer or the control room; every step, token and dollar is recorded.", href: "/operate/runs", label: "Runs" },
       { text: "Take it further: the same blueprint as a notebook, a framework project, a Langflow flow or a Copilot Studio recipe.", href: "/discover/low-code", label: "Two ways to build" },
     ],
-    docs: [{ label: "Agents guide", href: `${REPO_DOCS}/AGENTS.md` }, { label: "Copilot Studio agents", href: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-get-started" }],
+    docs: [{ label: "Agents guide", href: `${DOCS}/agents` }, { label: "Copilot Studio agents", href: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/fundamentals-get-started" }],
   },
   "/discover/frameworks": {
     title: "Run your own SDK through the playground",
@@ -37,7 +37,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Copy each step's commands in order, or download the whole guide as markdown for a ticket or a runbook." },
       { text: "Prefer a one-shot script? The deploy script below the guide is the short form for the same cloud.", href: "/discover/frameworks", label: "Frameworks" },
     ],
-    docs: [{ label: "Cloud platforms guide", href: `${REPO_DOCS}/CLOUD_PLATFORMS.md` }, { label: "Foundry hosted agents", href: "https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/quickstart-hosted-agent" }, { label: "AgentCore CLI", href: "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-cli.html" }, { label: "Agent Runtime", href: "https://adk.dev/deploy/agent-runtime/deploy/" }, { label: "Managed Agents", href: "https://platform.claude.com/docs/en/managed-agents/quickstart" }],
+    docs: [{ label: "Cloud platforms guide", href: `${DOCS}/cloud-platforms` }, { label: "Foundry hosted agents", href: "https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/quickstart-hosted-agent" }, { label: "AgentCore CLI", href: "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-cli.html" }, { label: "Agent Runtime", href: "https://adk.dev/deploy/agent-runtime/deploy/" }, { label: "Managed Agents", href: "https://platform.claude.com/docs/en/managed-agents/quickstart" }],
   },
   "/build/data": {
     title: "Pick a dataset, then bring real data",
@@ -47,7 +47,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Open the linked notebook to see the set in use with pandas or a Knowledge Space.", href: "/build/notebooks", label: "Notebooks" },
       { text: "Trusted sources: Kaggle, Hugging Face, UCI, OpenML, Data.gov and more, each with the loader it publishes; run the %pip line in the sandbox, then the snippet." },
     ],
-    docs: [{ label: "Datasets guide", href: `${REPO_DOCS}/DATASETS.md` }, { label: "Kaggle API", href: "https://www.kaggle.com/docs/api" }, { label: "Hugging Face Datasets", href: "https://huggingface.co/docs/datasets/index" }],
+    docs: [{ label: "Datasets guide", href: `${DOCS}/datasets` }, { label: "Kaggle API", href: "https://www.kaggle.com/docs/api" }, { label: "Hugging Face Datasets", href: "https://huggingface.co/docs/datasets/index" }],
   },
   "/operate/cost": {
     title: "Drill from the organisation to one call",
@@ -58,7 +58,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "The ledger rows at the bottom are the raw calls behind the view, newest first; export any view or the rows as CSV." },
       { text: "Tokens are split into input, output and cached so prompt caching shows up as savings.", href: "/operate/traces", label: "Traces" },
     ],
-    docs: [{ label: "API: usage", href: `${REPO_DOCS}/API.md` }],
+    docs: [{ label: "API: usage", href: `${DOCS}/api` }],
   },
   "/build/notebooks": {
     title: "Run a notebook end to end",
@@ -68,7 +68,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Edit the payload cell and run again; use %pip install for packages in the sandbox." },
       { text: "Take it to GPU compute with More compute (NVIDIA Brev, Colab, Codespaces)." },
     ],
-    docs: [{ label: "Notebooks guide", href: `${REPO_DOCS}/NOTEBOOKS.md` }],
+    docs: [{ label: "Notebooks guide", href: `${DOCS}/notebooks` }],
   },
   "/discover/low-code": {
     title: "Build it in a studio",
@@ -78,7 +78,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "n8n: paste the workflow JSON, add the model credential and a Bearer credential for the playground." },
       { text: "Copilot Studio: paste the instructions, add the knowledge and tools the recipe lists, build the workflow with the node map." },
     ],
-    docs: [{ label: "Two ways to build", href: `${REPO_DOCS}/LOW_CODE.md` }],
+    docs: [{ label: "Two ways to build", href: `${DOCS}/low-code` }],
   },
   "/discover/connectors": {
     title: "Connect a server to your client",
@@ -88,7 +88,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Admins approve servers before agents can call them; the Connector reviewer agent prepares the queue.", href: "/build/agents", label: "Agent Hub" },
       { text: "Test connection shows the server's tools before you commit to it." },
     ],
-    docs: [{ label: "Marketplace guide", href: `${REPO_DOCS}/MARKETPLACE.md` }],
+    docs: [{ label: "Marketplace guide", href: `${DOCS}/marketplace` }],
   },
   "/discover/blueprints": {
     title: "Find the right blueprint",
@@ -97,7 +97,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Filter by category and family; open a card for the instructions and the build tracks." },
       { text: "Run it, open it as a notebook, take the code, or build it in a low-code studio." },
     ],
-    docs: [{ label: "Architecture", href: `${REPO_DOCS}/ARCHITECTURE.md` }],
+    docs: [{ label: "Architecture", href: `${DOCS}/architecture` }],
   },
   "/build/knowledge": {
     title: "Give agents your documents",
@@ -106,7 +106,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Create a space, add text or files, then search it and ask it a question with citations." },
       { text: "Attach the space to a wizard agent, or use the search_knowledge built-in tool from any agent." },
     ],
-    docs: [{ label: "API reference", href: `${REPO_DOCS}/API.md` }],
+    docs: [{ label: "API reference", href: `${DOCS}/api` }],
   },
   "/evaluate/evals": {
     title: "Prove an agent before people rely on it",
@@ -116,7 +116,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Run it, read the judge's rationale per case, enable the canary." },
       { text: "Watch the hardening ladder; promote to Production when three canaries pass." },
     ],
-    docs: [{ label: "Workflows", href: `${REPO_DOCS}/WORKFLOWS.md` }],
+    docs: [{ label: "Workflows", href: `${DOCS}/workflows` }],
   },
   "/operate/traces": {
     title: "Read a trace",
@@ -125,7 +125,7 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Open a trace to see each step next to the model calls it made: model, tokens, cost, latency, key source." },
       { text: "SDK sessions come from the gateway; send an X-Trace-Id header from your code to group calls." },
     ],
-    docs: [{ label: "Agents guide", href: `${REPO_DOCS}/AGENTS.md` }],
+    docs: [{ label: "Agents guide", href: `${DOCS}/agents` }],
   },
 };
 

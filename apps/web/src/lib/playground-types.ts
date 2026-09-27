@@ -277,3 +277,7 @@ export type AdoptionFeature = { feature: string; label: string; hours: number; o
 export type AdoptionDepartment = { department: string; users: number; hours: number; outcomes: number; cost_usd: number; hours_saved: number; value_saved_usd: number; roi: number | null };
 export type AdoptionAssumption = { key: string; value: number; label: string; updated_at: string };
 export type AdoptionSummary = { days: number; department: string | null; since: string; kpis: { active_users: number; total_users: number; hours: number; outcomes: number; cost_usd: number; cost_per_outcome_usd: number | null; hours_saved: number; value_saved_usd: number; roi: number | null }; features: AdoptionFeature[]; departments: AdoptionDepartment[]; weekly: { week: string; requests: number; cost_usd: number; users: number }[]; assumptions: AdoptionAssumption[]; method: string };
+
+export type DocGuideMeta = { slug: string; file: string; title: string; section: string; summary: string; page: string; page_label: string; minutes: number; words: number; headings: { text: string; id: string }[] };
+export type DocGuide = DocGuideMeta & { markdown: string; prev: { slug: string; title: string } | null; next: { slug: string; title: string } | null; files: Record<string, string> };
+export type DocSearchHit = { slug: string; title: string; section: string; anchor: string; snippet: string; score: number };

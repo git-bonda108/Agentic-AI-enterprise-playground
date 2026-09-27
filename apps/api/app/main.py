@@ -20,6 +20,7 @@ from app.routers import (
     community,
     connectors,
     conversations,
+    docs_hub,
     evals,
     faces,
     keys,
@@ -82,6 +83,7 @@ app.include_router(evals.router)
 app.include_router(community.router)
 app.include_router(adoption.router)
 app.include_router(keys.router)
+app.include_router(docs_hub.router)
 app.include_router(lowcode.router)
 app.include_router(repos.router)
 app.include_router(traces.router)

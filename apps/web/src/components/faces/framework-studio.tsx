@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Download, ExternalLink, FileCode2 } from "lucide-react";
 import { CopyButton } from "@/components/playground/copy-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +10,13 @@ import { Play, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Option = { id: string; name: string };
+
+// The gateway origin is only known in the browser; reading it through a store keeps the server and client markup identical.
+const noop = () => () => {};
+const SERVER_GATEWAY = "http://localhost:8000";
+function useGatewayOrigin(): string {
+  return useSyncExternalStore(noop, () => window.location.origin.replace(/:3000$/, ":8000"), () => SERVER_GATEWAY);
+}
 
 export function FrameworkStudio({ frameworks, blueprints, initialBlueprint }: { frameworks: FrameworkInfo[]; blueprints: Option[]; initialBlueprint: string }) {
   const [blueprint, setBlueprint] = useState(initialBlueprint);
@@ -31,6 +38,7 @@ export function FrameworkStudio({ frameworks, blueprints, initialBlueprint }: { 
   }, [blueprint, framework]);
 
   const current = frameworks.find((f) => f.id === framework);
+  const gatewayOrigin = useGatewayOrigin();
   return (
     <div className="mx-auto max-w-7xl">
       <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Discover</p>
@@ -63,7 +71,7 @@ export function FrameworkStudio({ frameworks, blueprints, initialBlueprint }: { 
       <div className="mt-4 rounded-2xl border bg-card p-4 text-xs" data-testid="gateway-setup">
         <p className="font-semibold">Runs through the playground gateway</p>
         <p className="mt-1 text-muted-foreground">The project needs no provider key. It reads three environment variables and every call is governed, metered and traced under your token.</p>
-        <pre className="mt-2 overflow-x-auto rounded-lg bg-[#0d0d18] p-3 font-mono text-[11px] text-slate-100">{`export PLAYGROUND_BASE_URL=${typeof window !== "undefined" ? window.location.origin.replace(/:3000$/, ":8000") : "http://localhost:8000"}/openai/v1\nexport PLAYGROUND_TOKEN=pgk_...      # Admin → Settings → Personal tokens\nexport PLAYGROUND_MODEL=smart        # or any catalog id\npython agent.py`}</pre>
+        <pre className="mt-2 overflow-x-auto rounded-lg bg-[#0d0d18] p-3 font-mono text-[11px] text-slate-100">{`export PLAYGROUND_BASE_URL=${gatewayOrigin}/openai/v1\nexport PLAYGROUND_TOKEN=pgk_...      # Admin → Settings → Personal tokens\nexport PLAYGROUND_MODEL=smart        # or any catalog id\npython agent.py`}</pre>
       </div>
       {run && (
         <div className="mt-3 rounded-2xl border bg-card p-4 text-xs" data-testid="flavor-run-output">

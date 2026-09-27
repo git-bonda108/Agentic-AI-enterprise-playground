@@ -23,6 +23,7 @@ export default defineConfig({
       command: `rm -f /tmp/eap-e2e.db /tmp/eap-e2e-checkpoints.db && cd ../api && ./.venv/bin/python -m uvicorn app.main:app --port ${API_PORT}`,
       url: `http://localhost:${API_PORT}/health`,
       reuseExistingServer: false,
+      stdout: process.env.E2E_LOGS ? "pipe" : "ignore", stderr: "pipe",
       timeout: 60_000,
       env: {
         PLAYGROUND_FAKE_LLM: "true",
@@ -38,6 +39,7 @@ export default defineConfig({
       command: `npm run build && npm run start -- --port ${WEB_PORT}`,
       url: `http://localhost:${WEB_PORT}/api/health`,
       reuseExistingServer: false,
+      stdout: process.env.E2E_LOGS ? "pipe" : "ignore", stderr: "pipe",
       timeout: 300_000,
       env: {
         PLAYGROUND_API_URL: `http://localhost:${API_PORT}`,

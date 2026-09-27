@@ -22,6 +22,7 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 | Two ways to build | Every blueprint is a Gen AI or an Agentic AI blueprint with a low-code track (an importable Langflow flow, an importable n8n workflow, a Copilot Studio recipe with a workflow node map) and a code track. See [docs/LOW_CODE.md](docs/LOW_CODE.md). |
 | Runnable notebooks | A gallery of getting-started notebooks and one MVP notebook per blueprint, each executing end to end on mock data in the browser or in a server sandbox, with package installs and links to GPU compute. See [docs/NOTEBOOKS.md](docs/NOTEBOOKS.md). |
 | Cost management | A ledger that records every call with tokens, cached tokens, latency, cost and which key paid, and a cockpit that slices it by day, department, user, feature, model, provider, key source, blueprint and conversation, drills from any row to the raw ledger calls, splits tokens into input, output and cached, and exports CSV. |
+| Documentation hub | Every guide in this folder served inside the product with search, a table of contents, page how-tos and images, so nothing links to the repository; the guides are mirrored into the API image by `npm run sync:docs` and a test fails on drift. |
 | Datasets | Eight synthetic mock sets with columns, provenance, downloads and notebook snippets, plus curated trusted public sources (Kaggle, Hugging Face, UCI, OpenML, Data.gov, World Bank and more) with their loaders. See [docs/DATASETS.md](docs/DATASETS.md). |
 | Smart spend | A deterministic router that classifies each prompt into Economy, Workhorse or Premium and records the savings against a premium baseline. |
 | Agent building | Six runnable domain blueprints on a LangGraph runtime with checkpoints, human review gates and resumable runs, plus a catalog of 175 imported and authored agent definitions. |
@@ -41,7 +42,7 @@ The application is organised into seven sections, laid out the way a cloud conso
 
 | Section | Pages | Status |
 | --- | --- | --- |
-| Home | Console with credits, spend, tokens, models used and a live ledger | Live |
+| Home | Console with credits, spend, tokens, hours, models used and a live ledger; Documentation hub | Live |
 | Discover | Models, Blueprints, Frameworks, Low-code studios, Cloud platforms, MCP Marketplace, Popular Git repos, Skills | Live |
 | Build | Playground, Agent Hub, Notebooks, Knowledge, Datasets | Live |
 | Evaluate | Evals, Canary | Live |

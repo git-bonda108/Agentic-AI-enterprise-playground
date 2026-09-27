@@ -21,7 +21,7 @@ The playground was built in ten batches, then extended in a second series that t
 | 14 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Done |
 | 15 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Done |
 | 16 | Datasets section with mock data and trusted sources; cost and token drill-down; hours tiles on the console | Done |
-| 17 | Documentation hub and a full retest of every left-pane item | Planned |
+| 17 | Documentation hub and a full retest of every left-pane item | Done |
 
 ## Batch 0: skeleton and design system
 
@@ -177,7 +177,8 @@ Delivered 2026-09-27. The Clouds page became **Cloud platforms**: Microsoft Foun
 
 Delivered 2026-09-27. **Datasets** (Build, Datasets; route unchanged) describes each of the eight synthetic sets well enough to use: columns with inferred types and an example value, a preview, the CC0 licence and the public set it is modelled on with that set's licence, the blueprints and gallery notebook that read it, a two-line notebook snippet, and CSV or JSON download with a filename. A second tab lists thirteen **trusted public sources** (Kaggle, Hugging Face Datasets, UCI, OpenML, Data.gov, data.europa.eu, World Bank, Our World in Data, Google Dataset Search, the AWS open data registry, Azure Open Datasets, NYC TLC trip records, Awesome Public Datasets) with the loader each one publishes as a `%pip install` line and a snippet. The **cost cockpit drills down**: clicking a row adds it as a filter chip and opens the next layer already narrowed, a blueprint layer was added, tokens are split into input, output and cached in the totals and per row, the raw ledger rows behind the view are listed newest first with paging, and both the view and the rows export as CSV; people who are not admins or champions only ever see their own rows. The **console** gained hours tiles (chat, agents, notebooks, all features) with the change against the previous window and the people behind each, derived from ledger sessions the same way as the adoption analytics. The resource cards on the console no longer show internal batch numbers. Docs: `docs/DATASETS.md`.
 
-### Batches 15 to 17
+### Batch 17 as shipped
 
-Unchanged from the earlier plan: documentation hub and full retest (17).
+Delivered 2026-09-27. A **Documentation hub** at Home, Documentation serves every product guide inside the playground: twelve guides in four sections (Start here, Build, Operate, Platform) with a one-line summary, reading time, section count and the product page each belongs with; a paragraph search with section anchors; the page how-tos collected in one place; and each guide rendered with a table of contents, heading anchors, copyable code blocks, images served by the API and cross-guide links that resolve inside the hub. Every how-to panel now links to the hub instead of the private repository. The guides are mirrored into the API image by `npm run sync:docs` (the API's Docker context is `apps/api`) and a test fails when the mirror drifts or a guide is missing from the hub; the delivery log stays internal. The **full retest** is a Playwright test that visits every left-pane item, checks the heading, the how-to button where one exists, and fails on any console error or failed API call; its per-page report is in `docs/RETEST.md` alongside the manual pass. The retest found and fixed two defects: a hydration error on the Frameworks page (the gateway snippet read the browser address during rendering) and a sign-out race in which a background poll re-issued the session cookie through the auth middleware.
+
 

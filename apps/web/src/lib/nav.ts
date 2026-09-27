@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  BookMarked,
   LayoutDashboard, Compass, Hammer, FlaskConical, Activity, Users, ShieldCheck,
   Boxes, Blocks, Layers, Cloud, Plug, Sparkles, MessagesSquare, Bot, NotebookPen,
   BookOpen, Database, ClipboardCheck, Radar, Play, Waypoints, Coins, TrendingUp,
@@ -25,7 +26,10 @@ export type NavSection = {
 export const NAV: NavSection[] = [
   {
     title: "Home", icon: LayoutDashboard, href: "/home",
-    items: [{ title: "Console", href: "/home", icon: LayoutDashboard, batch: 0, blurb: "Credits, spend, tokens, models and where to start." }],
+    items: [
+      { title: "Console", href: "/home", icon: LayoutDashboard, batch: 0, blurb: "Credits, spend, tokens, models and where to start." },
+      { title: "Documentation", href: "/docs", icon: BookMarked, batch: 0, blurb: "Every guide, page how-to and the API reference, searchable inside the playground." },
+    ],
   },
   {
     title: "Discover", icon: Compass, href: "/discover/models",

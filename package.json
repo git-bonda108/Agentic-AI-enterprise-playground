@@ -19,6 +19,7 @@
     "start:local": "bash scripts/dev.sh",
     "start:offline": "bash scripts/dev.sh --offline",
     "diagrams": "node scripts/render-diagrams.mjs",
-    "import:repos": "cd apps/api && uv run python scripts/import_repos.py"
+    "import:repos": "cd apps/api && uv run python scripts/import_repos.py",
+    "sync:docs": "bash scripts/sync-docs.sh"
   }
 }

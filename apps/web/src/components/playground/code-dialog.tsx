@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,9 +9,11 @@ import { CopyButton } from "@/components/playground/copy-button";
 import { buildSnippet, SNIPPET_LANGS } from "@/lib/code-snippets";
 import type { CatalogModel, ChatParams } from "@/lib/playground-types";
 
+const noop = () => () => {};
+
 export function CodeDialog({ model, prompt, params }: { model?: CatalogModel; prompt: string; params: ChatParams }) {
   const [open, setOpen] = useState(false);
-  const gateway = typeof window !== "undefined" ? `${window.location.origin}/gateway` : "https://playground.example.com/gateway";
+  const gateway = `${useSyncExternalStore(noop, () => window.location.origin, () => "https://playground.example.com")}/gateway`;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
