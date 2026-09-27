@@ -10,7 +10,7 @@ export type DevUser = {
   hue: number;
 };
 
-/** Ten seeded users for local development and the demo. Password for all: "playground". */
+/** Seeded pilot users for local development, the demo and the pilot deployment (no Entra yet). Password for all: "playground". */
 export const DEV_USERS: DevUser[] = [
   { id: "u1", name: "Satya Bonda", email: "satya@playground.local", role: "admin", department: "AI Platform", initials: "SB", hue: 265 },
   { id: "u2", name: "Priya Raman", email: "priya@playground.local", role: "champion", department: "R&A Training", initials: "PR", hue: 330 },
@@ -22,6 +22,7 @@ export const DEV_USERS: DevUser[] = [
   { id: "u8", name: "Hannah Weiss", email: "hannah@playground.local", role: "explorer", department: "Legal", initials: "HW", hue: 350 },
   { id: "u9", name: "Ravi Iyer", email: "ravi@playground.local", role: "champion", department: "Procurement", initials: "RI", hue: 120 },
   { id: "u10", name: "Elena Rossi", email: "elena@playground.local", role: "explorer", department: "Marketing", initials: "ER", hue: 20 },
+  { id: "u11", name: "Arbaz Sayed", email: "arbazsayed105@gmail.com", role: "builder", department: "Partners", initials: "AS", hue: 95 },
 ];
 
 export const DEV_PASSWORD = "playground";
