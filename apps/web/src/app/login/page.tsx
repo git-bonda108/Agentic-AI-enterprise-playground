@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { entraConfigured, devLoginAllowed } from "@/auth";
+import { devLoginAllowed, ssoProviders } from "@/auth";
 import { DEV_USERS } from "@/lib/users";
 import { LoginPanel } from "@/components/shell/login-panel";
 import { BeamField } from "@/components/motion/beam-field";
+import { BrandMark } from "@/components/shell/brand-mark";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -19,9 +20,7 @@ export default async function LoginPage({
         <div className="absolute -left-32 top-1/3 size-[520px] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.35),transparent_60%)] blur-2xl" aria-hidden />
         <div className="absolute right-[-120px] bottom-[-80px] size-[460px] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.28),transparent_60%)] blur-2xl" aria-hidden />
         <header className="relative flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl gradient-brand animate-gradient-shift shadow-lg shadow-violet-900/40">
-            <span className="text-lg font-semibold">✦</span>
-          </span>
+          <BrandMark size={40} />
           <div>
             <p className="text-sm font-medium tracking-wide text-white/90">Enterprise AI Playground</p>
             <p className="text-xs text-white/50">Governed. Multi-model. Agentic.</p>
@@ -50,7 +49,7 @@ export default async function LoginPage({
         <LoginPanel
           next={params.next ?? "/home"}
           error={params.error}
-          entraConfigured={entraConfigured}
+          ssoProviders={ssoProviders}
           devUsers={devLoginAllowed ? DEV_USERS : []}
         />
       </section>

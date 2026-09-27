@@ -3,18 +3,19 @@
 import { motion } from "framer-motion";
 import { Building2, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { devSignIn, entraSignIn } from "@/app/login/actions";
+import { devSignIn, ssoSignIn } from "@/app/login/actions";
 import { ROLE_LABEL, type DevUser } from "@/lib/users";
+import { BrandMark } from "@/components/shell/brand-mark";
 
 export function LoginPanel({
   next,
   error,
-  entraConfigured,
+  ssoProviders,
   devUsers,
 }: {
   next: string;
   error?: string;
-  entraConfigured: boolean;
+  ssoProviders: { id: string; name: string }[];
   devUsers: DevUser[];
 }) {
   return (
@@ -25,7 +26,7 @@ export function LoginPanel({
       className="w-full max-w-md"
     >
       <div className="mb-8 flex items-center gap-3 lg:hidden">
-        <span className="grid size-9 place-items-center rounded-lg gradient-brand text-white">✦</span>
+        <BrandMark size={36} />
         <span className="font-medium">Enterprise AI Playground</span>
       </div>
       <h2 className="text-2xl font-semibold tracking-tight">Sign in</h2>
@@ -37,24 +38,29 @@ export function LoginPanel({
         </p>
       ) : null}
 
-      {entraConfigured ? (
-        <form action={entraSignIn} className="mt-6">
-          <input type="hidden" name="next" value={next} />
-          <Button type="submit" size="lg" className="w-full gap-2 glow-violet">
-            <Building2 className="size-4" /> Continue with Microsoft Entra ID
-          </Button>
-        </form>
+      {ssoProviders.length > 0 ? (
+        <div className="mt-6 space-y-2">
+          {ssoProviders.map((p, i) => (
+            <form key={p.id} action={ssoSignIn}>
+              <input type="hidden" name="next" value={next} />
+              <input type="hidden" name="provider" value={p.id} />
+              <Button type="submit" size="lg" variant={i === 0 ? "default" : "outline"} className={i === 0 ? "w-full gap-2 glow-violet" : "w-full gap-2"}>
+                <Building2 className="size-4" /> Continue with {p.name}
+              </Button>
+            </form>
+          ))}
+        </div>
       ) : (
         <div className="mt-6 rounded-lg border border-dashed px-3 py-2 text-xs text-muted-foreground">
-          <KeyRound className="mr-1 inline size-3.5" /> Entra ID is not configured yet. Set the AUTH_MICROSOFT_ENTRA_ID variables to enable single sign-on.
+          <KeyRound className="mr-1 inline size-3.5" /> Single sign-on is not configured yet. Microsoft Entra ID, Google Workspace, Okta or any OpenID Connect provider can be enabled with environment variables.
         </div>
       )}
 
       {devUsers.length > 0 ? (
         <div className="mt-8">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Seeded users for this environment</p>
-            <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">demo</span>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pilot accounts for this environment</p>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">pilot</span>
           </div>
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {devUsers.map((u, i) => (

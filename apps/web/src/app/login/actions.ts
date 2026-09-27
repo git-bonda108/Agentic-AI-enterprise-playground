@@ -16,9 +16,11 @@ export async function devSignIn(formData: FormData) {
   await signIn("dev", { email, password: DEV_PASSWORD, redirectTo: next });
 }
 
-export async function entraSignIn(formData: FormData) {
+export async function ssoSignIn(formData: FormData) {
   const next = safeNext(formData.get("next"));
-  await signIn("microsoft-entra-id", { redirectTo: next });
+  const provider = String(formData.get("provider") ?? "microsoft-entra-id");
+  if (!["microsoft-entra-id", "google", "okta", "oidc"].includes(provider)) throw new Error("Unknown sign-in provider");
+  await signIn(provider, { redirectTo: next });
 }
 
 export async function signOutAction() {

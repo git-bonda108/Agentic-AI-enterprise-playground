@@ -23,6 +23,9 @@ export const DEV_USERS: DevUser[] = [
   { id: "u9", name: "Ravi Iyer", email: "ravi@playground.local", role: "champion", department: "Procurement", initials: "RI", hue: 120 },
   { id: "u10", name: "Elena Rossi", email: "elena@playground.local", role: "explorer", department: "Marketing", initials: "ER", hue: 20 },
   { id: "u11", name: "Arbaz Sayed", email: "arbazsayed105@gmail.com", role: "builder", department: "Partners", initials: "AS", hue: 95 },
+  { id: "u12", name: "Toral Rathod", email: "Toral.Rathod@eduramp.in", role: "builder", department: "Eduramp", initials: "TR", hue: 250 },
+  { id: "u13", name: "Joy Das", email: "Joy.Das@wns.com", role: "builder", department: "WNS", initials: "JD", hue: 175 },
+  { id: "u14", name: "Amal Socratles", email: "Amal.Socraties@wns.com", role: "builder", department: "WNS", initials: "AS", hue: 45 },
 ];
 
 export const DEV_PASSWORD = "playground";

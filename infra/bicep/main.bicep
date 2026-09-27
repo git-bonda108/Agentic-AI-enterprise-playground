@@ -40,6 +40,20 @@ param internalKey string
 @description('Auth.js session secret for the web app.')
 param authSecret string
 
+@description('OpenID Connect issuer for a non-Microsoft identity provider (Okta, Google Workspace, Ping, Auth0 or any OIDC server). Leave empty when not used.')
+param oidcIssuer string = ''
+@description('OpenID Connect client id.')
+param oidcClientId string = ''
+@secure()
+@description('OpenID Connect client secret.')
+param oidcClientSecret string = ''
+@description('Label shown on the sign-in button for the OpenID Connect provider.')
+param oidcName string = 'Company sign-in'
+@description('Comma-separated e-mail domains allowed to sign in through single sign-on; empty allows every account of the provider.')
+param allowedDomains string = ''
+@description('Comma-separated e-mail addresses that become administrators on first sign-in.')
+param adminEmails string = ''
+
 @description('Microsoft Entra ID application (client) id for sign-in. Leave empty to use seeded development users (pilot only).')
 param entraClientId string = ''
 
@@ -284,7 +298,7 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = {
         { name: 'acr-password', value: registry.listCredentials().passwords[0].value }
         { name: 'auth-secret', value: authSecret }
         { name: 'internal-key', value: internalKey }
-      ], empty(entraClientSecret) ? [] : [{ name: 'entra-client-secret', value: entraClientSecret }])
+      ], concat(empty(entraClientSecret) ? [] : [{ name: 'entra-client-secret', value: entraClientSecret }], empty(oidcClientSecret) ? [] : [{ name: 'oidc-client-secret', value: oidcClientSecret }]))
     }
     template: {
       containers: [{
@@ -296,12 +310,19 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = {
           { name: 'AUTH_TRUST_HOST', value: 'true' }
           { name: 'PLAYGROUND_API_URL', value: 'https://${prefix}-api.internal.${environmentAca.properties.defaultDomain}' }
           { name: 'PLAYGROUND_INTERNAL_KEY', secretRef: 'internal-key' }
-          { name: 'ALLOW_DEV_LOGIN', value: environment == 'pilot' && empty(entraClientId) ? 'true' : 'false' }
-        ], empty(entraClientId) ? [] : [
+          { name: 'ALLOW_DEV_LOGIN', value: environment == 'pilot' && empty(entraClientId) && empty(oidcIssuer) ? 'true' : 'false' }
+          { name: 'AUTH_ALLOWED_DOMAINS', value: allowedDomains }
+          { name: 'AUTH_ADMIN_EMAILS', value: adminEmails }
+        ], concat(empty(entraClientId) ? [] : [
           { name: 'AUTH_MICROSOFT_ENTRA_ID_ID', value: entraClientId }
           { name: 'AUTH_MICROSOFT_ENTRA_ID_SECRET', secretRef: 'entra-client-secret' }
           { name: 'AUTH_MICROSOFT_ENTRA_ID_ISSUER', value: entraIssuer }
-        ])
+        ], empty(oidcIssuer) ? [] : [
+          { name: 'AUTH_OIDC_ISSUER', value: oidcIssuer }
+          { name: 'AUTH_OIDC_ID', value: oidcClientId }
+          { name: 'AUTH_OIDC_SECRET', secretRef: 'oidc-client-secret' }
+          { name: 'AUTH_OIDC_NAME', value: oidcName }
+        ]))
         // The health route pings the API; give the probe more than the one-second default so a slow API never restarts the web app.
         probes: [{ type: 'Liveness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 30, timeoutSeconds: 5, initialDelaySeconds: 10, failureThreshold: 3 }]
       }]

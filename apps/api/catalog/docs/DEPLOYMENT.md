@@ -55,6 +55,21 @@ Some subscriptions do not permit ACR Tasks (the cloud build), and the script the
 
 To sign in with Entra ID instead of the seeded pilot users, register an application in the tenant (web platform, redirect URI `https://<web-fqdn>/api/auth/callback/microsoft-entra-id`) and export `AUTH_MICROSOFT_ENTRA_ID_ID`, `AUTH_MICROSOFT_ENTRA_ID_SECRET` and `AUTH_MICROSOFT_ENTRA_ID_ISSUER` before running the script. Development sign-in switches itself off as soon as a client id is present.
 
+### Sign-in for the pilot and beyond
+
+With no provider configured, the pilot shows its built-in accounts and no password is asked: anyone with the link can sign in, which is right for a demonstration and wrong for anything else. To restrict access, configure a provider (Entra, Google Workspace, Okta or any OpenID Connect server) and, if the provider is not already scoped to one organisation, list the allowed e-mail domains and the administrators:
+
+```bash
+export AUTH_OIDC_ISSUER='https://login.example.com'   # or the AUTH_MICROSOFT_ENTRA_ID_* variables
+export AUTH_OIDC_ID='...'
+export AUTH_OIDC_SECRET='...'
+export AUTH_OIDC_NAME='Example sign-in'
+export AUTH_ALLOWED_DOMAINS='example.com,partner.example'
+export AUTH_ADMIN_EMAILS='you@example.com'
+```
+
+Rerun the script and the pilot accounts disappear. The full matrix of providers and variables is in [SECURITY.md](SECURITY.md).
+
 ## 4. What the pipeline checks before an image exists
 
 The GitHub Actions workflow runs on every push and pull request:

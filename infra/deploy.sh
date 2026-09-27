@@ -64,6 +64,12 @@ az deployment group create \
                entraClientId="${AUTH_MICROSOFT_ENTRA_ID_ID:-}" \
                entraClientSecret="${AUTH_MICROSOFT_ENTRA_ID_SECRET:-}" \
                entraIssuer="${AUTH_MICROSOFT_ENTRA_ID_ISSUER:-}" \
+               oidcIssuer="${AUTH_OIDC_ISSUER:-}" \
+               oidcClientId="${AUTH_OIDC_ID:-}" \
+               oidcClientSecret="${AUTH_OIDC_SECRET:-}" \
+               oidcName="${AUTH_OIDC_NAME:-Company sign-in}" \
+               allowedDomains="${AUTH_ALLOWED_DOMAINS:-}" \
+               adminEmails="${AUTH_ADMIN_EMAILS:-}" \
   --query "properties.outputs" -o json > "$ROOT/infra/last-deployment.json"
 
 WEB_URL=$(python3 -c "import json; print(json.load(open('$ROOT/infra/last-deployment.json'))['webUrl']['value'])")

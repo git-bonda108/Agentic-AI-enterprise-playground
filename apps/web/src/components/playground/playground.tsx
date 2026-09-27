@@ -15,6 +15,7 @@ import {
   DEFAULT_PARAMS, formatUsd, type CatalogModel, type ChatMessage, type ChatParams, type ConversationDetail, type ConversationSummary, type RouteDecision, type Usage,
 } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { BrandMark } from "@/components/shell/brand-mark";
 
 const uid = () => Math.random().toString(36).slice(2);
 
@@ -233,7 +234,7 @@ export function Playground({ models, initialConversations, defaultModel, smartEn
           {mode === "chat" ? (
             messages.length === 0 ? (
               <div className="mx-auto mt-16 max-w-lg text-center">
-                <div className="mx-auto grid size-12 place-items-center rounded-2xl gradient-brand animate-gradient-shift text-white shadow-lg shadow-violet-900/30">✦</div>
+                <div className="mx-auto w-fit"><BrandMark size={48} /></div>
                 <h2 className="mt-4 text-lg font-semibold">Ask anything, on any model</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Every message is metered to you and visible in Cost. Switch models mid-conversation, compare four at once, or copy the request as code.</p>
                 <div className="mt-5 grid gap-2 sm:grid-cols-3">

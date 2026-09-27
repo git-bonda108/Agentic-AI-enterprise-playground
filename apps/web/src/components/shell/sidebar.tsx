@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CURRENT_BATCH, NAV } from "@/lib/nav";
+import { BrandMark } from "@/components/shell/brand-mark";
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const pathname = usePathname();
@@ -19,7 +20,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
     >
       <div className={cn("flex h-14 items-center gap-2.5 border-b border-sidebar-border px-3", collapsed && "justify-center px-0")}>
         <Link href="/home" className="flex items-center gap-2.5" aria-label="Enterprise AI Playground home">
-          <span className="grid size-8 shrink-0 place-items-center rounded-lg gradient-brand animate-gradient-shift text-sm font-semibold text-white shadow-md shadow-violet-900/30">✦</span>
+          <BrandMark size={32} />
           {!collapsed && (
             <span className="leading-tight">
               <span className="block text-[13px] font-semibold tracking-tight">AI Playground</span>
