@@ -9,6 +9,7 @@ import time
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -17,6 +18,14 @@ from app.agents.core import REGISTRY
 from app.auth import current_user
 from app.catalog import get_model
 from app.catalog_store import get_entry, manifest_for
+from app.cloud_platforms import (
+    GATEWAY,
+    MODES,
+    SELF_HOSTING,
+    deploy_guide,
+    guide_markdown,
+    platforms,
+)
 from app.config import settings
 from app.db import get_db
 from app.deploy import CLOUDS, render_script
@@ -338,7 +347,35 @@ def flavor_zip(blueprint_id: str, framework: str, _: User = Depends(current_user
 
 @router.get("/v1/clouds")
 def clouds(_: User = Depends(current_user)) -> dict:
-    return {"clouds": [{"id": k, **v} for k, v in CLOUDS.items()]}
+    """The four cloud platforms: runtime, pricing, portal, CLI sign-in, framework fit and native providers."""
+    return {"clouds": platforms(), "modes": MODES, "frameworks": [{"id": k, "name": v["name"]} for k, v in FRAMEWORKS.items()]}
+
+
+@router.get("/v1/clouds/self-hosting")
+def self_hosting(_: User = Depends(current_user)) -> dict:
+    """How to run the playground itself on an Azure subscription."""
+    return SELF_HOSTING
+
+
+@router.get("/v1/clouds/guide")
+def cloud_guide(
+    blueprint: str, cloud: str, framework: str = "langgraph", model: str = "smart", mode: str = GATEWAY,
+    download: bool = Query(default=False), _: User = Depends(current_user),
+) -> Response:
+    """A step-by-step deploy guide for one blueprint, cloud, framework and model; `download=1` returns it as markdown."""
+    manifest = _manifest(blueprint)
+    if cloud not in CLOUDS:
+        raise HTTPException(status_code=404, detail="Unknown cloud")
+    if framework not in FRAMEWORKS:
+        raise HTTPException(status_code=404, detail="Unknown framework")
+    if mode not in MODES:
+        raise HTTPException(status_code=422, detail="mode must be gateway or native")
+    if model != SMART and get_model(model) is None:
+        raise HTTPException(status_code=404, detail="Unknown model")
+    guide = deploy_guide(manifest, cloud, framework, model, mode)
+    if download:
+        return Response(guide_markdown(guide), media_type="text/markdown", headers={"Content-Disposition": f'attachment; filename="{guide["filename"]}"'})
+    return JSONResponse({**guide, "markdown": guide_markdown(guide)})
 
 
 @router.get("/v1/blueprints/{blueprint_id}/deploy/{cloud}")

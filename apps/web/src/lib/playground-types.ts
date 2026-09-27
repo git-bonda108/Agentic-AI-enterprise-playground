@@ -210,7 +210,19 @@ export type CopilotRecipe = {
 };
 
 export type FrameworkInfo = { id: string; name: string; install: string; docs: string; license: string; hosted: string; language: string };
-export type CloudInfo = { id: string; name: string; runtime: string; pricing: string; pricing_url: string; docs: string; prereq: string };
+export type CloudCli = { name: string; install: { os: string; cmd: string }[]; install_docs: string; login: string[]; login_note: string; verify: string[]; login_docs: string };
+export type CloudInfo = {
+  id: string; name: string; runtime: string; pricing: string; pricing_url: string; docs: string; prereq: string;
+  vendor: string; portal_url: string; portal_label: string; account_url: string; cli: CloudCli; roles: string; roles_url: string;
+  frameworks: Record<string, string>; frameworks_note: string; samples_url: string; native_providers: string[]; native_note: string; models_url: string;
+  model_lookup: string[]; quickstart_url: string; reference_url: string;
+};
+export type GuideStep = { number: number; title: string; body: string; commands: string[]; links: { label: string; href: string }[] };
+export type CloudGuide = {
+  cloud: string; cloud_name: string; blueprint_id: string; blueprint_name: string; framework: string; framework_name: string; framework_fit: string; framework_note: string;
+  model: string; mode: "gateway" | "native"; mode_note: string; model_fit: { native: boolean; provider: string; note: string }; cost: string; steps: GuideStep[]; filename: string; markdown: string;
+};
+export type SelfHosting = { title: string; intro: string; steps: Omit<GuideStep, "number">[]; cost: string; docs: string };
 export type CustomAgent = { id: string; name: string; description: string; instructions: string; knowledge: string[]; tools: string[]; skills: string[]; builtin_tools?: string[]; starters: string[]; published: boolean; owner_id: string; created_at: string };
 export type BuiltinTool = { id: string; description: string; blurb: string; parameters: Record<string, unknown> };
 export type FlavorRun = { mode: "smoke" | "live"; ok: boolean; stdout: string; stderr: string; exit_code: number; installed: boolean; ms: number };

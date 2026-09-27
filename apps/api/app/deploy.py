@@ -5,8 +5,8 @@ from __future__ import annotations
 CLOUDS: dict[str, dict] = {
     "foundry": {"name": "Microsoft Foundry", "runtime": "Foundry Agent Service prompt agent", "pricing": "Model tokens at standard rates; hosted agents billed as Container Apps compute", "pricing_url": "https://azure.microsoft.com/en-us/pricing/details/ai-foundry-models/aoai/", "docs": "https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/prompt-agent", "prereq": "az login, a Foundry project endpoint, a deployed model"},
     "anthropic": {"name": "Anthropic Managed Agents", "runtime": "Managed Agents session (beta)", "pricing": "$0.08 per session-hour while running, plus standard token rates", "pricing_url": "https://platform.claude.com/docs/en/about-claude/pricing", "docs": "https://platform.claude.com/docs/en/managed-agents/overview", "prereq": "ANTHROPIC_API_KEY, the ant CLI"},
-    "agentcore": {"name": "AWS Bedrock AgentCore", "runtime": "AgentCore Runtime (microVM)", "pricing": "$0.1276 per vCPU-hour and $0.0169 per GB-hour on consumption; idle is free", "pricing_url": "https://aws.amazon.com/bedrock/agentcore/pricing/", "docs": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-get-started-toolkit.html", "prereq": "AWS credentials, the agentcore CLI"},
-    "google": {"name": "Google Agent Runtime", "runtime": "Agent Runtime on Gemini Enterprise Agent Platform", "pricing": "See the provider pricing page; unit not confirmed at generation time", "pricing_url": "https://cloud.google.com/vertex-ai/pricing", "docs": "https://adk.dev/deploy/", "prereq": "gcloud auth, a project with Vertex AI enabled"},
+    "agentcore": {"name": "AWS Bedrock AgentCore", "runtime": "AgentCore Runtime (microVM)", "pricing": "$0.1276 per vCPU-hour and $0.0169 per GB-hour on consumption; idle is free", "pricing_url": "https://aws.amazon.com/bedrock/agentcore/pricing/", "docs": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-cli.html", "prereq": "AWS credentials, Node.js 20, the AgentCore CLI (npm install -g @aws/agentcore)"},
+    "google": {"name": "Google Agent Runtime", "runtime": "Agent Runtime on the Google Cloud Agent Platform (formerly Vertex AI Agent Engine)", "pricing": "Per vCPU-hour and GiB-hour while the agent serves, plus model tokens at Vertex AI rates", "pricing_url": "https://docs.cloud.google.com/agent-builder/agent-engine/pricing", "docs": "https://adk.dev/deploy/agent-runtime/deploy/", "prereq": "gcloud auth, a project with Vertex AI enabled"},
 }
 
 
@@ -46,17 +46,19 @@ system: |
 tools:
   - type: agent_toolset_20260401
 YAML
-ant beta:agents create < agent.yaml
-# Then: ant beta:sessions create --agent <agent_id> --message "$(cat sample_input.json)"
+ant apply agent.yaml   # prints the agent id and records it in claude-lock.json
+# Then: ant beta:sessions create --agent "$AGENT_ID" --environment-id "$ENVIRONMENT_ID" --title "{manifest['name']}"
 '''
     elif cloud == "agentcore":
         script = f'''#!/usr/bin/env bash
 # Host "{manifest['name']}" on AgentCore Runtime. Prereqs: {CLOUDS[cloud]['prereq']}.
 set -euo pipefail
-pip install bedrock-agentcore-starter-toolkit strands-agents
-agentcore configure --entrypoint agent.py --name {name.replace('-', '_')}
-agentcore launch
-agentcore invoke '{{"prompt": "Run the sample input"}}'
+npm install -g @aws/agentcore
+agentcore create --project-name {name.replace('-', '_')} --name {name.replace('-', '_')} --language Python --framework Strands --model-provider Bedrock --memory none --build CodeZip
+cp agent.py {name.replace('-', '_')}/app/
+cd {name.replace('-', '_')} && agentcore dev   # local inspector; Ctrl+C when the agent answers
+agentcore deploy
+agentcore invoke --prompt "Run the sample input"
 '''
     else:
         script = f'''#!/usr/bin/env bash

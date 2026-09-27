@@ -18,6 +18,7 @@ Enterprises adopting generative AI tend to end up with the same four problems: m
 | Security and governance | Entra ID sign-in, role-based model policies, per-user and pooled budgets with alerts and hard stops, and an internal-key boundary between web and API. |
 | Bring your own SDK | An OpenAI-compatible gateway with policy, budget, Smart routing, key resolution and metering; every framework project points at it and runs in the sandbox; built-in tools for wizard agents; six platform agents; a Traces page; how-to panels on every major page. See [docs/AGENTS.md](docs/AGENTS.md). |
 | MCP Marketplace and Popular Git repos | 7,547 MCP servers with ready-made configuration for Claude Desktop, Claude Code, Cursor, VS Code, Copilot Studio, Langflow and n8n, the playground itself as a server, and a curated catalogue of the repositories behind the playground with stars and licences. See [docs/MARKETPLACE.md](docs/MARKETPLACE.md). |
+| Cloud platforms | Microsoft Foundry, AWS Bedrock AgentCore, Google Cloud Agent Runtime and Anthropic Managed Agents with portal links, CLI sign-in commands, framework fit, and a step-by-step deploy guide per blueprint, framework and model (gateway or native). See [docs/CLOUD_PLATFORMS.md](docs/CLOUD_PLATFORMS.md). |
 | Two ways to build | Every blueprint is a Gen AI or an Agentic AI blueprint with a low-code track (an importable Langflow flow, an importable n8n workflow, a Copilot Studio recipe with a workflow node map) and a code track. See [docs/LOW_CODE.md](docs/LOW_CODE.md). |
 | Runnable notebooks | A gallery of getting-started notebooks and one MVP notebook per blueprint, each executing end to end on mock data in the browser or in a server sandbox, with package installs and links to GPU compute. See [docs/NOTEBOOKS.md](docs/NOTEBOOKS.md). |
 | Cost management | A ledger that records every call with tokens, cached tokens, latency, cost and which key paid, and a cockpit that slices it by day, department, user, feature, model, provider, key source and conversation. |
@@ -40,7 +41,7 @@ The application is organised into seven sections, laid out the way a cloud conso
 | Section | Pages | Status |
 | --- | --- | --- |
 | Home | Console with credits, spend, tokens, models used and a live ledger | Live |
-| Discover | Models, Blueprints, Frameworks, Low-code studios, Clouds, MCP Marketplace, Popular Git repos, Skills | Live |
+| Discover | Models, Blueprints, Frameworks, Low-code studios, Cloud platforms, MCP Marketplace, Popular Git repos, Skills | Live |
 | Build | Playground, Agent Hub, Notebooks, Knowledge, Data | Live |
 | Evaluate | Evals, Canary | Live |
 | Operate | Runs, Traces, Cost, Adoption | Live |

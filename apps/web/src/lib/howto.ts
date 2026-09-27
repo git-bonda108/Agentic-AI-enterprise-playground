@@ -24,9 +24,20 @@ export const HOWTO: Record<string, HowTo> = {
       { text: "Pick a framework and a blueprint; read agent.py, then run the offline smoke test in the sandbox." },
       { text: "Run live: the sandbox installs the SDK and executes agent.py through the gateway with a short-lived token; the calls appear in Traces.", href: "/operate/traces", label: "Traces" },
       { text: "Download the project. Set PLAYGROUND_BASE_URL, PLAYGROUND_TOKEN (Admin → Settings → Personal tokens) and PLAYGROUND_MODEL, then python agent.py." },
-      { text: "Deploy it with the cloud scripts when it behaves.", href: "/discover/clouds", label: "Clouds" },
+      { text: "Deploy it when it behaves: pick a cloud platform and follow the step-by-step guide.", href: "/discover/clouds", label: "Cloud platforms" },
     ],
     docs: [{ label: "OpenAI Agents SDK", href: "https://openai.github.io/openai-agents-python/" }, { label: "LangGraph", href: "https://docs.langchain.com/oss/python/langgraph/overview" }, { label: "CrewAI", href: "https://docs.crewai.com/en/quickstart" }, { label: "Microsoft Agent Framework", href: "https://learn.microsoft.com/en-us/agent-framework/overview" }, { label: "Google ADK", href: "https://adk.dev/get-started/python/" }],
+  },
+  "/discover/clouds": {
+    title: "Take an agent to a cloud runtime",
+    intro: "Four runtimes, one path: sign in to the portal, sign in with the CLI, run the project once locally, choose where the model lives, then scaffold, test, deploy and invoke.",
+    steps: [
+      { text: "Pick the platform: the card shows the runtime, the pricing unit and what you need before you start; Open portal and the CLI sign-in commands are right there." },
+      { text: "Build the guide: blueprint, framework, model and model mode. Gateway keeps the agent governed and metered by the playground; native bills the cloud account." },
+      { text: "Copy each step's commands in order, or download the whole guide as markdown for a ticket or a runbook." },
+      { text: "Prefer a one-shot script? The deploy script below the guide is the short form for the same cloud.", href: "/discover/frameworks", label: "Frameworks" },
+    ],
+    docs: [{ label: "Cloud platforms guide", href: `${REPO_DOCS}/CLOUD_PLATFORMS.md` }, { label: "Foundry hosted agents", href: "https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/quickstart-hosted-agent" }, { label: "AgentCore CLI", href: "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-cli.html" }, { label: "Agent Runtime", href: "https://adk.dev/deploy/agent-runtime/deploy/" }, { label: "Managed Agents", href: "https://platform.claude.com/docs/en/managed-agents/quickstart" }],
   },
   "/build/notebooks": {
     title: "Run a notebook end to end",

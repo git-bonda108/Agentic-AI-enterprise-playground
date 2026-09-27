@@ -42,7 +42,7 @@ test.describe("Batch 5 faces", () => {
     await expect(page.getByTestId("cloud-cards").getByRole("button")).toHaveCount(4);
     await expect(page.getByTestId("cloud-cards")).toContainText("$0.08 per session-hour");
     await page.getByRole("button", { name: /AWS Bedrock AgentCore/ }).click();
-    await expect(page.getByTestId("deploy-script")).toContainText("agentcore launch", { timeout: 10_000 });
+    await expect(page.getByTestId("deploy-script")).toContainText("agentcore deploy", { timeout: 10_000 });
     await page.getByRole("button", { name: /Microsoft Foundry/ }).click();
     await expect(page.getByTestId("deploy-script")).toContainText("PromptAgentDefinition");
   });

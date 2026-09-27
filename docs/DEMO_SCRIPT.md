@@ -64,7 +64,7 @@ Build → Notebooks: open a blueprint as a notebook; expect it inside the in-bro
 
 Discover → Frameworks: pick CrewAI; expect a runnable project with README, sample input, requirements and an offline smoke test; download the zip.
 
-Discover → Clouds: pick AWS AgentCore; expect the deploy commands, pricing unit and prerequisites.
+Discover → Cloud platforms: pick AWS AgentCore; expect Open portal, the CLI sign-in commands, the pricing unit, and a numbered guide that changes with the framework and model.
 
 ## 8. Wizard, knowledge, skills, connectors (6 minutes)
 

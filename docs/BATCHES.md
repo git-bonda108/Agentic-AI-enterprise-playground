@@ -19,7 +19,7 @@ The playground was built in ten batches, then extended in a second series that t
 | 12 | Two ways to build: blueprints split into Gen AI and Agentic AI, each with a low-code track (Langflow flow, n8n workflow, Copilot Studio recipe) and a code track (notebook, framework flavor); low-code landscape page | Done |
 | 13 | MCP Marketplace (Connectors reborn): client configuration generator, featured shelf, per-blueprint recommendations, the playground as a server for Langflow, n8n, Copilot Studio and Claude; Popular Git repos | Done |
 | 14 | Agents that run on every framework in the sandbox, built-in tools, how-to panels, more platform agents, traces | Done |
-| 15 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Planned |
+| 15 | Cloud platforms: portal links, CLI sign-in, step-by-step deploy guides per framework and model | Done |
 | 16 | Datasets section with mock data and trusted sources; cost and token drill-down; hours tiles on the console | Planned |
 | 17 | Documentation hub and a full retest of every left-pane item | Planned |
 
@@ -169,7 +169,11 @@ Found live and fixed before shipping: an SDK that omits `max_tokens` used to rec
 
 Verification at close: 143 API tests (19 new, one skipped where the LangGraph SDK is not installed), 53 end-to-end tests, strict types and lint clean.
 
+
+### Batch 15 as shipped
+
+Delivered 2026-09-27. The Clouds page became **Cloud platforms**: Microsoft Foundry hosted agents, AWS Bedrock AgentCore Runtime, Google Cloud Agent Runtime and Anthropic Managed Agents, each with its portal link, the CLI install commands per operating system, the exact sign-in commands (`azd auth login` and `az login`; `aws configure sso` and `aws sso login`; `gcloud auth login` and `gcloud auth application-default login`; an Anthropic API key with the `ant` CLI), a verify command, the roles the identity needs, the fit of each of the five framework projects (first-class, sample, bring your own, harness) and the providers whose models the cloud sells natively. A **step-by-step deploy guide** builder takes a blueprint, a framework, a catalog model and a model mode and returns eight ordered steps with copyable commands and the official page for each: sign in to the portal, install the CLI and sign in, run the project once locally, choose where the model lives, scaffold, test locally, deploy and invoke, clean up. Gateway mode keeps the deployed agent governed and metered by the playground; native mode points it at the cloud's own model and falls back with an explanation when the cloud does not sell that provider. The guide downloads as markdown. The deploy scripts were refreshed to the npm AgentCore CLI and to `ant apply`, and a self-hosting section explains how to run the playground on an Azure subscription with `infra/deploy.sh` (no public Deploy to Azure button, the repository is private). Every command in every guide, sign-in block and script is parsed with `bash -n` in the tests. Docs: `docs/CLOUD_PLATFORMS.md`.
 ### Batches 15 to 17
 
-Unchanged from the earlier plan: Cloud platforms with portal links, CLI sign-in and step-by-step deploy guides (15); Datasets, cost and token drill-down, console hours tiles (16); documentation hub and full retest (17).
+Unchanged from the earlier plan: Datasets, cost and token drill-down, console hours tiles (16); documentation hub and full retest (17).
 

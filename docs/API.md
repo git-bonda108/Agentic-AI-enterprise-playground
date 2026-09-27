@@ -80,8 +80,10 @@ All routes require the internal key and identity headers, which the web applicat
 | GET | `/v1/frameworks` | Supported frameworks with install, docs, licence and hosting notes |
 | GET | `/v1/blueprints/{id}/flavor/{framework}` | Generated project files |
 | GET | `/v1/blueprints/{id}/flavor/{framework}/download` | The same project as a zip |
-| GET | `/v1/clouds` | Supported cloud runtimes with pricing and prerequisites |
-| GET | `/v1/blueprints/{id}/deploy/{cloud}` | Deploy script |
+| GET | `/v1/clouds` | The four cloud platforms: runtime, pricing, portal, CLI install and sign-in commands, framework fit, native providers; plus the model modes and the framework list |
+| GET | `/v1/clouds/guide?blueprint=&cloud=&framework=&model=&mode=` | Step-by-step deploy guide (portal, CLI sign-in, local run, model choice, scaffold, test, deploy, clean up); `download=1` returns markdown with a filename |
+| GET | `/v1/clouds/self-hosting` | How to run the playground itself on Azure with `infra/deploy.sh` |
+| GET | `/v1/blueprints/{id}/deploy/{cloud}` | Deploy script (the one-shot short form) |
 | GET, POST | `/v1/custom-agents` | Agents built in the wizard |
 | DELETE | `/v1/custom-agents/{id}` | Remove one of your agents |
 | GET | `/v1/custom-agents/{id}/export/declarative-agent` | Microsoft 365 declarative agent manifest |
