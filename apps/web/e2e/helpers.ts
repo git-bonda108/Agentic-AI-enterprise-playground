@@ -12,6 +12,8 @@ export async function logout(page: Page) {
   await page.getByRole("menuitem", { name: /Sign out/ }).click();
   await expect(page).toHaveURL(/\/login/);
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
-  // A response still in flight at sign-out can re-issue the rolling session cookie; drop everything to be sure.
+  // Give responses still in flight at sign-out a moment to land before the cookies are dropped (the sign-out epoch makes
+  // any that arrive later harmless); a bounded wait, because a page that keeps polling never reaches network idle.
+  await page.waitForLoadState("networkidle", { timeout: 3000 }).catch(() => {});
   await page.context().clearCookies();
 }

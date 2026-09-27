@@ -1,5 +1,7 @@
 import "server-only";
+import { cookies } from "next/headers";
 import { auth } from "@/auth";
+import { SIGNED_OUT_AT_COOKIE, sessionIsCurrent } from "@/lib/session-epoch";
 
 /** Server-side API base. PLAYGROUND_API_URL is read at runtime; NEXT_PUBLIC_API_URL is the build-time fallback. */
 export const API_URL = process.env.PLAYGROUND_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -10,6 +12,7 @@ export async function identityHeaders(): Promise<Record<string, string> | null> 
   const session = await auth();
   const u = session?.user;
   if (!u?.email) return null;
+  if (!sessionIsCurrent(session?.signedInAt, (await cookies()).get(SIGNED_OUT_AT_COOKIE)?.value)) return null;
   const id = (session as { user: { id?: string } }).user.id ?? u.email;
   return {
     "X-Internal-Key": INTERNAL_KEY,

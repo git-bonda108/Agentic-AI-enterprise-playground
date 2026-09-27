@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Award, Medal } from "lucide-react";
 import type { AchievementRecord, CommunityMe, LeaderboardRow } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatDay } from "@/lib/format";
 
 const MEDAL = ["text-brand-amber", "text-slate-400", "text-amber-700"];
 
@@ -29,7 +30,7 @@ export function Leaderboard({ people, departments, me, points, days }: { people:
               <p className="text-xs font-semibold">{a.name}</p>
               <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">{a.description}</p>
               <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted"><div className={cn("h-full rounded-full", a.unlocked ? "bg-brand-violet" : "bg-brand-cyan")} style={{ width: `${Math.round((a.progress / a.target) * 100)}%` }} /></div>
-              <p className="mt-1 font-mono text-[10px] text-muted-foreground">{a.unlocked ? `unlocked ${a.unlocked_at ? new Date(a.unlocked_at).toLocaleDateString() : ""}` : `${a.progress}/${a.target}`}</p>
+              <p className="mt-1 font-mono text-[10px] text-muted-foreground">{a.unlocked ? `unlocked ${a.unlocked_at ? formatDay(a.unlocked_at) : ""}` : `${a.progress}/${a.target}`}</p>
             </li>
           ))}
         </ul>

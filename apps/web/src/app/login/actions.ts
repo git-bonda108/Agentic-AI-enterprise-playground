@@ -1,6 +1,8 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { signIn, signOut } from "@/auth";
+import { SIGNED_OUT_AT_COOKIE } from "@/lib/session-epoch";
 import { DEV_PASSWORD } from "@/lib/users";
 
 function safeNext(next: unknown): string {
@@ -20,5 +22,7 @@ export async function entraSignIn(formData: FormData) {
 }
 
 export async function signOutAction() {
+  // Any session issued before this moment is treated as signed out, even if a late response re-issues its cookie.
+  (await cookies()).set(SIGNED_OUT_AT_COOKIE, String(Date.now()), { httpOnly: true, sameSite: "lax", path: "/", secure: process.env.NODE_ENV === "production" });
   await signOut({ redirectTo: "/login" });
 }

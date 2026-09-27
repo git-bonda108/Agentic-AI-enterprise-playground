@@ -6,6 +6,8 @@ import { DEV_PASSWORD, findDevUser, type Role } from "@/lib/users";
 declare module "next-auth" {
   interface Session {
     user: { role: Role; department: string } & DefaultSession["user"];
+    /** When this session was issued, compared with the sign-out epoch cookie (see lib/session-epoch). */
+    signedInAt?: number;
   }
   interface User {
     role?: Role;
@@ -13,7 +15,7 @@ declare module "next-auth" {
   }
 }
 
-type AppClaims = { role?: Role; department?: string };
+type AppClaims = { role?: Role; department?: string; signedInAt?: number };
 
 export const entraConfigured = Boolean(process.env.AUTH_MICROSOFT_ENTRA_ID_ID);
 export const devLoginAllowed =
@@ -67,6 +69,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         claims.role = user.role ?? "explorer";
         claims.department = user.department ?? "General";
+        claims.signedInAt = Date.now();
       }
       return claims;
     },
@@ -75,6 +78,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token.sub) session.user.id = token.sub;
       session.user.role = claims.role ?? "explorer";
       session.user.department = claims.department ?? "General";
+      session.signedInAt = claims.signedInAt;
       return session;
     },
   },

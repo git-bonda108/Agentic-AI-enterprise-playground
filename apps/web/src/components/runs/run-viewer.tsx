@@ -10,6 +10,7 @@ import { ControlRoom } from "@/components/runs/control-room";
 import { Markdown } from "@/components/playground/markdown";
 import { formatTokens, formatUsd, type BlueprintManifest, type RunRecord } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatTime } from "@/lib/format";
 
 const STATUS: Record<RunRecord["status"], { label: string; cls: string; icon: React.ComponentType<{ className?: string }> }> = {
   queued: { label: "Queued", cls: "bg-muted text-muted-foreground", icon: Clock },
@@ -128,7 +129,7 @@ export function RunViewer({ initial, manifest }: { initial: RunRecord; manifest:
                 <div className="flex items-center gap-2 text-xs">
                   <span className={cn("size-1.5 rounded-full", s.kind === "llm" ? "bg-brand-violet-soft" : s.kind === "human" ? "bg-brand-pink" : s.kind === "gate" ? "bg-brand-amber" : "bg-brand-cyan")} />
                   <span className="font-medium">{manifest.graph.nodes.find((n) => n.id === s.node)?.label ?? s.node}</span>
-                  <span className="ml-auto font-mono text-[10px] text-muted-foreground">{new Date(s.at).toLocaleTimeString()}</span>
+                  <span className="ml-auto font-mono text-[10px] text-muted-foreground">{formatTime(s.at)}</span>
                 </div>
                 <p className="mt-1 text-sm">{s.summary}</p>
                 {Object.keys(s.detail ?? {}).length > 0 && <pre className="mt-1 max-h-32 overflow-auto rounded-lg bg-muted p-2 font-mono text-[10.5px] text-muted-foreground">{JSON.stringify(s.detail, null, 1)}</pre>}

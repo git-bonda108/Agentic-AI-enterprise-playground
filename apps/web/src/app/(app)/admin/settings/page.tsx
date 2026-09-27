@@ -5,6 +5,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { TokensPanel } from "@/components/admin/tokens-panel";
 import { KeyScopeSwitch } from "@/components/admin/key-scope-switch";
 import type { ApiTokenInfo } from "@/lib/playground-types";
+import { formatCount } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -47,7 +48,7 @@ export default async function AdminSettingsPage() {
               <dt className="text-muted-foreground">Environment</dt><dd className="font-mono">{data.environment}</dd>
               <dt className="text-muted-foreground">Database</dt><dd className="font-mono">{data.database}</dd>
               <dt className="text-muted-foreground">Provider mode</dt><dd className="font-mono">{data.fake_llm ? "fake (offline)" : "live"}</dd>
-              <dt className="text-muted-foreground">Org credits</dt><dd className="font-mono">${data.org_credits_usd.toLocaleString()}</dd>
+              <dt className="text-muted-foreground">Org credits</dt><dd className="font-mono">${formatCount(data.org_credits_usd)}</dd>
               <dt className="text-muted-foreground">Key encryption</dt><dd className="font-mono">{data.key_encryption}</dd>
             </dl>
             <p className="mt-4 text-muted-foreground">Identity comes from Entra ID when the AUTH_MICROSOFT_ENTRA_ID variables are set; seeded users are for development only.</p>

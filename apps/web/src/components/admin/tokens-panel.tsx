@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/playground/copy-button";
 import type { ApiTokenInfo } from "@/lib/playground-types";
+import { formatWhen } from "@/lib/format";
 
 export function TokensPanel({ initial, mcpUrl }: { initial: ApiTokenInfo[]; mcpUrl: string }) {
   const [tokens, setTokens] = useState(initial);
@@ -46,7 +47,7 @@ export function TokensPanel({ initial, mcpUrl }: { initial: ApiTokenInfo[]; mcpU
         {tokens.map((t) => (
           <li key={t.id} className="flex items-center justify-between py-1.5">
             <span><span className="font-medium">{t.name}</span> <span className="font-mono text-muted-foreground">{t.prefix}…</span></span>
-            <span className="flex items-center gap-3 text-muted-foreground">{t.last_used_at ? `used ${new Date(t.last_used_at).toLocaleString()}` : "never used"}<button type="button" onClick={() => revoke(t.id)} aria-label={`Revoke ${t.name}`} className="rounded p-1 hover:bg-muted hover:text-destructive"><Trash2 className="size-3.5" /></button></span>
+            <span className="flex items-center gap-3 text-muted-foreground">{t.last_used_at ? `used ${formatWhen(t.last_used_at)}` : "never used"}<button type="button" onClick={() => revoke(t.id)} aria-label={`Revoke ${t.name}`} className="rounded p-1 hover:bg-muted hover:text-destructive"><Trash2 className="size-3.5" /></button></span>
           </li>
         ))}
         {tokens.length === 0 && <li className="py-2 text-muted-foreground">No tokens yet.</li>}

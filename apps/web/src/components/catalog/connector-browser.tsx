@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { CopyButton } from "@/components/playground/copy-button";
 import type { ClientConfig, Connector, ConnectorStats, Directory, ProbeResult } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatCount } from "@/lib/format";
 
 const APPROVAL_STYLE: Record<string, string> = {
   approved: "bg-brand-emerald/15 text-emerald-700 dark:text-emerald-300",
@@ -84,7 +85,7 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin, featur
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Discover</p>
           <h1 className="text-2xl font-semibold tracking-tight">MCP Marketplace</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{stats.total.toLocaleString()} MCP servers from the official registry, {stats.by_approval.approved ?? 0} approved by your admins. Open any tile for ready-made configuration for Claude Desktop, Claude Code, Cursor, VS Code, Copilot Studio, Langflow and n8n. The playground itself is a server here.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{formatCount(stats.total)} MCP servers from the official registry, {stats.by_approval.approved ?? 0} approved by your admins. Open any tile for ready-made configuration for Claude Desktop, Claude Code, Cursor, VS Code, Copilot Studio, Langflow and n8n. The playground itself is a server here.</p>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <span className="rounded-full bg-brand-emerald/15 px-2.5 py-1 font-medium text-emerald-700 dark:text-emerald-300" data-testid="approved-count">{stats.by_approval.approved ?? 0} approved</span>
@@ -129,7 +130,7 @@ export function ConnectorBrowser({ initial, stats: initialStats, isAdmin, featur
         <select value={approval} onChange={(e) => setApproval(e.target.value)} aria-label="Approval" className="h-8 rounded-lg border bg-card px-2 text-xs">
           <option value="">Any approval</option><option value="approved">Approved</option><option value="pending">Pending</option><option value="blocked">Blocked</option>
         </select>
-        <span className="ml-auto text-xs text-muted-foreground">{total.toLocaleString()} matching</span>
+        <span className="ml-auto text-xs text-muted-foreground">{formatCount(total)} matching</span>
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3" data-testid="connector-cards">

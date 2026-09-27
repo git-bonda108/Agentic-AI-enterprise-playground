@@ -12,6 +12,7 @@ import { CodeGraph } from "@/components/knowledge/code-graph";
 import type { DatasetInfo, EmbeddingModel, GraphEdge, GraphNode, KnowledgeDocument, KnowledgeSpace, RunRecord, SearchHit } from "@/lib/playground-types";
 import { formatUsd } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatCount } from "@/lib/format";
 
 type SpaceDetail = KnowledgeSpace & { documents: KnowledgeDocument[]; can_edit: boolean };
 const VISIBILITY: Record<string, string> = { private: "Only me", department: "My department", org: "Whole organization" };
@@ -200,7 +201,7 @@ export function KnowledgeWorkbench({ spaces: initial, models, datasets, initialD
                           <td className="py-1.5 font-medium">{d.title}</td>
                           <td className="text-muted-foreground">{d.source_type}{d.has_graph ? " · graph" : ""}</td>
                           <td className="text-right font-mono">{d.chunk_count}</td>
-                          <td className="text-right font-mono">{d.tokens.toLocaleString()}</td>
+                          <td className="text-right font-mono">{formatCount(d.tokens)}</td>
                           <td className="text-right font-mono">{formatUsd(d.cost_usd)}</td>
                           <td className="text-right">{detail.can_edit && <button type="button" onClick={() => removeDoc(d)} aria-label={`Remove ${d.title}`} className="rounded p-1 hover:bg-muted hover:text-destructive"><Trash2 className="size-3.5" /></button>}</td>
                         </tr>

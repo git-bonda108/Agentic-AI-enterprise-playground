@@ -10,6 +10,7 @@ import { HardeningLadder } from "@/components/evals/hardening-ladder";
 import type { EvalLibrary, EvalRunRecord, EvalSuiteRecord, RunRecord } from "@/lib/playground-types";
 import { formatUsd } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatWhen } from "@/lib/format";
 
 type AgentOption = { id: string; name: string; samples: { name: string; input: Record<string, unknown> }[] };
 
@@ -129,7 +130,7 @@ export function EvalsWorkbench({ suites: initial, library, agents, recentRuns, i
                       <li key={r.id}>
                         <button type="button" onClick={() => openRun(r.id)} className={cn("flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-xs", active?.id === r.id && "border-brand-violet/60")} aria-label={`Open evaluation run ${r.id}`}>
                           <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", r.kind === "canary" ? "bg-brand-pink/15 text-pink-700 dark:text-pink-300" : "bg-secondary")}>{r.kind}</span>
-                          <span className="flex-1 truncate">{new Date(r.created_at).toLocaleString()}</span>
+                          <span className="flex-1 truncate">{formatWhen(r.created_at)}</span>
                           {r.status === "completed" ? <span className={cn("font-mono", r.summary.gate_passed ? "text-brand-emerald" : "text-brand-rose")}>{r.summary.pass_rate}%</span> : <span className="text-muted-foreground">{r.status}</span>}
                           {r.drift && <span className={cn("text-[10px]", r.drift.verdict === "drift" ? "text-brand-rose" : "text-muted-foreground")}>{r.drift.verdict}</span>}
                         </button>

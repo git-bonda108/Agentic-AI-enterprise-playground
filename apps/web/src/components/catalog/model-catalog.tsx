@@ -17,6 +17,11 @@ const TIER_STYLE: Record<string, string> = {
 
 type Sort = "price" | "name" | "context";
 
+/** A zero price is a free, rate-limited developer endpoint (NVIDIA NIM), not a missing figure. */
+function price(v: number): string {
+  return v === 0 ? "Free" : `$${v}`;
+}
+
 export function ModelCatalog({ models, smartEnabled }: { models: (CatalogModel & { allowed: boolean })[]; smartEnabled: boolean }) {
   const [q, setQ] = useState("");
   const [provider, setProvider] = useState<string>("All");
@@ -142,8 +147,8 @@ export function ModelCatalog({ models, smartEnabled }: { models: (CatalogModel &
                   <td className="px-3 py-2 font-medium">{m.name}</td>
                   <td className="px-3 py-2 text-muted-foreground">{m.provider}</td>
                   <td className="px-3 py-2"><span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${TIER_STYLE[m.tier]}`}>{m.tier}</span></td>
-                  <td className="px-3 py-2 text-right font-mono">${m.input_per_m}</td>
-                  <td className="px-3 py-2 text-right font-mono">${m.output_per_m}</td>
+                  <td className="px-3 py-2 text-right font-mono">{price(m.input_per_m)}</td>
+                  <td className="px-3 py-2 text-right font-mono">{price(m.output_per_m)}</td>
                   <td className="px-3 py-2 text-right font-mono">{m.cached_input_per_m !== null ? `$${m.cached_input_per_m}` : "—"}</td>
                   <td className="px-3 py-2 text-right font-mono">{formatTokens(m.context)}</td>
                   <td className="px-3 py-2">{m.available ? (m.allowed ? <span className="inline-flex items-center gap-1 text-brand-emerald"><Check className="size-3" /> {m.key_source === "personal" ? "Your key" : "Ready"}</span> : <span className="text-brand-amber">Policy</span>) : <button type="button" onClick={() => openKeysDrawer(m.provider)} className="text-brand-amber hover:underline">Add key</button>}</td>
@@ -164,7 +169,7 @@ function PriceBar({ label, value, max }: { label: string; value: number; max: nu
     <div className="flex items-center gap-2">
       <span className="w-12 text-muted-foreground">{label}</span>
       <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"><span className="block h-full rounded-full gradient-brand" style={{ width: `${pct}%` }} /></span>
-      <span className="w-14 text-right font-mono">${value}</span>
+      <span className="w-14 text-right font-mono">{price(value)}</span>
     </div>
   );
 }

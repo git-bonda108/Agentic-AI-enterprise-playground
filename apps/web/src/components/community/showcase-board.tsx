@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { CustomAgent, RunRecord, ShowcaseDraft, ShowcaseItemRecord } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatWhen, formatDay } from "@/lib/format";
 
 const KIND_STYLE: Record<string, string> = { agent: "bg-brand-violet/15 text-violet-700 dark:text-violet-300", run: "bg-brand-cyan/15 text-cyan-700 dark:text-cyan-300", conversation: "bg-brand-pink/15 text-pink-700 dark:text-pink-300", suite: "bg-brand-emerald/15 text-emerald-700 dark:text-emerald-300" };
 
@@ -129,7 +130,7 @@ export function ShowcaseBoard({ initial, tags: initialTags, myRuns, myAgents, us
             <>
               <DialogHeader>
                 <DialogTitle>{detail.title}</DialogTitle>
-                <DialogDescription>{detail.owner_name} · {detail.owner_department} · {new Date(detail.created_at).toLocaleDateString()}</DialogDescription>
+                <DialogDescription>{detail.owner_name} · {detail.owner_department} · {formatDay(detail.created_at)}</DialogDescription>
               </DialogHeader>
               <p className="text-sm">{detail.summary}</p>
               {detail.outcome && <p className="rounded-lg bg-brand-emerald/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">{detail.outcome}</p>}
@@ -164,7 +165,7 @@ export function ShowcaseBoard({ initial, tags: initialTags, myRuns, myAgents, us
             <div className="grid gap-3 sm:grid-cols-2">
               <label>What<select value={form.kind} onChange={(e) => { const kind = e.target.value as "run" | "agent"; setForm({ ...form, kind, ref_id: kind === "run" ? myRuns[0]?.id ?? "" : myAgents[0]?.id ?? "" }); }} aria-label="Kind" className="mt-1 h-9 w-full rounded-lg border bg-background px-2 text-sm"><option value="run">A run</option><option value="agent">An agent I built</option></select></label>
               <label>Which<select value={form.ref_id} onChange={(e) => setForm({ ...form, ref_id: e.target.value })} aria-label="Reference" className="mt-1 h-9 w-full rounded-lg border bg-background px-2 text-sm">
-                {form.kind === "run" ? myRuns.map((r) => <option key={r.id} value={r.id}>{r.blueprint_name} · {new Date(r.created_at).toLocaleString()}</option>) : myAgents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+                {form.kind === "run" ? myRuns.map((r) => <option key={r.id} value={r.id}>{r.blueprint_name} · {formatWhen(r.created_at)}</option>) : myAgents.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select></label>
             </div>
             <Button variant="outline" size="sm" onClick={draft} disabled={drafting || !form.ref_id} aria-label="Draft with the writer agent">{drafting ? <Loader2 className="size-3.5 animate-spin" /> : <Wand2 className="size-3.5" />} Draft with the writer agent</Button>

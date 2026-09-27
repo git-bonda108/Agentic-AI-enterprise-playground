@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ROLE_LABEL, type Role } from "@/lib/users";
+import { formatDay } from "@/lib/format";
 
 export type AdminUser = { id: string; name: string; email: string; role: Role; department: string; created_at: string };
 
@@ -34,7 +35,7 @@ export function UsersTable({ initial }: { initial: AdminUser[] }) {
               <td className="px-3 py-2">
                 <input aria-label={`Department for ${u.name}`} defaultValue={u.department} onBlur={(e) => { if (e.target.value !== u.department) save(u, { department: e.target.value }); }} className="h-8 w-44 rounded-lg border bg-background px-2 text-xs" />
               </td>
-              <td className="px-3 py-2 text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
+              <td className="px-3 py-2 text-muted-foreground">{formatDay(u.created_at)}</td>
             </tr>
           ))}
         </tbody>

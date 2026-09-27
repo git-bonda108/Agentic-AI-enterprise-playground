@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Markdown } from "@/components/playground/markdown";
 import type { Skill, SkillStats } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatCount } from "@/lib/format";
 
 export function SkillBrowser({ initial, stats }: { initial: Skill[]; stats: SkillStats }) {
   const [q, setQ] = useState("");
@@ -66,7 +67,7 @@ export function SkillBrowser({ initial, stats }: { initial: Skill[]; stats: Skil
           <button key={s.id} type="button" onClick={() => open(s)} className="card-hover flex flex-col rounded-2xl border bg-card p-4 text-left" aria-label={s.name}>
             <div className="flex items-center justify-between gap-2">
               <span className="rounded-md bg-brand-cyan/15 px-1.5 py-0.5 text-[10px] font-medium text-cyan-700 dark:text-cyan-300">{s.category}</span>
-              <span className="font-mono text-[10px] text-muted-foreground">{s.words.toLocaleString()} words</span>
+              <span className="font-mono text-[10px] text-muted-foreground">{formatCount(s.words)} words</span>
             </div>
             <h3 className="mt-2 flex items-center gap-1.5 text-sm font-semibold"><Sparkles className="size-3.5 text-brand-violet-soft" /> {s.name}</h3>
             <p className="mt-1 line-clamp-3 flex-1 text-xs text-muted-foreground">{s.description}</p>

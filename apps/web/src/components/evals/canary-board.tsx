@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { HardeningLadder } from "@/components/evals/hardening-ladder";
 import type { AlertItem, CanaryBoardRow, EvalRunRecord } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
+import { formatWhen } from "@/lib/format";
 
 export function CanaryBoard({ rows: initial, history: initialHistory, alerts: initialAlerts, isAdmin }: { rows: CanaryBoardRow[]; history: Record<string, EvalRunRecord[]>; alerts: AlertItem[]; isAdmin: boolean }) {
   const [rows, setRows] = useState(initial);
@@ -114,7 +115,7 @@ export function CanaryBoard({ rows: initial, history: initialHistory, alerts: in
                 <li key={a.id} className="rounded-xl border p-2.5">
                   <p className="font-medium">{a.label}</p>
                   <p className="mt-0.5 text-muted-foreground">{a.message}</p>
-                  <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">{new Date(a.created_at).toLocaleString()} · pass rate {a.spend_usd}% vs baseline {a.cap_usd}%</p>
+                  <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">{formatWhen(a.created_at)} · pass rate {a.spend_usd}% vs baseline {a.cap_usd}%</p>
                 </li>
               ))}
               {canaryAlerts.length === 0 && <li className="text-muted-foreground">No drift detected so far.</li>}

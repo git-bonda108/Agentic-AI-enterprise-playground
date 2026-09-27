@@ -148,14 +148,31 @@ function ComputePanel({ options, onDownload }: { options: ComputeOption[]; onDow
   );
 }
 
-type LiteApp = { started?: Promise<unknown>; serviceManager: { contents: { save: (path: string, model: object) => Promise<unknown> } }; commands: { execute: (id: string, args?: object) => Promise<unknown> } };
+type LiteWidget = { id: string };
+type LiteApp = {
+  started?: Promise<unknown>;
+  restored?: Promise<unknown>;
+  serviceManager: { contents: { save: (path: string, model: object) => Promise<unknown> } };
+  commands: { execute: (id: string, args?: object) => Promise<unknown> };
+  shell: { widgets: (area: string) => Iterator<LiteWidget & { close?: () => void }>; activateById: (id: string) => void; currentWidget: LiteWidget | null };
+};
+
+/** JupyterLite restores the documents from the previous visit once its layout is restored; close them so only the requested notebook is open. */
+async function closeOtherDocuments(app: LiteApp): Promise<void> {
+  if (app.restored) await app.restored;
+  try { await app.commands.execute("application:close-all"); } catch { /* older runtime without the command */ }
+  const it = app.shell.widgets("main");
+  const open: (LiteWidget & { close?: () => void })[] = [];
+  for (let n = it.next(); !n.done; n = it.next()) open.push(n.value);
+  for (const w of open) w.close?.();
+}
 
 function BrowserRuntime({ source, fileName }: { source: Source; fileName: string }) {
   const mounted = useMounted();
   const frameRef = useRef<HTMLIFrameElement>(null);
   const appRef = useRef<LiteApp | null>(null);
   const [liteState, setLiteState] = useState<"loading" | "ready" | "failed">("loading");
-  const liteSrc = "/jupyterlite/lab/index.html";
+  const liteSrc = "/jupyterlite/lab/index.html?reset";  // ?reset discards the saved workspace, so documents from an earlier visit are not restored
 
   // The runtime exposes its app on the iframe window (same origin). We fetch the generated notebook with the
   // user's cookies, save it through the runtime's contents API, and open it: a real per-user prefill.
@@ -172,9 +189,22 @@ function BrowserRuntime({ source, fileName }: { source: Source; fileName: string
         if (app.started) await app.started;  // the app object appears before its services are ready
         const res = await fetch(`/api/pg${source.path}`);
         const nb = await res.json();
+        await closeOtherDocuments(app);
         await app.serviceManager.contents.save(fileName, { type: "notebook", format: "json", content: nb });
-        await app.commands.execute("docmanager:open", { path: fileName });
+        const widget = (await app.commands.execute("docmanager:open", { path: fileName })) as LiteWidget | undefined;
+        if (widget?.id) app.shell.activateById(widget.id);
         appRef.current = app;
+        // A restore that lands after our open would leave a second, output-less tab: sweep anything that is not our file.
+        for (const delay of [1500, 4000]) {
+          setTimeout(() => {
+            const it = app.shell.widgets("main");
+            for (let n = it.next(); !n.done; n = it.next()) {
+              const w = n.value as LiteWidget & { close?: () => void; title?: { label?: string } };
+              if (w.title?.label && w.title.label !== fileName) w.close?.();
+            }
+            if (widget?.id) app.shell.activateById(widget.id);
+          }, delay);
+        }
         if (!cancelled) setLiteState("ready");
       } catch {
         if (!cancelled) setLiteState("failed");
@@ -183,7 +213,14 @@ function BrowserRuntime({ source, fileName }: { source: Source; fileName: string
     return () => { cancelled = true; clearInterval(timer); };
   }, [mounted, source.path, fileName]);
 
-  const runAll = () => { void appRef.current?.commands.execute("notebook:run-all-cells"); };
+  const runAll = () => {
+    const app = appRef.current;
+    if (!app) return;
+    // Make sure the command acts on our notebook even if the person clicked into the runtime's own UI.
+    const it = app.shell.widgets("main");
+    for (let n = it.next(); !n.done; n = it.next()) { if ((n.value as { title?: { label?: string } }).title?.label === fileName) { app.shell.activateById(n.value.id); break; } }
+    void app.commands.execute("notebook:run-all-cells");
+  };
 
   return (
     <section className="overflow-hidden rounded-2xl border bg-card" aria-label="In-browser notebook">
