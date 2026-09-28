@@ -14,7 +14,7 @@ OUT = Path(__file__).resolve().parents[1] / "docs" / "images" / "deck"
 BG, CARD, BORDER, WIRE = "#F7F7FB", "#FFFFFF", "#E4E2F0", "#D9D5EA"
 INK, BODY, MUTED = "#14122B", "#454A63", "#6B7085"
 VIOLET, PINK, CYAN, EMERALD, AMBER = "#7C3AED", "#DB2777", "#0891B2", "#059669", "#D97706"
-FONT = "Instrument Sans, ui-sans-serif, system-ui, sans-serif"
+FONT = "Sora, ui-sans-serif, system-ui, sans-serif"  # the closest open face to Styrene A
 
 
 def esc(s: str) -> str:
@@ -83,7 +83,7 @@ def layers() -> str:
         ("Governance", "Nothing runs ungoverned", [("Identity", "Entra · Google · Okta · OIDC"), ("Role policy", "models · tools · connectors"), ("Budgets", "person · department · organisation"), ("Keys", "platform or personal, encrypted")]),
         ("Reasoning", "Predictable agents", [("Smart routing", "cheapest capable model"), ("Blueprints", "explicit step graphs"), ("Review gates", "pause · approve · resume"), ("Evaluation", "golden sets · canary · rollback")]),
         ("Knowledge and data", "Grounded answers", [("Knowledge Spaces", "hybrid search · citations"), ("Datasets", "mock sets · trusted sources"), ("Sandboxes", "notebooks · framework projects"), ("PostgreSQL", "runs · evaluations · ledger")]),
-        ("Providers and integrations", "Choice without lock-in", [("Models", "30 models · 11 providers"), ("MCP servers", "7,500 · admin approved"), ("Cloud runtimes", "Azure · AWS · Google · Anthropic"), ("Git and skills", "reference implementations")]),
+        ("Integrations", "Choice without lock-in", [("Models", "30 models · 11 providers"), ("MCP servers", "7,500 · admin approved"), ("Cloud runtimes", "Azure · AWS · Google · Anthropic"), ("Git and skills", "reference implementations")]),
         ("Ledger", "Cost that reconciles", [("One row per call", "who · feature · model · tokens in, out and cached · cost · latency · key · trace")]),
     ]
     bh, gap, top = 100, 20, 10
@@ -95,8 +95,8 @@ def layers() -> str:
         b = 0.3 + i * step
         out.append(f'<rect x="10" y="{y}" width="{W - 20}" height="{bh}" rx="18" fill="{CARD}" stroke="{BORDER}" filter="url(#shadow)"/>')
         out.append(highlight(10, y, W - 20, bh, 18, T, b + 0.35, step * (len(bands) - i) + 0.4, fill="#FBFAFF"))
-        out.append(text(40, y + 45, name, 24, 600))
-        out.append(text(40, y + 74, promise, 17, 500, VIOLET))
+        out.append(text(36, y + 45, name, 22, 600))
+        out.append(text(36, y + 74, promise, 16, 500, VIOLET))
         cx0, cw, cg = 372, 282, 20
         if len(chips) == 1:
             cw = 4 * 282 + 3 * 20
@@ -104,8 +104,8 @@ def layers() -> str:
             cx = cx0 + j * (cw + cg)
             out.append(f'<rect x="{cx}" y="{y + 16}" width="{cw}" height="{bh - 32}" rx="12" fill="#F4F3FA" stroke="{BORDER}"/>')
             out.append(highlight(cx, y + 16, cw, bh - 32, 12, T, b + 0.45 + j * 0.16, 0.55, fill="#FFFFFF"))  # a brief shimmer as the light passes
-            out.append(text(cx + 18, y + 45, t, 19, 600))
-            out.append(text(cx + 18, y + 69, s, 15, 400, MUTED))
+            out.append(text(cx + 16, y + 45, t, 18, 600))
+            out.append(text(cx + 16, y + 69, s, 14, 400, MUTED))
     out.append(beam(f"M {spine} {top} L {spine} {top + 6 * bh + 5 * gap}", T, 0.1, 6 * step + 0.2))
     return svg(W, H, "".join(out))
 
@@ -123,8 +123,8 @@ def run() -> str:
         ("07 · IMPROVE", "Evaluate and canary", ["Golden cases graded nightly;", "drift rolls back"]),
         ("08 · SHARE", "Notebook, SDK, cloud", ["The same run as a notebook,", "a project or a deployment"]),
     ]
-    nw, nh, gap = 340, 170, 72
-    x0, rows = 14, (60, 370)
+    nw, nh, gap = 362, 170, 50
+    x0, rows = 1, (60, 370)
     pos = []
     for i in range(8):
         col = i if i < 4 else 7 - i
@@ -157,10 +157,10 @@ def run() -> str:
         out.append(f'<rect x="{x}" y="{y}" width="{nw}" height="{nh}" rx="18" fill="{CARD}" stroke="{BORDER}" filter="url(#shadow)"/>')
         b, d = lights[i]
         out.append(highlight(x, y, nw, nh, 18, T, b, d + 0.2))
-        out.append(text(x + 24, y + 40, eyebrow, 15, 600, accent, spacing=1.8))
-        out.append(text(x + 24, y + 76, title, 24, 600))
-        out.append(text(x + 24, y + 110, sub[0], 17, 400, BODY))
-        out.append(text(x + 24, y + 134, sub[1], 17, 400, BODY))
+        out.append(text(x + 24, y + 40, eyebrow, 14, 600, accent, spacing=1.4))
+        out.append(text(x + 24, y + 76, title, 22, 600))
+        out.append(text(x + 24, y + 110, sub[0], 16, 400, BODY))
+        out.append(text(x + 24, y + 134, sub[1], 16, 400, BODY))
     # the review pause: a pill that waits, then approves
     rx, ry = pos[4]
     b, d = lights[4]
@@ -174,14 +174,14 @@ def run() -> str:
 # ---------------------------------------------------------------- agent: inside one agent
 def agent() -> str:
     W, H, T = 1600, 560, 15.0
-    kinds = {"tool": ("TOOL · CODE, NO MODEL", CYAN), "gate": ("GATE · A RULE DECIDES", AMBER), "human": ("HUMAN · A PERSON DECIDES", PINK), "model": ("MODEL · A NARROW BRIEF", VIOLET)}
-    nw, nh = 232, 138
+    kinds = {"tool": ("TOOL · CODE, NO MODEL", CYAN), "gate": ("GATE · A RULE DECIDES", AMBER), "human": ("HUMAN · PERSON DECIDES", PINK), "model": ("MODEL · NARROW BRIEF", VIOLET)}
+    nw, nh = 244, 138
     nodes = {
-        "load": (20, 70, "tool", "Load documents", "invoices, orders, contracts"),
-        "extract": (292, 70, "tool", "Extract fields", "per-field confidence"),
-        "validate": (564, 70, "tool", "Validate", "tolerances, master data"),
+        "load": (8, 70, "tool", "Load documents", "invoices, orders, contracts"),
+        "extract": (284, 70, "tool", "Extract fields", "per-field confidence"),
+        "validate": (560, 70, "tool", "Validate", "tolerances, master data"),
         "gate": (836, 70, "gate", "Quality gate", "clean or exception"),
-        "human": (1108, 360, "human", "Human decision", "approve or reject"),
+        "human": (1092, 360, "human", "Human decision", "approve or reject"),
         "summary": (1348, 70, "model", "Write summary", "exceptions for finance"),
     }
 
@@ -232,9 +232,9 @@ def agent() -> str:
             if ln == n:
                 out.append(highlight(x, y, nw, nh, 18, T, b, d + 0.15))
         out.append(f'<rect x="{x + 20}" y="{y + 20}" width="{nw - 40}" height="4" rx="2" fill="{colour}"/>')
-        out.append(text(x + 20, y + 52, label, 12, 700, colour, spacing=1.2))
-        out.append(text(x + 20, y + 86, title, 23, 600))
-        out.append(text(x + 20, y + 114, sub, 16, 400, MUTED))
+        out.append(text(x + 20, y + 52, label, 11, 700, colour, spacing=0.6))
+        out.append(text(x + 20, y + 86, title, 21, 600))
+        out.append(text(x + 20, y + 114, sub, 15, 400, MUTED))
     hx, hy = nodes["human"][:2]
     hb = next(b for n, b, _ in lights if n == "human")
     kt, vals = window(T, hb + 0.1, 1.9, 0.15)
@@ -283,8 +283,44 @@ def hub() -> str:
     return svg(W, H, "".join(out))
 
 
+# ---------------------------------------------------------------- journeys: the features used together
+def journeys() -> str:
+    W, H, T = 1600, 600, 12.5
+    rows = [
+        ("Choose the right model", "best answer, lowest price", ["Models", "Compare four", "Smart routing", "Cost savings"]),
+        ("Blueprint to production", "an agent you can trust", ["Blueprint", "Run on mock data", "Notebook", "Golden set, gate", "Nightly canary", "Cloud guide"]),
+        ("Agent on your own data", "grounded, auditable answers", ["Your documents", "Knowledge Space", "Wizard agent", "Skills, MCP tools", "Run", "Trace, citations"]),
+        ("Bring your own code", "existing code, now governed", ["Personal token", "SDK gateway", "Framework project", "Sandbox run", "Traces, cost"]),
+        ("Prove the value", "results leaders can defend", ["Console", "Cost drill-down", "Adoption, ROI", "Showcase", "Leaderboard"]),
+    ]
+    rh, gap, top = 96, 18, 22
+    cx0, cw, cg = 340, 191, 20
+    out = []
+    per = T / len(rows)
+    for i, (name, outcome, chips) in enumerate(rows):
+        y = top + i * (rh + gap)
+        b = 0.15 + i * per
+        out.append(f'<rect x="4" y="{y}" width="{W - 8}" height="{rh}" rx="18" fill="{CARD}" stroke="{BORDER}" filter="url(#shadow)"/>')
+        out.append(highlight(4, y, W - 8, rh, 18, T, b, per - 0.25, fill="#FBFAFF"))
+        out.append(text(28, y + 44, name, 20, 600))
+        out.append(text(28, y + 70, outcome, 15, 500, VIOLET))
+        n = len(chips)
+        x_end = cx0 + n * cw + (n - 1) * cg
+        cy = y + rh / 2
+        out.append(f'<line x1="{cx0}" y1="{cy}" x2="{x_end}" y2="{cy}" stroke="{WIRE}" stroke-width="2.5"/>')
+        d = 0.32 * n + 0.2
+        for j, c in enumerate(chips):
+            x = cx0 + j * (cw + cg)
+            out.append(f'<rect x="{x}" y="{y + 20}" width="{cw}" height="{rh - 40}" rx="12" fill="#F4F3FA" stroke="{BORDER}"/>')
+            tj = b + 0.1 + d * (j + 0.5) / n
+            out.append(highlight(x, y + 20, cw, rh - 40, 12, T, tj, b + per - 0.35 - tj, fill="#FFFFFF"))
+            out.append(text(x + cw / 2, cy + 6, c, 16, 600, INK, "middle"))
+        out.append(beam(f"M {cx0} {cy} L {x_end} {cy}", T, b + 0.1, d))
+    return svg(W, H, "".join(out))
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    for name, fn in (("hub", hub), ("layers", layers), ("run", run), ("agent", agent)):
+    for name, fn in (("hub", hub), ("layers", layers), ("run", run), ("agent", agent), ("journeys", journeys)):
         (OUT / f"{name}.svg").write_text(fn(), encoding="utf-8")
         print(f"wrote docs/images/deck/{name}.svg")

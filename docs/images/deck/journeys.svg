@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="1600" height="600" font-family="Sora, ui-sans-serif, system-ui, sans-serif"><defs>
+  <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7C3AED"/><stop offset="0.55" stop-color="#DB2777"/><stop offset="1" stop-color="#0891B2"/></linearGradient>
+  <linearGradient id="brandv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset="0.55" stop-color="#DB2777"/><stop offset="1" stop-color="#0891B2"/></linearGradient>
+  <radialGradient id="glow"><stop offset="0" stop-color="#FFFFFF"/><stop offset="0.3" stop-color="#F0ABFC"/><stop offset="0.65" stop-color="#7C3AED" stop-opacity="0.35"/><stop offset="1" stop-color="#7C3AED" stop-opacity="0"/></radialGradient>
+  <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1E1B4B" flood-opacity="0.06"/></filter>
+</defs><rect width="1600" height="600" fill="#F7F7FB"/><rect x="4" y="22" width="1592" height="96" rx="18" fill="#FFFFFF" stroke="#E4E2F0" filter="url(#shadow)"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.0000;0.0120;0.1920;0.2120;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="0" y="18" width="1600" height="104" rx="22" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="4" y="22" width="1592" height="96" rx="18" fill="#FBFAFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="28" y="66" font-size="20" font-weight="600" fill="#14122B" text-anchor="start">Choose the right model</text><text x="28" y="92" font-size="15" font-weight="500" fill="#7C3AED" text-anchor="start">best answer, lowest price</text><line x1="340" y1="70.0" x2="1164" y2="70.0" stroke="#D9D5EA" stroke-width="2.5"/><rect x="340" y="42" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.0148;0.0348;0.1840;0.2040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="336" y="38" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="340" y="42" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="435.5" y="76.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Models</text><rect x="551" y="42" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.0444;0.0644;0.1840;0.2040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="547" y="38" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="551" y="42" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="646.5" y="76.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Compare four</text><rect x="762" y="42" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.0740;0.0940;0.1840;0.2040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="758" y="38" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="762" y="42" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="857.5" y="76.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Smart routing</text><rect x="973" y="42" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.1036;0.1236;0.1840;0.2040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="969" y="38" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="973" y="42" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1068.5" y="76.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Cost savings</text><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.0104;0.0200;0.1384;0.1480;1.0000" values="0;0;1;1;0;0"/>
+  <path d="M 340 70.0 L 1164 70.0" fill="none" stroke="url(#brand)" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="22 78" stroke-dashoffset="22">
+    <animate attributeName="stroke-dashoffset" dur="12.5s" repeatCount="indefinite" keyTimes="0;0.0200;0.1384;1" values="22;22;-100;-100"/></path>
+  <circle r="16" fill="url(#glow)"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 70.0 L 1164 70.0" keyPoints="0;0;1;1" keyTimes="0;0.0200;0.1384;1" calcMode="linear"/></circle>
+  <circle r="4.5" fill="#FFFFFF"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 70.0 L 1164 70.0" keyPoints="0;0;1;1" keyTimes="0;0.0200;0.1384;1" calcMode="linear"/></circle>
+</g><rect x="4" y="136" width="1592" height="96" rx="18" fill="#FFFFFF" stroke="#E4E2F0" filter="url(#shadow)"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.1920;0.2120;0.3920;0.4120;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="0" y="132" width="1600" height="104" rx="22" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="4" y="136" width="1592" height="96" rx="18" fill="#FBFAFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="28" y="180" font-size="20" font-weight="600" fill="#14122B" text-anchor="start">Blueprint to production</text><text x="28" y="206" font-size="15" font-weight="500" fill="#7C3AED" text-anchor="start">an agent you can trust</text><line x1="340" y1="184.0" x2="1586" y2="184.0" stroke="#D9D5EA" stroke-width="2.5"/><rect x="340" y="156" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.2141;0.2341;0.3840;0.4040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="336" y="152" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="340" y="156" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="435.5" y="190.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Blueprint</text><rect x="551" y="156" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.2424;0.2624;0.3840;0.4040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="547" y="152" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="551" y="156" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="646.5" y="190.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Run on mock data</text><rect x="762" y="156" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.2707;0.2907;0.3840;0.4040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="758" y="152" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="762" y="156" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="857.5" y="190.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Notebook</text><rect x="973" y="156" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.2989;0.3189;0.3840;0.4040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="969" y="152" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="973" y="156" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1068.5" y="190.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Golden set, gate</text><rect x="1184" y="156" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.3272;0.3472;0.3840;0.4040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="1180" y="152" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="1184" y="156" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1279.5" y="190.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Nightly canary</text><rect x="1395" y="156" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.3555;0.3755;0.3840;0.4040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="1391" y="152" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="1395" y="156" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1490.5" y="190.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Cloud guide</text><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.2104;0.2200;0.3896;0.3992;1.0000" values="0;0;1;1;0;0"/>
+  <path d="M 340 184.0 L 1586 184.0" fill="none" stroke="url(#brand)" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="22 78" stroke-dashoffset="22">
+    <animate attributeName="stroke-dashoffset" dur="12.5s" repeatCount="indefinite" keyTimes="0;0.2200;0.3896;1" values="22;22;-100;-100"/></path>
+  <circle r="16" fill="url(#glow)"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 184.0 L 1586 184.0" keyPoints="0;0;1;1" keyTimes="0;0.2200;0.3896;1" calcMode="linear"/></circle>
+  <circle r="4.5" fill="#FFFFFF"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 184.0 L 1586 184.0" keyPoints="0;0;1;1" keyTimes="0;0.2200;0.3896;1" calcMode="linear"/></circle>
+</g><rect x="4" y="250" width="1592" height="96" rx="18" fill="#FFFFFF" stroke="#E4E2F0" filter="url(#shadow)"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.3920;0.4120;0.5920;0.6120;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="0" y="246" width="1600" height="104" rx="22" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="4" y="250" width="1592" height="96" rx="18" fill="#FBFAFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="28" y="294" font-size="20" font-weight="600" fill="#14122B" text-anchor="start">Agent on your own data</text><text x="28" y="320" font-size="15" font-weight="500" fill="#7C3AED" text-anchor="start">grounded, auditable answers</text><line x1="340" y1="298.0" x2="1586" y2="298.0" stroke="#D9D5EA" stroke-width="2.5"/><rect x="340" y="270" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.4141;0.4341;0.5840;0.6040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="336" y="266" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="340" y="270" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="435.5" y="304.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Your documents</text><rect x="551" y="270" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.4424;0.4624;0.5840;0.6040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="547" y="266" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="551" y="270" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="646.5" y="304.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Knowledge Space</text><rect x="762" y="270" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.4707;0.4907;0.5840;0.6040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="758" y="266" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="762" y="270" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="857.5" y="304.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Wizard agent</text><rect x="973" y="270" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.4989;0.5189;0.5840;0.6040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="969" y="266" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="973" y="270" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1068.5" y="304.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Skills, MCP tools</text><rect x="1184" y="270" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.5272;0.5472;0.5840;0.6040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="1180" y="266" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="1184" y="270" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1279.5" y="304.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Run</text><rect x="1395" y="270" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.5555;0.5755;0.5840;0.6040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="1391" y="266" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="1395" y="270" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1490.5" y="304.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Trace, citations</text><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.4104;0.4200;0.5896;0.5992;1.0000" values="0;0;1;1;0;0"/>
+  <path d="M 340 298.0 L 1586 298.0" fill="none" stroke="url(#brand)" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="22 78" stroke-dashoffset="22">
+    <animate attributeName="stroke-dashoffset" dur="12.5s" repeatCount="indefinite" keyTimes="0;0.4200;0.5896;1" values="22;22;-100;-100"/></path>
+  <circle r="16" fill="url(#glow)"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 298.0 L 1586 298.0" keyPoints="0;0;1;1" keyTimes="0;0.4200;0.5896;1" calcMode="linear"/></circle>
+  <circle r="4.5" fill="#FFFFFF"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 298.0 L 1586 298.0" keyPoints="0;0;1;1" keyTimes="0;0.4200;0.5896;1" calcMode="linear"/></circle>
+</g><rect x="4" y="364" width="1592" height="96" rx="18" fill="#FFFFFF" stroke="#E4E2F0" filter="url(#shadow)"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.5920;0.6120;0.7920;0.8120;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="0" y="360" width="1600" height="104" rx="22" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="4" y="364" width="1592" height="96" rx="18" fill="#FBFAFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="28" y="408" font-size="20" font-weight="600" fill="#14122B" text-anchor="start">Bring your own code</text><text x="28" y="434" font-size="15" font-weight="500" fill="#7C3AED" text-anchor="start">existing code, now governed</text><line x1="340" y1="412.0" x2="1375" y2="412.0" stroke="#D9D5EA" stroke-width="2.5"/><rect x="340" y="384" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.6144;0.6344;0.7840;0.8040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="336" y="380" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="340" y="384" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="435.5" y="418.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Personal token</text><rect x="551" y="384" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.6432;0.6632;0.7840;0.8040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="547" y="380" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="551" y="384" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="646.5" y="418.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">SDK gateway</text><rect x="762" y="384" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.6720;0.6920;0.7840;0.8040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="758" y="380" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="762" y="384" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="857.5" y="418.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Framework project</text><rect x="973" y="384" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.7008;0.7208;0.7840;0.8040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="969" y="380" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="973" y="384" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1068.5" y="418.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Sandbox run</text><rect x="1184" y="384" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.7296;0.7496;0.7840;0.8040;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="1180" y="380" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="1184" y="384" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1279.5" y="418.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Traces, cost</text><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.6104;0.6200;0.7640;0.7736;1.0000" values="0;0;1;1;0;0"/>
+  <path d="M 340 412.0 L 1375 412.0" fill="none" stroke="url(#brand)" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="22 78" stroke-dashoffset="22">
+    <animate attributeName="stroke-dashoffset" dur="12.5s" repeatCount="indefinite" keyTimes="0;0.6200;0.7640;1" values="22;22;-100;-100"/></path>
+  <circle r="16" fill="url(#glow)"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 412.0 L 1375 412.0" keyPoints="0;0;1;1" keyTimes="0;0.6200;0.7640;1" calcMode="linear"/></circle>
+  <circle r="4.5" fill="#FFFFFF"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 412.0 L 1375 412.0" keyPoints="0;0;1;1" keyTimes="0;0.6200;0.7640;1" calcMode="linear"/></circle>
+</g><rect x="4" y="478" width="1592" height="96" rx="18" fill="#FFFFFF" stroke="#E4E2F0" filter="url(#shadow)"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.7920;0.8120;0.9920;1.0000;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="0" y="474" width="1600" height="104" rx="22" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="4" y="478" width="1592" height="96" rx="18" fill="#FBFAFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="28" y="522" font-size="20" font-weight="600" fill="#14122B" text-anchor="start">Prove the value</text><text x="28" y="548" font-size="15" font-weight="500" fill="#7C3AED" text-anchor="start">results leaders can defend</text><line x1="340" y1="526.0" x2="1375" y2="526.0" stroke="#D9D5EA" stroke-width="2.5"/><rect x="340" y="498" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.8144;0.8344;0.9840;1.0000;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="336" y="494" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="340" y="498" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="435.5" y="532.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Console</text><rect x="551" y="498" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.8432;0.8632;0.9840;1.0000;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="547" y="494" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="551" y="498" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="646.5" y="532.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Cost drill-down</text><rect x="762" y="498" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.8720;0.8920;0.9840;1.0000;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="758" y="494" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="762" y="498" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="857.5" y="532.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Adoption, ROI</text><rect x="973" y="498" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.9008;0.9208;0.9840;1.0000;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="969" y="494" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="973" y="498" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1068.5" y="532.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Showcase</text><rect x="1184" y="498" width="191" height="56" rx="12" fill="#F4F3FA" stroke="#E4E2F0"/><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.9296;0.9496;0.9840;1.0000;1.0000" values="0;0;1;1;0;0"/>
+  <rect x="1180" y="494" width="199" height="64" rx="16" fill="#7C3AED" opacity="0.22" filter="url(#soft)"/>
+  <rect x="1184" y="498" width="191" height="56" rx="12" fill="#FFFFFF" stroke="url(#brand)" stroke-width="3"/>
+</g><text x="1279.5" y="532.0" font-size="16" font-weight="600" fill="#14122B" text-anchor="middle">Leaderboard</text><g opacity="0"><animate attributeName="opacity" dur="12.5s" repeatCount="indefinite" keyTimes="0.0000;0.8104;0.8200;0.9640;0.9736;1.0000" values="0;0;1;1;0;0"/>
+  <path d="M 340 526.0 L 1375 526.0" fill="none" stroke="url(#brand)" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="22 78" stroke-dashoffset="22">
+    <animate attributeName="stroke-dashoffset" dur="12.5s" repeatCount="indefinite" keyTimes="0;0.8200;0.9640;1" values="22;22;-100;-100"/></path>
+  <circle r="16" fill="url(#glow)"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 526.0 L 1375 526.0" keyPoints="0;0;1;1" keyTimes="0;0.8200;0.9640;1" calcMode="linear"/></circle>
+  <circle r="4.5" fill="#FFFFFF"><animateMotion dur="12.5s" repeatCount="indefinite" path="M 340 526.0 L 1375 526.0" keyPoints="0;0;1;1" keyTimes="0;0.8200;0.9640;1" calcMode="linear"/></circle>
+</g></svg>
