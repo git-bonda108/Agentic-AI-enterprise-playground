@@ -3,7 +3,8 @@
 Usage: python3 scripts/build_deck.py <out-root> <current deck.json>. Image sources are asset urls already uploaded to the
 deck; the animated diagrams come from `npm run deck:gifs`. Typeface: Sora, the closest open face to Styrene A.
 """
-import json, sys
+import json
+import sys
 from pathlib import Path
 
 ROOT = Path(sys.argv[1]); SL = ROOT / "project" / "slides"; SL.mkdir(parents=True, exist_ok=True)
