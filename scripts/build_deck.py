@@ -135,7 +135,7 @@ ch = [("Pilots everywhere, platform nowhere", "Teams try tools one by one. Nothi
       ("Agents nobody can audit", "No record of which model saw which data, or who approved the answer."),
       ("Locked into one vendor", "Each tool chooses the model, the cloud and the price for you.")]
 section("challenge", header("The challenge", "Where enterprise AI stalls") +
-        f'<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:32px">' +
+        '<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:32px">' +
         "".join(card(f'<h3 style="font-size:40px; font-weight:600; line-height:1.15; color:{INK}">{t}</h3><p style="font-size:28px; line-height:1.4; color:{BODY}">{d}</p>') for t, d in ch) + '</div>', bg=ALT)
 
 pr = [("Trust", VIOLET, "Governed", "Identity, role policy and budget are checked before every call, with one ledger row after it."),
@@ -186,7 +186,7 @@ roles = [("Search", "Explorers", "Try every model safely, compare answers and le
          ("Users", "Champions", "Lead a department: adoption, showcases, challenges and results."),
          ("Settings", "Administrators", "Set policy, budgets and keys, approve integrations and see all spend.")]
 section("roles", header("Who it serves", "Built for every role") +
-        f'<div style="display:flex; gap:32px">' + "".join(card(f'{icon(i)}<h3 style="font-size:32px; font-weight:600; color:{INK}">{t}</h3><p style="font-size:28px; line-height:1.4; color:{BODY}">{d}</p>', gap=20) for i, t, d in roles) + '</div>'
+        '<div style="display:flex; gap:32px">' + "".join(card(f'{icon(i)}<h3 style="font-size:32px; font-weight:600; color:{INK}">{t}</h3><p style="font-size:28px; line-height:1.4; color:{BODY}">{d}</p>', gap=20) for i, t, d in roles) + '</div>'
         f'<div style="display:flex; align-items:center; gap:24px; background:{CARD}; border:1px solid {BORDER}; border-radius:24px; padding:28px 40px">'
         f'{icon("Key", VIOLET, 44)}<p style="font-size:28px; color:{BODY}">Sign in with <b>Microsoft Entra ID</b>, <b>Google Workspace</b>, <b>Okta</b> or any <b>OpenID Connect</b> provider.</p></div>')
 
@@ -195,19 +195,19 @@ d1 = [("Chat", "Models", "30 · 11 providers", "Prices, context, capabilities an
       ("Code", "Frameworks", "5 SDKs", "Any blueprint as an OpenAI Agents SDK, LangGraph, CrewAI, Agent Framework or ADK project.", "Download it, run its smoke test, or run it live in a sandbox through the governed gateway."),
       ("Link", "Low-code studios", "3 studios", "Importable Langflow flows, n8n workflows and Copilot Studio recipes for any blueprint.", "Give business builders the same agent inside the tool they already use.")]
 section("discover", header("Discover", "Discover: models, blueprints, projects") +
-        f'<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:24px">' + "".join(asset_card(*x) for x in d1) + '</div>')
+        '<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:24px">' + "".join(asset_card(*x) for x in d1) + '</div>')
 
 d2 = [("Cloud", "Cloud platforms", "4 runtimes", "Microsoft Foundry, AWS AgentCore, Google Agent Runtime and Anthropic Managed Agents.", "Sign in from the CLI and follow a deploy guide written for your framework and model."),
       ("Globe", "MCP Marketplace", "7,500 servers", "Servers from the official MCP registry, with ready configuration for seven clients.", "Once an administrator approves one, attach it to agents or use it from Claude, Cursor or VS Code."),
       ("Star", "Popular Git repos", "60 repositories", "The frameworks, harnesses and reference implementations behind the playground, with licences.", "Study working code and start from a proven pattern instead of a blank page."),
       ("Tool", "Skills", "338 packs", "SKILL.md packs for testing, security, data, documents and more.", "Attach them to any agent in the wizard to give it a specialist's playbook.")]
 section("discover2", header("Discover", "Discover: integrations and clouds") +
-        f'<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:24px">' + "".join(asset_card(*x) for x in d2) + '</div>')
+        '<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:24px">' + "".join(asset_card(*x) for x in d2) + '</div>')
 
 def captioned(key, w, h, alt, cap):
     return f'<div style="display:flex; flex-direction:column; gap:16px">{shot(key, w, h, alt)}<p style="font-size:24px; color:{MUTED}">{cap}</p></div>'
 section("screens", header("Discover", "Discover, in the product") +
-        f'<div style="display:flex; gap:104px">'
+        '<div style="display:flex; gap:104px">'
         + captioned("models", 780, 545, "Models page filtered to available models, with price, context and capabilities", "<b>Models</b>: one price sheet, filtered to what you may use")
         + captioned("connectors", 780, 545, "MCP Marketplace with approved servers and ready configuration", "<b>MCP Marketplace</b>: approved servers, ready to connect")
         + '</div>')
@@ -230,7 +230,7 @@ ag = [("Document reconciliation", "Load → extract → validate → quality gat
       ("Data analyst", "Load the file → route the question → compute in code → narrate", "Not needed: every number comes from code"),
       ("Knowledge Q&amp;A", "Retrieve passages → answer with citations → verify each citation", "Sees any answer without valid citations")]
 section("agents", header("Ready-made agents", "Six agents ready on day one") +
-        f'<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:24px">' + "".join(card(
+        '<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:24px">' + "".join(card(
             f'<h3 style="font-size:30px; font-weight:600; line-height:1.2; color:{INK}">{t}</h3>'
             f'<p style="font-size:24px; line-height:1.4; color:{BODY}">{s}</p>'
             f'<p style="font-size:24px; line-height:1.4; color:{PINK}"><b>Person:</b> <span style="color:{BODY}">{p}</span></p>', pad=32, gap=12) for t, s, p in ag) + '</div>')
@@ -246,7 +246,7 @@ code = (f'<div style="background:#14122B; border-radius:20px; padding:32px 40px;
         f'<p style="font-family:{MONO}; font-size:26px; color:#C4B5FD">client = OpenAI(base_url=PLAYGROUND_URL, api_key=PERSONAL_TOKEN)</p>'
         f'<p style="font-family:{MONO}; font-size:26px; color:#E5E7EB">client.chat.completions.create(model=<span style="color:#F9A8D4">"smart"</span>, messages=[...])</p></div>')
 section("anywhere", header("Take it anywhere", "Take any agent anywhere") +
-        f'<div style="display:flex; gap:24px">' + "".join(card(f'{icon(i, VIOLET, 48)}<h3 style="font-size:32px; font-weight:600; color:{INK}">{t}</h3><p style="font-size:24px; line-height:1.4; color:{BODY}">{d}</p>', pad=32, gap=16) for i, t, d in aw) + f'</div>{code}',
+        '<div style="display:flex; gap:24px">' + "".join(card(f'{icon(i, VIOLET, 48)}<h3 style="font-size:32px; font-weight:600; color:{INK}">{t}</h3><p style="font-size:24px; line-height:1.4; color:{BODY}">{d}</p>', pad=32, gap=16) for i, t, d in aw) + f'</div>{code}',
         layout="padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px")
 
 lv = [("Draft", "Runs on mock data"), ("Golden", "Five golden cases and one evaluation"), ("Gated", "The latest evaluation clears the gate"),
@@ -291,7 +291,7 @@ line_embed = ('<x-embed style="position:absolute; left:128px; top:888px; width:1
               '<rect x="0" y="11" width="1664" height="2" fill="#6D28D9"/><g class="b"><rect x="0" y="9" width="300" height="6" rx="3" fill="url(#t)" filter="url(#f)"/>'
               '<rect x="0" y="11" width="300" height="2" fill="url(#t)"/><circle cx="298" cy="12" r="5" fill="#FFFFFF"/></g></svg></x-embed>\n')
 section("numbers", header("Choice without lock-in", "Everything in one catalogue", dark=True) +
-        f'<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:48px">' +
+        '<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:48px">' +
         "".join(f'<div style="display:flex; flex-direction:column; gap:8px"><p style="font-size:120px; font-weight:700; line-height:1; letter-spacing:-2px; color:#FFFFFF">{n}</p><p style="font-size:28px; color:#DDD6FE">{l}</p></div>' for n, l in nums) + '</div>',
         bg=DEEP, extra=line_embed, transition="push")
 
@@ -323,7 +323,7 @@ stack = [("Experience", "Next.js and React; Auth.js sign-in through Entra ID, Go
          ("Platform", "Azure Container Apps, Container Registry and Key Vault, defined as code in Bicep"),
          ("Delivery", "GitHub Actions: lint, tests, end-to-end checks, secret scanning, dependency audit"),
          ("Integrations", "The playground is itself an MCP server for Claude, Cursor and other clients")]
-trs = f'<tr style="background:#F1EFFA"><th style="width:24%; padding:12px 24px; font-weight:600">Layer</th><th style="width:76%; padding:12px 24px; font-weight:600">Built with</th></tr>'
+trs = '<tr style="background:#F1EFFA"><th style="width:24%; padding:12px 24px; font-weight:600">Layer</th><th style="width:76%; padding:12px 24px; font-weight:600">Built with</th></tr>'
 for i, (c, h) in enumerate(stack):
     trs += f'<tr style="background:{"#FFFFFF" if i % 2 == 0 else "#FAF9FE"}"><td style="padding:12px 24px; font-weight:600">{c}</td><td style="padding:12px 24px; color:{BODY}">{h}</td></tr>'
 section("stack", header("Technology", "The technology stack") + f'<table style="width:1664px; font-size:24px; color:{INK}; border:1px solid {BORDER}; border-radius:16px">{trs}</table>')
@@ -355,7 +355,7 @@ pa = [("Activity", "Key health check", "Probes every platform key and raises an 
       ("Chart", "Adoption digest", "Turns the analytics into a short weekly summary with recommendations."),
       ("Star", "Showcase writer", "Drafts a showcase post from a run, for a person to edit and publish.")]
 section("platform", header("Self-running", "Built to run itself") +
-        f'<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:24px">' + "".join(card(
+        '<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:24px">' + "".join(card(
             f'<div style="display:flex; gap:16px; align-items:center">{icon(i, VIOLET, 40)}<h3 style="font-size:30px; font-weight:600; color:{INK}">{t}</h3></div>'
             f'<p style="font-size:24px; line-height:1.4; color:{BODY}">{d}</p>', pad=32, gap=16) for i, t, d in pa) + '</div>'
         f'<p style="font-size:28px; line-height:1.4; color:{BODY}">These platform agents use the same runtime, governance and traces as every business agent.</p>',
@@ -368,7 +368,7 @@ sec = [("Sign-in", "Microsoft Entra ID, Google Workspace, Okta or any OpenID Con
        ("Untrusted code", "Notebooks and framework projects run in isolated sandboxes without egress"),
        ("Data", "One region; calls reach only enabled providers; MCP servers only after approval"),
        ("Change control", "Every release passes tests, end-to-end checks, secret scanning and dependency audit")]
-trs = f'<tr style="background:#F1EFFA"><th style="width:24%; padding:18px 24px; font-weight:600">Concern</th><th style="width:76%; padding:18px 24px; font-weight:600">How it is handled</th></tr>'
+trs = '<tr style="background:#F1EFFA"><th style="width:24%; padding:18px 24px; font-weight:600">Concern</th><th style="width:76%; padding:18px 24px; font-weight:600">How it is handled</th></tr>'
 for i, (c, h) in enumerate(sec):
     trs += f'<tr style="background:{"#FFFFFF" if i % 2 == 0 else "#FAF9FE"}"><td style="padding:18px 24px; font-weight:600">{c}</td><td style="padding:18px 24px; color:{BODY}">{h}</td></tr>'
 section("security", header("Security", "Security and identity") + f'<table style="width:1664px; font-size:24px; color:{INK}; border:1px solid {BORDER}; border-radius:16px">{trs}</table>')
@@ -379,7 +379,7 @@ dp = [("One command", "Provisions registry, database, key vault, sandboxes and b
       ("90–150 USD", "A month at pilot sizing, plus model usage shown per person.")]
 idp = "".join(pill(x, INK, CARD) for x in ("Microsoft Entra ID", "Google Workspace", "Okta", "Any OpenID Connect"))
 section("deploy", header("Deployment", "Runs in your cloud, under your identity") +
-        f'<div style="display:flex; gap:32px">' + "".join(card(f'<h3 style="font-size:40px; font-weight:600; line-height:1.15; color:{VIOLET}">{t}</h3><p style="font-size:28px; line-height:1.4; color:{BODY}">{d}</p>', gap=16) for t, d in dp) + '</div>'
+        '<div style="display:flex; gap:32px">' + "".join(card(f'<h3 style="font-size:40px; font-weight:600; line-height:1.15; color:{VIOLET}">{t}</h3><p style="font-size:28px; line-height:1.4; color:{BODY}">{d}</p>', gap=16) for t, d in dp) + '</div>'
         f'<div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap"><p style="font-size:28px; font-weight:600; color:{INK}">Sign-in</p>{idp}</div>')
 
 # =============================== CLOSE ===============================
@@ -389,7 +389,7 @@ st = [("01", "Deploy", "The playground in your own cloud tenant, from one comman
       ("03", "Configure", "Policies per role, budgets per department and platform keys."),
       ("04", "Adopt", "Run the ready agents, build your own and review adoption weekly.")]
 section("start", header("Getting started", "From pilot to production in four steps") +
-        f'<div style="display:flex; gap:32px">' + "".join(card(
+        '<div style="display:flex; gap:32px">' + "".join(card(
             f'<p style="font-size:64px; font-weight:700; line-height:1; background:{GRAD}; background-clip:text; -webkit-text-fill-color:transparent; color:{VIOLET}">{n}</p>'
             f'<h3 style="font-size:40px; font-weight:600; color:{INK}">{t}</h3><p style="font-size:28px; line-height:1.4; color:{BODY}">{d}</p>', gap=20) for n, t, d in st) + '</div>')
 SECTIONS["s3"] = {"description": "How to start, and contact", "start": "start"}
