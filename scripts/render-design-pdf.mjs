@@ -1,6 +1,6 @@
-// Prints the design overview to docs/DESIGN.pdf in the playground's palette.
-// Step 1 captures a still frame of each animated diagram (docs/images/<name>-still.png) at a moment where the beam is
-// mid-journey; step 2 prints the HTML that scripts/design_html.py produced.
+// Prints the design overview to docs/DESIGN.pdf: white A4 pages set in DM Sans with the playground's accents.
+// Step 1 captures light still frames of the animated diagrams (docs/images/deck/print-<name>.png) with the beam
+// mid-journey; step 2 paginates and prints the HTML that scripts/design_html.py produced.
 //   npm run design:pdf
 import { chromium } from "playwright";
 import { readFileSync, existsSync } from "node:fs";
@@ -9,19 +9,23 @@ import { resolve } from "node:path";
 const HTML = process.argv[2];
 if (!HTML || !existsSync(HTML)) { console.error("usage: node scripts/render-design-pdf.mjs <design.html>"); process.exit(1); }
 
+// Light print stills of the deck's animated diagrams (scripts/deck_diagrams.py), re-set in DM Sans, the PDF's typeface.
 const STILLS = [
-  { name: "architecture-flow", width: 1290, height: 720, at: 4.6 },
-  { name: "workflow-flow", width: 1200, height: 420, at: 5.2 },
+  { name: "hub", width: 820, height: 820, at: 1.2 },
+  { name: "layers", width: 1600, height: 720, at: 4.4 },
+  { name: "run", width: 1600, height: 600, at: 5.6 },
+  { name: "agent", width: 1600, height: 560, at: 10.6 },
 ];
+const FONT_LINK = "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap";
 
 const browser = await chromium.launch();
 for (const s of STILLS) {
-  const svg = readFileSync(resolve("docs/images", `${s.name}.svg`), "utf8");
+  const svg = readFileSync(resolve("docs/images/deck", `${s.name}.svg`), "utf8").replace(/font-family="[^"]*"/, 'font-family="DM Sans, sans-serif"');
   const page = await browser.newPage({ viewport: { width: s.width, height: s.height }, deviceScaleFactor: 2 });
-  await page.setContent(`<!doctype html><html><body style="margin:0;background:#0a0a14">${svg}</body></html>`);
-  await page.evaluate(() => document.fonts.ready);
+  await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="${FONT_LINK}"></head><body style="margin:0;background:#F7F7FB">${svg}</body></html>`, { waitUntil: "networkidle" });
+  await page.evaluate(async () => { await Promise.all(["400", "600", "700"].map((w) => document.fonts.load(`${w} 20px "DM Sans"`))); await document.fonts.ready; });
   await page.evaluate((t) => { const el = document.querySelector("svg"); el.pauseAnimations(); el.setCurrentTime(t); }, s.at);
-  await page.locator("svg").screenshot({ path: resolve("docs/images", `${s.name}-still.png`) });
+  await page.locator("svg").screenshot({ path: resolve("docs/images/deck", `print-${s.name}.png`) });
   await page.close();
 }
 
