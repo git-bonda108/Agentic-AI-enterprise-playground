@@ -22,6 +22,7 @@
     "import:repos": "cd apps/api && uv run python scripts/import_repos.py",
     "sync:docs": "bash scripts/sync-docs.sh",
     "diagrams:gif": "node scripts/render-gifs.mjs && uvx --with pillow python scripts/frames_to_gif.py",
-    "design:pdf": "uvx --with markdown python scripts/design_html.py /tmp/eap-design.html && node scripts/render-design-pdf.mjs /tmp/eap-design.html"
+    "design:pdf": "uvx --with markdown python scripts/design_html.py /tmp/eap-design.html && node scripts/render-design-pdf.mjs /tmp/eap-design.html",
+    "deck:gifs": "python3 scripts/deck_diagrams.py && node scripts/render-deck-gifs.mjs && uvx --with pillow python scripts/deck_gifs.py"
   }
 }

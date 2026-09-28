@@ -12,5 +12,6 @@ for f in "$ROOT"/docs/*.md; do
   cp "$f" "$DEST/$name"
 done
 rm -f "$DEST"/images/*
-cp "$ROOT"/docs/images/* "$DEST/images/"
+# Files only: docs/images/deck holds the client deck's sources, which the API does not serve.
+find "$ROOT/docs/images" -maxdepth 1 -type f -exec cp {} "$DEST/images/" \;
 echo "synced $(ls "$DEST"/*.md | wc -l | tr -d ' ') guides and $(ls "$DEST"/images | wc -l | tr -d ' ') images into apps/api/catalog/docs"

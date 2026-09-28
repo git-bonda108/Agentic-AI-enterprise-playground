@@ -15,7 +15,8 @@ def test_shipped_mirror_matches_the_repository_docs_and_excludes_the_delivery_lo
     for g in GUIDES:
         assert filecmp.cmp(repo / g["file"], mirror / g["file"], shallow=False), f"{g['file']} drifted: run `npm run sync:docs`"
     assert not (mirror / "BATCHES.md").exists() and "BATCHES.md" not in listed
-    assert {p.name for p in (repo / "images").iterdir()} == {p.name for p in (mirror / "images").iterdir()}
+    # Files only: subfolders such as images/deck hold the client deck's sources and are not shipped.
+    assert {p.name for p in (repo / "images").iterdir() if p.is_file()} == {p.name for p in (mirror / "images").iterdir()}
     assert {p.name for p in repo.glob("*.md")} - {"BATCHES.md"} == listed, "every guide in docs/ must be listed in the hub (or be the internal delivery log)"
 
 

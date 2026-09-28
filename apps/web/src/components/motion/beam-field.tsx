@@ -8,7 +8,7 @@ const NODES: Node[] = [
   { id: "models", label: "Models", sub: "Fable to DeepSeek", x: 440, y: 18, w: 150, stroke: "#06b6d4" },
   { id: "fw", label: "Frameworks", sub: "5 SDK flavors", x: 440, y: 78, w: 150, stroke: "#06b6d4" },
   { id: "clouds", label: "Clouds", sub: "Azure, AWS, Google", x: 440, y: 138, w: 150, stroke: "#06b6d4" },
-  { id: "mcp", label: "Connectors", sub: "13k MCP servers", x: 440, y: 198, w: 150, stroke: "#06b6d4" },
+  { id: "mcp", label: "Connectors", sub: "7,500 MCP servers", x: 440, y: 198, w: 150, stroke: "#06b6d4" },
 ];
 
 const PATHS: { id: string; d: string; dur: number; begin: number; color: string }[] = [
