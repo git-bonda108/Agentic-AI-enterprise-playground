@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpDown, BookOpen, Check, ExternalLink, LayoutGrid, Lock, Rows3, Search, Sparkles, KeyRound } from "lucide-react";
+import { ArrowUpDown, BookOpen, Check, ExternalLink, LayoutGrid, Rows3, Search, Sparkles } from "lucide-react";
 import { formatTokens, PROVIDER_ART, type CatalogModel } from "@/lib/playground-types";
 import { cn } from "@/lib/utils";
 import { openKeysDrawer } from "@/components/shell/keys-drawer";
+import { toast } from "sonner";
 
 const TIERS = ["Frontier", "Premium", "Workhorse", "Economy"] as const;
 const TIER_STYLE: Record<string, string> = {
@@ -51,7 +52,7 @@ export function ModelCatalog({ models, smartEnabled }: { models: (CatalogModel &
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Discover</p>
           <h1 className="text-2xl font-semibold tracking-tight">Models</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{models.length} models across {providers.length - 1} providers, one price sheet. Greyed models need a key or a policy change.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{models.length} models across {providers.length - 1} providers, one price sheet. Models without a platform key run on your own key.</p>
         </div>
         {smartEnabled && (
           <Link href="/build/playground?model=smart" className="inline-flex h-9 items-center gap-2 rounded-lg gradient-brand px-3.5 text-sm font-medium text-white shadow-md shadow-violet-900/30">
@@ -90,7 +91,7 @@ export function ModelCatalog({ models, smartEnabled }: { models: (CatalogModel &
       {view === "grid" ? (
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-testid="model-grid">
           {rows.map((m) => (
-            <article key={m.id} className={cn("card-hover flex flex-col overflow-hidden rounded-2xl border bg-card", (!m.available || !m.allowed) && "opacity-70")} aria-label={m.name}>
+            <article key={m.id} className="card-hover flex flex-col overflow-hidden rounded-2xl border bg-card" aria-label={m.name}>
               <div className="relative h-20" style={{ backgroundImage: PROVIDER_ART[m.provider] ?? PROVIDER_ART.Anthropic }}>
                 <div className="absolute inset-0 grid-bg opacity-30" aria-hidden />
                 <span className="absolute left-3 top-3 rounded-md bg-black/25 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur">{m.provider}</span>
@@ -117,15 +118,8 @@ export function ModelCatalog({ models, smartEnabled }: { models: (CatalogModel &
                   {m.available && m.allowed ? (
                     <Link href={`/build/playground?model=${m.id}`} className="inline-flex h-8 items-center gap-1 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground">Try in playground</Link>
                   ) : (
-                    !m.available ? (
-                      <button type="button" onClick={() => openKeysDrawer(m.provider)} className="inline-flex h-8 items-center gap-1 rounded-lg border border-brand-amber/50 px-3 text-xs text-brand-amber hover:bg-brand-amber/10" title={`Add your own ${m.provider} key to use ${m.name}`}>
-                        <KeyRound className="size-3" /> Add your {m.provider} key
-                      </button>
-                    ) : (
-                      <span className="inline-flex h-8 items-center gap-1 rounded-lg border px-3 text-xs text-muted-foreground" title="Not allowed for your role">
-                        <Lock className="size-3" /> Policy
-                      </span>
-                    )
+                    // Every tile looks the same; what a model needs is explained when someone tries it.
+                    <button type="button" onClick={() => tryUnavailable(m)} className="inline-flex h-8 items-center gap-1 rounded-lg bg-primary px-3 text-xs font-medium text-primary-foreground">Try in playground</button>
                   )}
                   <a href={m.docs_url} target="_blank" rel="noreferrer" className="ml-auto inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs text-muted-foreground hover:text-foreground" aria-label={`${m.provider} documentation`}>
                     <BookOpen className="size-3.5" /> Docs <ExternalLink className="size-3" />
@@ -172,4 +166,14 @@ function PriceBar({ label, value, max }: { label: string; value: number; max: nu
       <span className="w-14 text-right font-mono">{price(value)}</span>
     </div>
   );
+}
+
+/** A model without a platform key runs on the person's own key (bring your own key); one outside the role's policy needs an administrator. */
+function tryUnavailable(m: CatalogModel) {
+  if (!m.available) {
+    toast(`${m.name} runs on your own ${m.provider} key`, { description: `No platform key is configured for ${m.provider}. Add your key and it is stored encrypted, used only for your calls and metered to you.` });
+    openKeysDrawer(m.provider);
+    return;
+  }
+  toast(`${m.name} is not enabled for your role`, { description: "Ask an administrator to allow its tier or provider in Admin, Policies." });
 }

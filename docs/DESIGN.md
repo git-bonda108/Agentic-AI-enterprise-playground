@@ -61,7 +61,7 @@ Custom agents built in the wizard use the same runtime: instructions, Knowledge 
 | --- | --- | --- | --- |
 | Home | Console | Credits, spend, tokens, hours by feature, models used | The state of adoption at a glance |
 | Home | Documentation | Every guide, page how-to and the API reference, searchable, inside the product | Nothing to look up elsewhere |
-| Discover | Models | 30 models across 11 providers with prices, context and capabilities; greyed until a key or policy allows them | One price sheet for every model |
+| Discover | Models | 30 models across 11 providers with prices, context and capabilities; each runs on a platform key or your own | One price sheet for every model |
 | Discover | Blueprints | 175 blueprints across six families, Gen AI or Agentic AI, each with two ways to build | Start from something that already works |
 | Discover | Frameworks | The same blueprint as an OpenAI Agents SDK, LangGraph, CrewAI, Microsoft Agent Framework or Google ADK project, run in the sandbox through the gateway | Leave with code that runs |
 | Discover | Low-code studios | Importable Langflow flows and n8n workflows, Copilot Studio recipes | The no-code route to the same agent |
