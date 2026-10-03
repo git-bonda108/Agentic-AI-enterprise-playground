@@ -30,3 +30,4 @@ apps/api/catalog/curation.json
 infra/last-deployment.json
 infra/bicep/*.local.bicepparam
 .run/
+docs/BATCHES.md
